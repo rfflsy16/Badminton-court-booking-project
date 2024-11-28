@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
-import { hashPassword, comparePassword } from "../helpers/bcrypt";
-import { signToken } from "../helpers/jwt";
-import { db } from "../config/mongoDB";
+import { hashPassword, comparePassword } from "../helpers/bcrypt.js";
+import { signToken } from "../helpers/jwt.js";
+import { db } from "../config/mongoDB.js";
 import crypto from "crypto"; // Untuk membuat deviceId secara otomatis
 
 export class User {

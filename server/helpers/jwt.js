@@ -1,10 +1,11 @@
-const jwt = require("jsonwebtoken")
-const secretKey = process.env.JWT_SECRET
+
+import jwt from "jsonwebtoken";
+const secretKey = process.env.JWT_SECRET || "amanaza";
 
 export const signToken = (payload) => {
-    return jwt.sign(payload, secretKey)
-}
+  return jwt.sign(payload, secretKey);
+};
 
 export const verifyToken = (token) => {
-    return jwt.verify(token, secretKey)
-}
+  return jwt.verify(token, secretKey);
+};

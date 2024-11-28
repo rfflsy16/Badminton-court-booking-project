@@ -6,8 +6,8 @@ export class userController {
 
             const result = await User.login(req.body)
             res.status(200).json(result)
-        } catch (error) {
-
+        } catch (err) {
+            next(err)
         }
     }
 
@@ -18,8 +18,8 @@ export class userController {
                 message: "Register Successfully",
                 newUser
             })
-        } catch (error) {
-            next(error)
+        } catch (err) {
+            next(err)
         }
     }
 }

@@ -1,11 +1,11 @@
-import { User } from "../models/user"
+import { User } from "../models/user.js"
 
-export class userController{
+export class userController {
     static async login(req, res, next) {
         try {
-            
+
         } catch (error) {
-            
+
         }
     }
 

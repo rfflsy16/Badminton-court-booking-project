@@ -1,9 +1,16 @@
-import express from "express"
-import { BuildingController } from "../controllers/BuildingController"
+import express from 'express'
+import { BuildingController } from '../controllers/BuildingController.js';
 
-export const router = express.Router()
+export const buildingRouter = express.Router()
 
-router.get("/", BuildingController.getBuilding)
-router.get("/:id", BuildingController.getBuildingById)
-router.post("/", BuildingController.addBuilding)
-router.delete("/", BuildingController.deleteBuilding)
+buildingRouter.post("/", BuildingController.createBuilding);
+
+buildingRouter.get("/", BuildingController.getAllBuildings);
+
+buildingRouter.get("/:id", BuildingController.getBuildingById);
+
+buildingRouter.put("/:id", BuildingController.updateBuilding);
+
+buildingRouter.delete("/:id", BuildingController.deleteBuilding);
+
+buildingRouter.post("/:deviceId/nearest", BuildingController.findNearestBuildings);

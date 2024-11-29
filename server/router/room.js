@@ -1,5 +1,5 @@
 import express from "express"
-import { RoomController } from "../controllers/RoomsController"
+import { RoomController } from "../controllers/RoomsController.js"
 export const router = express.Router()
 
 router.get("/", RoomController.getRoom)

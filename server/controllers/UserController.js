@@ -1,7 +1,6 @@
 import { User } from "../models/user.js";
 
 export class UserController {
-    // Login user
     static async login(req, res, next) {
         try {
             const result = await User.login(req.body);
@@ -11,7 +10,6 @@ export class UserController {
         }
     }
 
-    // Register user
     static async register(req, res, next) {
         try {
             const newUser = await User.register(req.body);
@@ -24,7 +22,6 @@ export class UserController {
         }
     }
 
-    // Update lokasi user
     static async updateUserLocation(req, res, next) {
         try {
             const { deviceId, location } = req.body;
@@ -35,7 +32,6 @@ export class UserController {
         }
     }
 
-    // Mencari building terdekat berdasarkan deviceId
     static async findNearestBuildingsByDeviceId(req, res, next) {
         try {
             const { deviceId } = req.params;

@@ -98,4 +98,30 @@ export default class BuildingModel {
 
         return buildings;
     }
+
+    static async findBuildingByCoordinates(longitude, latitude) {
+        const collection = this.getCollection();
+
+        if (typeof longitude !== 'number' || typeof latitude !== 'number') {
+            throw new Error("Invalid coordinates");
+        }
+
+        const building = await collection.findOne({
+            location: {
+                $nearSphere: {
+                    $geometry: {
+                        type: "Point",
+                        coordinates: [longitude, latitude],
+                    },
+                    $maxDistance: 1000,
+                },
+            },
+        });
+
+        if (!building) {
+            throw new Error("Building not found near the provided coordinates");
+        }
+
+        return building;
+    }
 }

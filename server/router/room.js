@@ -1,6 +1,7 @@
 import express from "express"
 import { RoomController } from "../controllers/RoomsController.js"
 
+
 export default function roomRouter() {
     const router = express.Router()
 

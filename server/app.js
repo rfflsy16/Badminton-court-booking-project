@@ -5,7 +5,7 @@ import cors from "cors";
 import { router } from "./router/index.js"
 const app = express();
 dotenv.config();
-const port = process.env.PORT || 3003;
+const port = process.env.PORT;
 
 
 app.use(cors());

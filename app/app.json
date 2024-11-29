@@ -8,7 +8,7 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "../../assets/ShuttleSpace -logo1 .png",
+      "image": "./assets/logo3.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },

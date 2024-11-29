@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, Alert, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 export default function Register() {
@@ -7,7 +7,13 @@ export default function Register() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Register</Text>
+            {/* Add Logo */}
+            <Image
+                source={require("../../assets/logo2.png")} // Update this path
+                style={styles.logo}
+                resizeMode="contain"
+            />
+            {/* <Text style={styles.title}>Register</Text> */}
 
             <TextInput
                 style={styles.input}
@@ -27,11 +33,6 @@ export default function Register() {
                 placeholder="Password"
                 placeholderTextColor="#aaa"
                 secureTextEntry
-            />
-            <TextInput
-                style={styles.input}
-                placeholder="Profile Image URL"
-                placeholderTextColor="#aaa"
             />
 
             <TouchableOpacity style={styles.registerButton} >
@@ -97,5 +98,11 @@ const styles = StyleSheet.create({
         color: "#1e3c72",
         fontSize: 16,
         fontWeight: "bold",
+    },
+    logo: {
+        width: 150, // Adjust width of the logo
+        height: 150, // Adjust height of the logo
+        marginTop: 30,
+        marginBottom: 5,
     },
 });

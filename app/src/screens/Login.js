@@ -10,11 +10,11 @@ export default function Login() {
         <View style={styles.container}>
             {/* Add Logo */}
             <Image
-                source={require("../../assets/ShuttleSpace -logo1 .png")} // Update this path
+                source={require("../../assets/logo3.png")} // Update this path
                 style={styles.logo}
                 resizeMode="contain"
             />
-            <Text style={styles.title}>Welcome Back!</Text>
+            {/* <Text style={styles.title}>Welcome Back!</Text> */}
 
             <TextInput
                 style={styles.input}
@@ -32,6 +32,15 @@ export default function Login() {
             <TouchableOpacity style={styles.loginButton}>
                 <Text style={styles.loginButtonText}>Log In</Text>
             </TouchableOpacity>
+
+            <View >
+                <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+                    <Text >
+                        Home
+                    </Text>
+                </TouchableOpacity>
+            </View>
+
 
             <View style={styles.bottomBanner}>
                 <TouchableOpacity onPress={() => navigation.navigate("Register")}>
@@ -92,8 +101,8 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
     },
     logo: {
-        width: 100, // Adjust width of the logo
-        height: 100, // Adjust height of the logo
+        width: 100,
+        height: 100,
         marginTop: 30,
         marginBottom: 5,
     },

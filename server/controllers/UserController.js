@@ -3,6 +3,8 @@ import { User } from "../models/user.js";
 export class UserController {
     static async login(req, res, next) {
         try {
+
+            console.log(req.body, "<<<<<<<< ini dari controller")
             const result = await User.login(req.body);
             res.status(200).json(result);
         } catch (err) {

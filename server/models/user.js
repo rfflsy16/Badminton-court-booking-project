@@ -16,7 +16,7 @@ export class User {
     const collection = this.getCollection();
     return await collection.find().toArray();
   }
-  
+
   // Mendapatkan user berdasarkan ID
   static async getById(id) {
     const _id = new ObjectId(id);
@@ -60,12 +60,17 @@ export class User {
 
   // Login user
   static async login(body) {
+
+    console.log(body, "<<<<< ini dari model")
     const { email, password } = body;
     const collection = this.getCollection();
 
+    console.log(email, password, "<<<<<<< ini setelah distructer")
+
     if (!email || !password) {
-      throw { name: "BadRequest" };
+      throw { name: "NotFound" };
     }
+
 
     // Cari user berdasarkan email
     const user = await collection.findOne({ email });

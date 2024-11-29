@@ -1,7 +1,11 @@
 import express from "express"
 import { MessageController } from "../controllers/MessageController.js"
 
-export const router = express.Router()
+export default function messageRouter() {
+    const router = express.Router()
+    router.get("/", MessageController.getMessage)
+    router.get("/", MessageController.postMessage)
+    
+}
 
-router.get("/", MessageController.getMessage)
-router.get("/", MessageController.postMessage)
+

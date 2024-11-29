@@ -1,6 +1,5 @@
-import { verifyToken } from "../helpers/jwt";
-import { User } from "../models/user";
-
+import { verifyToken } from "../helpers/jwt.js";
+import { User } from "../models/user.js";
 export const authentication = async (req, res, next) => {
         try {
             const { authorization } = req.headers

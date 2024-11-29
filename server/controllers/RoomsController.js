@@ -1,9 +1,35 @@
-export default class RoomController {
-    static async read(req, res, next) {
-        try {
 
+
+export class RoomController{
+    static async getRoom(req, res, next) {
+        try {
+            
         } catch (error) {
-            console.error(error)
+            
+        }
+    }
+
+    static async getRoomById(req, res, next) {
+        try {
+            
+        } catch (error) {
+            
+        }
+    }
+
+    static async addRoom(req, res, next) {
+        try {
+            
+        } catch (error) {
+            
+        }
+    }
+
+    static async deleteRoom(req, res, next) {
+        try {
+            
+        } catch (error) {
+            
         }
     }
 }

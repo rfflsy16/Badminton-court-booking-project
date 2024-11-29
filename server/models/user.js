@@ -14,7 +14,6 @@ export class User {
     const collection = this.getCollection();
     return await collection.find().toArray();
   }
-  Postman
   // Mendapatkan user berdasarkan ID
   static async getById(id) {
     const _id = new ObjectId(id);

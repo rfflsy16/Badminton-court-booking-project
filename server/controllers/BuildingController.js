@@ -1,5 +1,5 @@
 import BuildingModel from "../models/building.js";
-import { User } from "../models/user.js";  // Import User model untuk mendapatkan lokasi berdasarkan deviceId
+import { User } from "../models/user.js";
 
 export class BuildingController {
     static async createBuilding(req, res, next) {
@@ -15,9 +15,11 @@ export class BuildingController {
     }
 
     static async getAllBuildings(req, res, next) {
+        console.log('masukkk')
         try {
             const buildings = await BuildingModel.readBuilding();
-            res.status(200).json(buildings);
+            // console.log(buildings, '<<<<<<< ini building model')
+            res.status(200).json({ buildings });
         } catch (err) {
             next(err);
         }
@@ -26,6 +28,9 @@ export class BuildingController {
     static async getBuildingById(req, res, next) {
         try {
             const { id } = req.params;
+
+            if (id.length < 24) throw { name: 'InvalidInputID' }
+
             const building = await BuildingModel.readByIdBuilding(id);
             res.status(200).json(building);
         } catch (err) {

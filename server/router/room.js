@@ -8,5 +8,7 @@ export default function roomRouter() {
     router.get("/", RoomController.getRoom)
     router.get("/:id", RoomController.getRoomById)
     router.post("/", RoomController.addRoom)
+
+    return router
 }
 

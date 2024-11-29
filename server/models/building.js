@@ -15,10 +15,10 @@ export default class BuildingModel {
     static async readByIdBuilding(id) {
         const _id = new ObjectId(id);
         const collection = this.getCollection();
-        const building = await collection.findOne({ _id });
 
+        const building = await collection.findOne({ _id });
         if (!building) {
-            throw new Error("Building not found");
+            throw { name: "BuildingNotFound" };
         }
 
         return building;
@@ -28,7 +28,7 @@ export default class BuildingModel {
         const { name, address, location } = body;
 
         if (!name || !address || !location || !location.type || !location.coordinates) {
-            throw new Error("Invalid data. Provide name, address, and a valid location.");
+            return new Error("Invalid data. Provide name, address, and a valid location.");
         }
 
         const collection = this.getCollection();
@@ -41,7 +41,7 @@ export default class BuildingModel {
         };
 
         const result = await collection.insertOne(newBuilding);
-        return result.ops[0];
+        return result.ops;
     }
 
     static async updateBuilding(id, body) {
@@ -75,7 +75,7 @@ export default class BuildingModel {
         const result = await collection.deleteOne({ _id });
 
         if (result.deletedCount === 0) {
-            throw new Error("Building not found");
+            throw { name: 'BuildingNotFound' }
         }
 
         return { message: "Building deleted successfully" };
@@ -118,8 +118,10 @@ export default class BuildingModel {
             },
         });
 
+        console.log(building, '<<<<<<')
+
         if (!building) {
-            throw new Error("Building not found near the provided coordinates");
+            throw { name: 'BuildingNotFound' }
         }
 
         return building;

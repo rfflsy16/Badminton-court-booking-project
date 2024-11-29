@@ -22,6 +22,11 @@ export const errorHandler = (err, req, res, next) => {
         status = 401
     }
 
+    if (err.name === 'InvalidInputID') {
+        message = 'input must be a 24 character hex string'
+        status = 400
+    }
+
     if (err.name == 'LoginError') {
         message = 'Invalid email or password'
         status = 401
@@ -50,6 +55,11 @@ export const errorHandler = (err, req, res, next) => {
     if (err.name === "LoginError" || err.name === "EmailUnique") {
         status = 400
         message = 'Invalid Credentials'
+    }
+
+    if (err.name === 'BuildingNotFound') {
+        status = 404
+        message = 'Cannot find GOR'
     }
     res.status(status).json({
         message

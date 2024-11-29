@@ -12,10 +12,10 @@ router.post("/register", UserController.register)
 router.post("/login", UserController.login)
 
 router.use(authentication)
-router.get("/profile")
-router.use("/buildings", buildingRouter)
-router.use("/room", roomRouter)
-router.use("/message", messageRouter)
+// router.get("/profile")
+router.use("/buildings", buildingRouter())
+router.use("/room", roomRouter())
+router.use("/message", messageRouter())
 
 
 

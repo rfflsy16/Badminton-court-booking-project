@@ -16,7 +16,7 @@ export class User {
     const collection = this.getCollection();
     return await collection.find().toArray();
   }
-  
+
   // Mendapatkan user berdasarkan ID
   static async getById(id) {
     const _id = new ObjectId(id);
@@ -47,15 +47,14 @@ export class User {
       email,
       password: hashedPassword,
       role,
-      imgUrl: defaultImgUrl, // Diisi otomatis
+      imgUrl: defaultImgUrl,
       deviceId: generatedDeviceId, // Diisi otomatis
       createdAt: new Date(),
       updatedAt: new Date(),
-      location: null, // Lokasi default null
     };
 
     const result = await collection.insertOne(newUser);
-    return result.ops[0];
+    return result.ops;
   }
 
   // Login user
@@ -88,6 +87,13 @@ export class User {
       message: "Login successful",
       access_token,
     };
+  }
+
+  static async findByEmail(email) {
+    const collection = this.getCollection()
+    const findUser = await collection.findOne({ email: email })
+    if (!findUser) throw { name: 'NotFound' }
+    return findUser
   }
 
   static async updateUserLocation(deviceId, location) {

@@ -12,11 +12,8 @@ export const authentication = async (req, res, next) => {
 
         const payload = verifyToken(access_token)
 
-        const user = await User.findOne({
-            where: {
-                email: payload.email
-            }
-        })
+        const user = await User.findByEmail(payload.email)
+
 
         if (!user) throw { name: "Unauthorized" }
 

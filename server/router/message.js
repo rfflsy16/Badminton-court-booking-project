@@ -5,7 +5,8 @@ export default function messageRouter() {
     const router = express.Router()
     router.get("/", MessageController.getMessage)
     router.get("/", MessageController.postMessage)
-    
+
+    return router
 }
 
 

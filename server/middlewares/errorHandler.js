@@ -42,6 +42,15 @@ export const errorHandler = (err, req, res, next) => {
         message = `Data not found`
     }
 
+    if (err.name === "ValidationError") {
+        status = 400
+        message = err.message
+    }
+
+    if (err.name === "LoginError" || err.name === "EmailUnique") {
+        status = 400
+        message = 'Invalid Credentials'
+    }
     res.status(status).json({
         message
     })

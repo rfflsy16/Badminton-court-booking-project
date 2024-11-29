@@ -1,5 +1,6 @@
 
 
+
 export class BookingController{
     static async getBooking(req, res, next) {
         try {

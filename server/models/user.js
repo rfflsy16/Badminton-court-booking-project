@@ -1,12 +1,14 @@
+import { db } from "../config/mongoDB.js";
 import { ObjectId } from "mongodb";
+import crypto from "crypto";
 import { hashPassword, comparePassword } from "../helpers/bcrypt.js";
 import { signToken } from "../helpers/jwt.js";
-import { db } from "../config/mongoDB.js";
-import crypto from "crypto"; // Untuk membuat deviceId secara otomatis
+import BuildingModel from "./building.js";
 
 export class User {
+  // Mendapatkan koleksi Users
   static getCollection() {
-    return db.collection('Users');
+    return db.collection("Users");
   }
 
   // Mendapatkan semua user
@@ -14,6 +16,7 @@ export class User {
     const collection = this.getCollection();
     return await collection.find().toArray();
   }
+  
   // Mendapatkan user berdasarkan ID
   static async getById(id) {
     const _id = new ObjectId(id);
@@ -35,11 +38,10 @@ export class User {
     // Hash password
     const hashedPassword = hashPassword(password);
 
-    // Hooks untuk imgUrl dan deviceIduser
-    const defaultImgUrl = "https://example.com/default-profile.png"; // Ganti dengan URL gambar default
-    const generatedDeviceId = crypto.randomBytes(16).toString("hex"); // Membuat deviceId unik
+    const defaultImgUrl = "https://example.com/default-profile.png";
+    const generatedDeviceId = crypto.randomBytes(16).toString("hex");
 
-    // Buat data user baru
+    // Data user baru
     const newUser = {
       fullName,
       email,
@@ -49,11 +51,11 @@ export class User {
       deviceId: generatedDeviceId, // Diisi otomatis
       createdAt: new Date(),
       updatedAt: new Date(),
+      location: null, // Lokasi default null
     };
 
-    // Masukkan ke database
     const result = await collection.insertOne(newUser);
-    return result
+    return result.ops[0];
   }
 
   // Login user
@@ -62,30 +64,72 @@ export class User {
     const collection = this.getCollection();
 
     if (!email || !password) {
-      throw { name: 'BadRequest' }
+      throw { name: "BadRequest" };
     }
 
     // Cari user berdasarkan email
-
     const user = await collection.findOne({ email });
-    if (!user) throw { name: "LoginError" }
+    if (!user) throw { name: "LoginError" };
 
     // Cocokkan password
     if (!comparePassword(password, user.password)) {
-      throw { name: "LoginError" }
+      throw { name: "LoginError" };
     }
 
     const payload = {
       id: user._id,
       email: user.email,
-      role: user.role
-    }
+      role: user.role,
+    };
 
-    const access_token = signToken(payload)
+    const access_token = signToken(payload);
 
     return {
       message: "Login successful",
-      access_token
+      access_token,
     };
+  }
+
+  static async updateUserLocation(deviceId, location) {
+    const collection = this.getCollection();
+
+    if (!location || !location.coordinates || location.coordinates.length !== 2) {
+      throw new Error("Invalid location data");
+    }
+
+    const updateData = {
+      location: {
+        type: "Point",
+        coordinates: location.coordinates, // [longitude, latitude]
+      },
+      updatedAt: new Date(),
+    };
+
+    const result = await collection.findOneAndUpdate(
+      { deviceId },
+      { $set: updateData },
+      { returnDocument: "after" }
+    );
+
+    if (!result.value) {
+      throw new Error("User not found");
+    }
+
+    return result.value;
+  }
+
+  static async findNearestBuildings(deviceId) {
+    const collection = this.getCollection();
+
+    const user = await collection.findOne({ deviceId });
+    if (!user || !user.location) {
+      throw new Error("User location not found");
+    }
+
+    const userLocation = user.location.coordinates;
+
+    // Menemukan building terdekat
+    const buildings = await BuildingModel.findNearestBuildings(userLocation, 1000); // max distance 1km
+    return buildings;
   }
 }

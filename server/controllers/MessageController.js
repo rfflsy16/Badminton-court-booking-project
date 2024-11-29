@@ -1,5 +1,6 @@
 
 
+
 export class MessageController{
     static async getMessage(req, res, next) {
         try {

@@ -1,5 +1,6 @@
-import { StyleSheet, View, Text, TextInput, TouchableOpacity } from "react-native";
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+
 
 
 export default function Login() {
@@ -7,7 +8,13 @@ export default function Login() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>ShuttleSpace</Text>
+            {/* Add Logo */}
+            <Image
+                source={require("../../assets/ShuttleSpace -logo1 .png")} // Update this path
+                style={styles.logo}
+                resizeMode="contain"
+            />
+            <Text style={styles.title}>Welcome Back!</Text>
 
             <TextInput
                 style={styles.input}
@@ -28,7 +35,7 @@ export default function Login() {
 
             <View style={styles.bottomBanner}>
                 <TouchableOpacity onPress={() => navigation.navigate("Register")}>
-                    <Text style={styles.registerBannerText}>
+                    <Text style={styles.LoginBannerText}>
                         Don't have an account? Register
                     </Text>
                 </TouchableOpacity>
@@ -46,11 +53,11 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     title: {
-        fontSize: 28,
-        color: "#000",
+        fontSize: 40,
+        color: "#1e3c72",
         fontWeight: "bold",
         marginBottom: 20,
-        marginTop: 50,
+        marginTop: 10,
     },
     input: {
         width: "100%",
@@ -79,9 +86,15 @@ const styles = StyleSheet.create({
         alignItems: "center",
         marginBottom: 50,
     },
-    registerBannerText: {
+    LoginBannerText: {
         color: "#1e3c72",
         fontSize: 16,
         fontWeight: "bold",
+    },
+    logo: {
+        width: 100, // Adjust width of the logo
+        height: 100, // Adjust height of the logo
+        marginTop: 30,
+        marginBottom: 5,
     },
 });

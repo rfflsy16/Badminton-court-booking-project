@@ -23,6 +23,7 @@ const StackNavigator = createNativeStackNavigator({
             end={{ x: 1, y: 0 }}
           />
         ),
+        headerBackVisible: false
       },
     },
     Register: {
@@ -38,6 +39,7 @@ const StackNavigator = createNativeStackNavigator({
             end={{ x: 1, y: 0 }}
           />
         ),
+        headerBackVisible: false
       },
     }
   }

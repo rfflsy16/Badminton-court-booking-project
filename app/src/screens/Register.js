@@ -3,6 +3,8 @@ import { StyleSheet, View, Text, TextInput, TouchableOpacity, Alert } from "reac
 import { useNavigation } from "@react-navigation/native";
 
 export default function Register() {
+    const navigation = useNavigation()
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Register</Text>
@@ -36,6 +38,14 @@ export default function Register() {
                 <Text style={styles.registerButtonText}>Sign Up</Text>
             </TouchableOpacity>
 
+            <View style={styles.bottomBanner}>
+                <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+                    <Text style={styles.registerBannerText}>
+                        Already have an account? Login
+                    </Text>
+                </TouchableOpacity>
+            </View>
+
             {/* {error && <Text style={{ color: 'red', marginTop: 10 }}>Error: {error.message}</Text>} */}
         </View>
     );
@@ -51,7 +61,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 28,
-        color: '#000',
+        color: '#1e3c72',
         fontWeight: 'bold',
         marginBottom: 20,
         marginTop: 50
@@ -64,6 +74,13 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         marginVertical: 10,
     },
+    bottomBanner: {
+        position: "absolute",
+        bottom: 20,
+        width: "100%",
+        alignItems: "center",
+        marginBottom: 50,
+    },
     registerButton: {
         backgroundColor: '#1e3c72',
         paddingVertical: 15,
@@ -75,5 +92,10 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
+    },
+    registerBannerText: {
+        color: "#1e3c72",
+        fontSize: 16,
+        fontWeight: "bold",
     },
 });

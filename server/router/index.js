@@ -1,13 +1,23 @@
 import express from 'express'
 import { UserController } from '../controllers/UserController.js'
 import { errorHandler } from '../middlewares/errorHandler.js'
-import { buildingRouter } from './building.js'
+import { authentication } from '../middlewares/authentication.js'
+import buildings from "./buildings.js"
+import room from "./room.js"
+import message from "./message.js"
 
 export const router = express.Router()
 
 router.post("/register", UserController.register)
 router.post("/login", UserController.login)
 
-router.use('/buildings', buildingRouter)
+
+router.use(authentication)
+router.get("/profile")
+router.use("/buildings",buildings)
+router.use("/room", room)
+router.use("/message", message)
+
+
 
 router.use(errorHandler)

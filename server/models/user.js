@@ -16,7 +16,7 @@ export class User {
     const collection = this.getCollection();
     return await collection.find().toArray();
   }
-
+  
   // Mendapatkan user berdasarkan ID
   static async getById(id) {
     const _id = new ObjectId(id);
@@ -90,7 +90,6 @@ export class User {
     };
   }
 
-  // Update lokasi user berdasarkan deviceId
   static async updateUserLocation(deviceId, location) {
     const collection = this.getCollection();
 
@@ -119,7 +118,6 @@ export class User {
     return result.value;
   }
 
-  // Mencari building terdekat berdasarkan deviceId
   static async findNearestBuildings(deviceId) {
     const collection = this.getCollection();
 

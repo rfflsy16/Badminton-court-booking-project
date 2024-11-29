@@ -1,9 +1,19 @@
-export default class PaymentController {
-    static async read(req, res, next) {
-        try {
 
+
+export class PaymentController{
+    static async getPayment(req, res, next) {
+        try {
+            
         } catch (error) {
-            console.error(error)
+            
+        }
+    }
+
+    static async addPayment(req, res, next) {
+        try {
+            
+        } catch (error) {
+            
         }
     }
 }

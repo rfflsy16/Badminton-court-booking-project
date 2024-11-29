@@ -5,6 +5,8 @@ import { createStaticNavigation } from "@react-navigation/native";
 import Login from './src/screens/Login';
 import { LinearGradient } from 'expo-linear-gradient';
 import Register from './src/screens/Register';
+import Home from './src/screens/Home';
+import BottomTabNavigator from './src/components/BottomTabNavigator';
 
 
 
@@ -23,6 +25,7 @@ const StackNavigator = createNativeStackNavigator({
             end={{ x: 1, y: 0 }}
           />
         ),
+        headerBackVisible: false
       },
     },
     Register: {
@@ -38,6 +41,23 @@ const StackNavigator = createNativeStackNavigator({
             end={{ x: 1, y: 0 }}
           />
         ),
+        headerBackVisible: false
+      },
+    },
+    Home: {
+      screen: Home,
+      options: {
+        title: "Home",
+        headerTintColor: "white",
+        headerBackground: () => (
+          <LinearGradient
+            colors={['#1e3c72', '#dcedc1']}
+            style={{ flex: 1 }}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+          />
+        ),
+        headerBackVisible: false
       },
     }
   }

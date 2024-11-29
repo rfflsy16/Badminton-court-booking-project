@@ -3,10 +3,11 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import * as OutlineIcons from 'react-native-heroicons/outline';
 import * as SolidIcons from 'react-native-heroicons/solid';
 import Home from '../screens/Home';
-// Uncomment these when screens are available
-// import BookingScreen from '../screens/BookingScreen';
-// import ChatScreen from '../screens/ChatScreen';
-// import ProfileScreen from '../screens/ProfileScreen';
+import Booking from '../screens/Booking';
+import Chat from '../screens/Chat';
+import Profile from '../screens/Profile';
+import AvailableCourts from '../screens/AvailableCourts';
+
 
 const Tab = createBottomTabNavigator();
 
@@ -19,7 +20,7 @@ export default function BottomTabNavigator() {
                     backgroundColor: '#fff',
                     borderTopWidth: 1,
                     borderTopColor: '#f1f1f1',
-                    height: 60,
+                    height: 85,
                     paddingBottom: 8,
                     paddingTop: 8,
                     elevation: 4,
@@ -45,10 +46,21 @@ export default function BottomTabNavigator() {
                         ),
                 }}
             />
-            {/* Uncomment other tabs when the screens are ready */}
-            {/* <Tab.Screen
+            <Tab.Screen
+                name="Courts"
+                component={AvailableCourts}
+                options={{
+                    tabBarIcon: ({ focused, color }) =>
+                        focused ? (
+                            <SolidIcons.HomeIcon size={24} color={color} />
+                        ) : (
+                            <OutlineIcons.HomeIcon size={24} color={color} />
+                        ),
+                }}
+            />
+            <Tab.Screen
                 name="Booking"
-                component={BookingScreen}
+                component={Booking}
                 options={{
                     tabBarIcon: ({ focused, color }) =>
                         focused ? (
@@ -60,28 +72,29 @@ export default function BottomTabNavigator() {
             />
             <Tab.Screen
                 name="Chat"
-                component={ChatScreen}
+                component={Chat}
                 options={{
                     tabBarIcon: ({ focused, color }) =>
                         focused ? (
-                            <SolidIcons.ChatBubbleLeftIcon size={24} color={color} />
+                            <SolidIcons.ChatBubbleOvalLeftEllipsisIcon size={24} color={color} />
                         ) : (
-                            <OutlineIcons.ChatBubbleLeftIcon size={24} color={color} />
+                            <OutlineIcons.ChatBubbleOvalLeftEllipsisIcon size={24} color={color} />
                         ),
                 }}
             />
             <Tab.Screen
                 name="Profile"
-                component={ProfileScreen}
+                component={Profile}
                 options={{
                     tabBarIcon: ({ focused, color }) =>
                         focused ? (
-                            <SolidIcons.UserIcon size={24} color={color} />
+                            <SolidIcons.UserCircleIcon size={24} color={color} />
                         ) : (
-                            <OutlineIcons.UserIcon size={24} color={color} />
+                            <OutlineIcons.UserCircleIcon size={24} color={color} />
                         ),
                 }}
-            /> */}
+            />
+
         </Tab.Navigator>
     );
 }

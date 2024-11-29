@@ -10,11 +10,11 @@ export default function Login() {
         <View style={styles.container}>
             {/* Add Logo */}
             <Image
-                source={require("../../assets/logo3.png")} // Update this path
+                source={require("../../assets/logo4.png")}
                 style={styles.logo}
                 resizeMode="contain"
             />
-            {/* <Text style={styles.title}>Welcome Back!</Text> */}
+            <Text style={styles.title}>Welcome Back!</Text>
 
             <TextInput
                 style={styles.input}
@@ -34,7 +34,7 @@ export default function Login() {
             </TouchableOpacity>
 
             <View >
-                <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+                <TouchableOpacity onPress={() => navigation.navigate("HomeNavigator")}>
                     <Text >
                         Home
                     </Text>
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     title: {
-        fontSize: 40,
+        fontSize: 20,
         color: "#1e3c72",
         fontWeight: "bold",
         marginBottom: 20,
@@ -101,8 +101,8 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
     },
     logo: {
-        width: 100,
-        height: 100,
+        width: 50,
+        height: 50,
         marginTop: 30,
         marginBottom: 5,
     },

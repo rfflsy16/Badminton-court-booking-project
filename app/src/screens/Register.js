@@ -1,108 +1,194 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Alert, Image } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
+import { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 
 export default function Register() {
-    const navigation = useNavigation()
+  const navigation = useNavigation();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-    return (
-        <View style={styles.container}>
-            {/* Add Logo */}
-            <Image
-                source={require("../../assets/logo2.png")} // Update this path
-                style={styles.logo}
-                resizeMode="contain"
-            />
-            {/* <Text style={styles.title}>Register</Text> */}
+  const handleRegister = () => {
+    // TODO: Implement register logic
+    console.log("Register with:", name, email, password);
+  };
 
-            <TextInput
-                style={styles.input}
-                placeholder="Full Name"
-                placeholderTextColor="#aaa"
-            />
-
-
-            <TextInput
-                style={styles.input}
-                placeholder="Email"
-                placeholderTextColor="#aaa"
-            />
-
-            <TextInput
-                style={styles.input}
-                placeholder="Password"
-                placeholderTextColor="#aaa"
-                secureTextEntry
-            />
-
-            <TouchableOpacity style={styles.registerButton} >
-                <Text style={styles.registerButtonText}>Sign Up</Text>
-            </TouchableOpacity>
-
-            <View style={styles.bottomBanner}>
-                <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-                    <Text style={styles.registerBannerText}>
-                        Already have an account? Login
-                    </Text>
-                </TouchableOpacity>
-            </View>
-
-            {/* {error && <Text style={{ color: 'red', marginTop: 10 }}>Error: {error.message}</Text>} */}
+  return (
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.headerContainer}>
+          <Image 
+            source={{ uri: 'https://cdn-icons-png.flaticon.com/512/491/491935.png' }}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <Text style={styles.title}>Create Account</Text>
+          <Text style={styles.subtitle}>Sign up to get started</Text>
         </View>
-    );
+
+        <View style={styles.formContainer}>
+          <View style={styles.inputContainer}>
+            <Ionicons name="person-outline" size={20} color="#94A3B8" style={styles.inputIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Full Name"
+              value={name}
+              onChangeText={setName}
+              autoCapitalize="words"
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Ionicons name="mail-outline" size={20} color="#94A3B8" style={styles.inputIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Ionicons name="lock-closed-outline" size={20} color="#94A3B8" style={styles.inputIcon} />
+            <TextInput
+              style={[styles.input, { flex: 1 }]}
+              placeholder="Password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+            />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+              <Ionicons 
+                name={showPassword ? "eye-outline" : "eye-off-outline"} 
+                size={20} 
+                color="#94A3B8" 
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Ionicons name="lock-closed-outline" size={20} color="#94A3B8" style={styles.inputIcon} />
+            <TextInput
+              style={[styles.input, { flex: 1 }]}
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry={!showConfirmPassword}
+            />
+            <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+              <Ionicons 
+                name={showConfirmPassword ? "eye-outline" : "eye-off-outline"} 
+                size={20} 
+                color="#94A3B8" 
+              />
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
+            <Text style={styles.registerButtonText}>Sign Up</Text>
+          </TouchableOpacity>
+
+          <View style={styles.loginContainer}>
+            <Text style={styles.loginText}>Already have an account? </Text>
+            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+              <Text style={styles.loginLink}>Sign In</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        paddingHorizontal: 20,
-    },
-    title: {
-        fontSize: 28,
-        color: '#1e3c72',
-        fontWeight: 'bold',
-        marginBottom: 20,
-        marginTop: 50
-    },
-    input: {
-        width: '100%',
-        backgroundColor: '#f8fbfc',
-        color: '#fff',
-        padding: 15,
-        borderRadius: 8,
-        marginVertical: 10,
-    },
-    bottomBanner: {
-        position: "absolute",
-        bottom: 20,
-        width: "100%",
-        alignItems: "center",
-        marginBottom: 50,
-    },
-    registerButton: {
-        backgroundColor: '#1e3c72',
-        paddingVertical: 15,
-        paddingHorizontal: 40,
-        borderRadius: 8,
-        marginTop: 20,
-    },
-    registerButtonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    registerBannerText: {
-        color: "#1e3c72",
-        fontSize: 16,
-        fontWeight: "bold",
-    },
-    logo: {
-        width: 150, // Adjust width of the logo
-        height: 150, // Adjust height of the logo
-        marginTop: 30,
-        marginBottom: 5,
-    },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  scrollContent: {
+    flexGrow: 1,
+    padding: 20,
+  },
+  headerContainer: {
+    alignItems: "center",
+    marginTop: 40,
+    marginBottom: 30,
+  },
+  logo: {
+    width: 80,
+    height: 80,
+    marginBottom: 16,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#1F2937",
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "#94A3B8",
+  },
+  formContainer: {
+    marginTop: 20,
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F8FAFC",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    marginBottom: 16,
+    height: 56,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+  },
+  inputIcon: {
+    marginRight: 12,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    color: "#1F2937",
+  },
+  registerButton: {
+    backgroundColor: "#EA580C",
+    borderRadius: 12,
+    height: 56,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 8,
+    marginBottom: 24,
+  },
+  registerButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  loginContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loginText: {
+    color: "#94A3B8",
+    fontSize: 14,
+  },
+  loginLink: {
+    color: "#EA580C",
+    fontSize: 14,
+    fontWeight: "600",
+  },
 });

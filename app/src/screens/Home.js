@@ -1,132 +1,114 @@
-import React, { useState } from 'react';
-import {
-    StyleSheet,
-    View,
-    Text,
-    Image,
-    TextInput,
-    ScrollView,
-    TouchableOpacity,
-    Dimensions,
-    TabView
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-
-const carouselData = [
-    {
-        id: '1',
-        image: 'https://cove-blog-id.sgp1.cdn.digitaloceanspaces.com/cove-blog-id/2023/12/GOR-Cempaka-Putih--2-.webp',
-        title: 'GOR Cempaka Putih',
-    },
-    {
-        id: '2',
-        image: 'https://cove-blog-id.sgp1.cdn.digitaloceanspaces.com/cove-blog-id/2023/12/GOR-Cempaka-Putih--2-.webp',
-        title: 'GOR Senayan',
-    },
-    {
-        id: '3',
-        image: 'https://cove-blog-id.sgp1.cdn.digitaloceanspaces.com/cove-blog-id/2023/12/GOR-Cempaka-Putih--2-.webp',
-        title: 'GOR Rawamangun',
-    },
-];
-
-const popularCourts = [
-    {
-        id: '1',
-        name: 'Shuttle Arena',
-        image: 'https://via.placeholder.com/300',
-        price: 'Rp 150.000/jam',
-    },
-    {
-        id: '2',
-        name: 'Smash Court',
-        image: 'https://via.placeholder.com/300',
-        price: 'Rp 200.000/jam',
-    },
-    {
-        id: '3',
-        name: 'Rally Zone',
-        image: 'https://via.placeholder.com/300',
-        price: 'Rp 180.000/jam',
-    },
-];
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 export default function Home() {
-    const [index, setIndex] = useState(0);
+    const navigation = useNavigation();
+
+    const featuredCourts = [
+        {
+            id: 1,
+            name: 'Court 1',
+            price: 'Rp 50.000',
+            rating: '4.5',
+            image: 'https://images.unsplash.com/photo-1534158914592-062992fbe900?q=80&w=3784&auto=format'
+        },
+        {
+            id: 2,
+            name: 'Court 2',
+            price: 'Rp 50.000',
+            rating: '4.5',
+            image: 'https://images.unsplash.com/photo-1521537634581-0dced2fee2ef?q=80&w=4140&auto=format&fit=crop'
+        },
+        {
+            id: 3,
+            name: 'Court 3',
+            price: 'Rp 50.000',
+            rating: '4.5',
+            image: 'https://images.unsplash.com/photo-1613918108466-292b78a8ef95?q=80&w=3776&auto=format&fit=crop'
+        }
+    ];
+
     return (
-        <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        <View style={styles.container}>
             {/* Header */}
-            {/* <View style={styles.header}>
-                <Image source={require('../../assets/logo3.png')} style={styles.logo} />
-                <Text style={styles.title}>Shuttlecock Space</Text>
-                <Ionicons name="notifications-outline" size={24} color="#333" />
-            </View> */}
-
-            {/* Search Section */}
-            <View style={styles.searchSection}>
-                {/* <Text style={styles.tagline}>#BadmintonSehat</Text>
-                <Text style={styles.subTagline}>Cari & Booking Lapangan Mudah</Text> */}
-                <View style={styles.searchBox}>
-                    <Ionicons name="search" size={20} color="#aaa" />
-                    <TextInput
-                        placeholder="Mau cari lapangan dimana?"
-                        placeholderTextColor="#aaa"
-                        style={styles.searchInput}
-                    />
+            <View style={styles.header}>
+                <View>
+                    <Text style={styles.greeting}>Hello, User! 👋</Text>
+                    <Text style={styles.subtitle}>Find and book your court</Text>
                 </View>
+                <TouchableOpacity style={styles.notificationButton}>
+                    <Ionicons name="notifications-outline" size={24} color="#1F2937" />
+                </TouchableOpacity>
             </View>
 
-            {/* Featured Courts */}
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>GOR Near You</Text>
-                <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={styles.horizontalScrollContainer}
-                >
-                    {carouselData.map((item) => (
-                        <TouchableOpacity key={item.id} style={styles.card}>
-                            <Image source={{ uri: item.image }} style={styles.cardImage} />
-                            <Text style={styles.cardTitle}>{item.title}</Text>
-                        </TouchableOpacity>
-                    ))}
-                </ScrollView>
-            </View>
+            <ScrollView showsVerticalScrollIndicator={false}>
+                {/* Featured Courts Section */}
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>Featured Courts</Text>
+                    <ScrollView 
+                        horizontal 
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={styles.featuredContainer}
+                    >
+                        {featuredCourts.map((court) => (
+                            <TouchableOpacity 
+                                key={court.id} 
+                                style={styles.featuredCard}
+                                onPress={() => navigation.navigate('CourtDetail', { court })}
+                            >
+                                <Image
+                                    source={{ uri: court.image }}
+                                    style={styles.courtImage}
+                                />
+                                <View style={styles.cardContent}>
+                                    <Text style={styles.courtName}>{court.name}</Text>
+                                    <Text style={styles.courtPrice}>{court.price}/hour</Text>
+                                    <View style={styles.ratingContainer}>
+                                        <Ionicons name="star" size={16} color="#EA580C" />
+                                        <Text style={styles.rating}>{court.rating}</Text>
+                                    </View>
+                                </View>
+                            </TouchableOpacity>
+                        ))}
+                    </ScrollView>
+                </View>
 
-            {/* Popular Courts */}
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Most Popular</Text>
-                {popularCourts.map((court) => (
-                    <TouchableOpacity key={court.id} style={styles.popularCard}>
-                        <Image source={{ uri: court.image }} style={styles.popularCardImage} />
-                        <View style={styles.popularCardInfo}>
-                            <Text style={styles.popularCardTitle}>{court.name}</Text>
-                            <Text style={styles.popularCardPrice}>{court.price}</Text>
-                        </View>
-                    </TouchableOpacity>
-                ))}
-            </View>
-
-            {/* Offers Section */}
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Penawaran Spesial</Text>
-                <View style={styles.offerCard}>
-                    <Image
-                        source={{ uri: 'https://via.placeholder.com/600x300' }}
-                        style={styles.offerImage}
-                    />
-                    <View style={styles.offerInfo}>
-                        <Text style={styles.offerTitle}>Diskon 20% untuk Booking Pertama!</Text>
-                        <Text style={styles.offerSubtitle}>Gunakan kode FIRST20 saat checkout.</Text>
+                {/* Quick Actions */}
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>Quick Actions</Text>
+                    <View style={styles.actionContainer}>
+                        {[
+                            { icon: 'calendar-outline', label: 'Book Court' },
+                            { icon: 'time-outline', label: 'My Bookings' },
+                            { icon: 'star-outline', label: 'Favorites' },
+                            { icon: 'help-circle-outline', label: 'Help' },
+                        ].map((action, index) => (
+                            <TouchableOpacity key={index} style={styles.actionButton}>
+                                <View style={styles.actionIcon}>
+                                    <Ionicons name={action.icon} size={24} color="#EA580C" />
+                                </View>
+                                <Text style={styles.actionLabel}>{action.label}</Text>
+                            </TouchableOpacity>
+                        ))}
                     </View>
                 </View>
-            </View>
-            <View style={styles.container}>
-            </View>
-        </ScrollView>
+
+                {/* Available Time Slots */}
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>Today's Available Slots</Text>
+                    <View style={styles.slotsContainer}>
+                        {['09:00', '10:00', '13:00', '15:00'].map((time, index) => (
+                            <TouchableOpacity key={index} style={styles.timeSlot}>
+                                <Text style={styles.timeText}>{time}</Text>
+                                <Text style={styles.availableText}>Available</Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                </View>
+            </ScrollView>
+        </View>
     );
-
-
 }
 
 const styles = StyleSheet.create({
@@ -136,141 +118,133 @@ const styles = StyleSheet.create({
     },
     header: {
         flexDirection: 'row',
-        alignItems: 'center',
         justifyContent: 'space-between',
-        padding: 16,
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingVertical: 16,
+        backgroundColor: '#fff',
         borderBottomWidth: 1,
-        borderBottomColor: '#eee',
+        borderBottomColor: '#F1F5F9',
     },
-    logo: {
+    greeting: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#1F2937',
+    },
+    subtitle: {
+        fontSize: 16,
+        color: '#94A3B8',
+        marginTop: 4,
+    },
+    notificationButton: {
         width: 40,
         height: 40,
-    },
-    title: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#333',
-    },
-    searchSection: {
-        padding: 16,
-    },
-    tagline: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#333',
-    },
-    subTagline: {
-        fontSize: 14,
-        color: '#666',
-        marginBottom: 10,
-    },
-    searchBox: {
-        flexDirection: 'row',
+        borderRadius: 20,
+        backgroundColor: '#F8FAFC',
+        justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#f5f5f5',
-        borderRadius: 8,
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-    },
-    searchInput: {
-        marginLeft: 8,
-        fontSize: 14,
-        flex: 1,
     },
     section: {
-        marginTop: 10,
+        padding: 20,
     },
     sectionTitle: {
         fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 10,
-        paddingHorizontal: 16,
-    },
-    horizontalScrollContainer: {
-        paddingLeft: 16,
-    },
-    card: {
-        width: 200,
-        marginRight: 15,
-    },
-    cardImage: {
-        width: '100%',
-        height: 120,
-        borderRadius: 8,
-    },
-    cardTitle: {
-        marginTop: 8,
-        fontSize: 14,
         fontWeight: '600',
-        color: '#333',
+        color: '#1F2937',
+        marginBottom: 16,
     },
-    popularCard: {
-        flexDirection: 'row',
-        marginBottom: 15,
-        marginHorizontal: 16,
-        backgroundColor: '#fff',
-        borderRadius: 8,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-        overflow: 'hidden',
+    featuredContainer: {
+        paddingRight: 20,
     },
-    popularCardImage: {
-        width: 100,
-        height: 100,
-    },
-    popularCardInfo: {
-        flex: 1,
-        padding: 10,
-    },
-    popularCardTitle: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#333',
-        marginBottom: 5,
-    },
-    popularCardPrice: {
-        fontSize: 14,
-        color: '#EA580C',
-        fontWeight: '600',
-    },
-    offerCard: {
-        marginHorizontal: 16,
-        borderRadius: 8,
-        overflow: 'hidden',
+    featuredCard: {
+        width: 280,
+        marginRight: 16,
+        borderRadius: 16,
         backgroundColor: '#fff',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
+        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
-        shadowRadius: 4,
+        shadowRadius: 8,
         elevation: 3,
     },
-    offerImage: {
+    courtImage: {
         width: '100%',
         height: 150,
+        borderTopLeftRadius: 16,
+        borderTopRightRadius: 16,
+        resizeMode: 'cover',
     },
-    offerInfo: {
-        padding: 10,
+    cardContent: {
+        padding: 16,
     },
-    offerTitle: {
+    courtName: {
         fontSize: 16,
-        fontWeight: 'bold',
-        color: '#333',
-        marginBottom: 5,
+        fontWeight: '600',
+        color: '#1F2937',
     },
-    offerSubtitle: {
+    courtPrice: {
         fontSize: 14,
-        color: '#666',
+        color: '#EA580C',
+        marginTop: 4,
     },
-    bottomNav: {
+    ratingContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-around',
-        paddingVertical: 20,
-        borderTopWidth: 1,
-        borderTopColor: 'gray',
-        backgroundColor: '#fff',
-        marginBottom: 20,
+        alignItems: 'center',
+        marginTop: 8,
+    },
+    rating: {
+        marginLeft: 4,
+        fontSize: 14,
+        color: '#1F2937',
+    },
+    actionContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+    },
+    actionButton: {
+        width: '48%',
+        padding: 16,
+        marginBottom: 16,
+        borderRadius: 12,
+        backgroundColor: '#F8FAFC',
+        alignItems: 'center',
+    },
+    actionIcon: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        backgroundColor: '#FFF1E6',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 8,
+    },
+    actionLabel: {
+        fontSize: 14,
+        color: '#1F2937',
+        fontWeight: '500',
+    },
+    slotsContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+    },
+    timeSlot: {
+        width: '48%',
+        padding: 16,
+        marginBottom: 12,
+        borderRadius: 12,
+        backgroundColor: '#F8FAFC',
+        alignItems: 'center',
+    },
+    timeText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#1F2937',
+    },
+    availableText: {
+        fontSize: 14,
+        color: '#EA580C',
+        marginTop: 4,
     },
 });

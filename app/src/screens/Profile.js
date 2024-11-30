@@ -1,13 +1,39 @@
 import React from 'react';
-import { Text, StyleSheet, View, Image, TouchableOpacity, Switch } from "react-native";
+import { Text, StyleSheet, View, Image, TouchableOpacity, Alert, Switch } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from "@react-navigation/native";
 
 export default function Profile() {
     const [isPushNotificationsEnabled, setPushNotificationsEnabled] = React.useState(true);
     const [isFaceIDEnabled, setFaceIDEnabled] = React.useState(false);
+    const navigation = useNavigation();
 
     const togglePushNotifications = () => setPushNotificationsEnabled(prev => !prev);
     const toggleFaceID = () => setFaceIDEnabled(prev => !prev);
+
+    const handleLogout = () => {
+        // Clear any stored user data (e.g., authentication tokens)
+        // For example, if you are using AsyncStorage:
+        // await AsyncStorage.removeItem('userToken');
+
+        Alert.alert(
+            "Logout",
+            "Are you sure you want to logout?",
+            [
+                {
+                    text: "Cancel",
+                    style: "cancel"
+                },
+                {
+                    text: "Logout",
+                    onPress: () => {
+                        // Navigate to the login screen
+                        navigation.navigate('Login');
+                    }
+                }
+            ]
+        );
+    };
 
     return (
         <View style={styles.profileContainer}>
@@ -48,7 +74,7 @@ export default function Profile() {
             </View>
 
             {/* Logout Section */}
-            <TouchableOpacity style={styles.logoutButton}>
+            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
                 <Ionicons name="log-out-outline" size={20} color="red" />
                 <Text style={styles.logoutText}>Logout</Text>
             </TouchableOpacity>

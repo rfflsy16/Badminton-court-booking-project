@@ -11,7 +11,7 @@ export default function Register() {
 
     const handleRegister = async () => {
         try {
-            const response = await fetch('https://643b-103-121-170-7.ngrok-free.app/register', {
+            const response = await fetch('https://02f4-103-121-170-7.ngrok-free.app/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -24,8 +24,13 @@ export default function Register() {
                 }).toString(),
             });
 
-            const data = await response.json();
-            console.log(data, '<<<<<<<<<<<< data');
+            const responseText = await response.text();
+            console.log(responseText, '<<<<<<<<<<<< raw response text');
+
+            // Attempt to parse the response as JSON
+            const data = JSON.parse(responseText);
+            console.log(data, '<<<<<<<<<<<< parsed data');
+
             if (response.ok) {
                 Alert.alert('Success', 'User registered successfully');
                 navigation.navigate('Login');
@@ -108,7 +113,7 @@ const styles = StyleSheet.create({
     input: {
         width: '100%',
         backgroundColor: '#f8fbfc',
-        color: '#ccc',
+        color: "#000",
         padding: 15,
         borderRadius: 8,
         marginVertical: 10,

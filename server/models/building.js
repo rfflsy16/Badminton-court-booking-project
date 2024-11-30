@@ -28,7 +28,7 @@ export default class BuildingModel {
         const { name, address, location } = body;
 
         if (!name || !address || !location || !location.type || !location.coordinates) {
-            return new Error("Invalid data. Provide name, address, and a valid location.");
+            throw { name: "BADREQUEST" }
         }
 
         const collection = this.getCollection();

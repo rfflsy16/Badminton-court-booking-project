@@ -16,6 +16,10 @@ export const errorHandler = (err, req, res, next) => {
         status = 400
         message = 'Invalid input'
     }
+    if (err.name === 'BADREQUEST') {
+        message = 'Please input all of the field'
+        status = 400
+    }
 
     if (err.name == 'BadRequest') {
         message = 'Please input email or password'

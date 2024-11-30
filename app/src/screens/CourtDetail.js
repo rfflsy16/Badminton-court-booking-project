@@ -3,6 +3,7 @@ import { Ionicons, MaterialIcons, FontAwesome5, Feather } from "@expo/vector-ico
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { useState, useEffect, useRef } from 'react';
 import { Calendar } from 'react-native-calendars';
+import MapView, { Marker } from 'react-native-maps';
 
 export default function CourtDetail() {
     const route = useRoute();
@@ -21,11 +22,51 @@ export default function CourtDetail() {
     const swipeAnim = useRef(new Animated.Value(0)).current;
     const progressAnim = useRef(new Animated.Value(0)).current;
 
+    const resetState = () => {
+        // Reset all states
+        setShowConfirmModal(false);
+        setShowPaymentModal(false);
+        setSelectedPayment(null);
+        setPromoCode('');
+        setPromoDiscount(0);
+        setIsSwipeCompleted(false);
+        
+        // Reset animations
+        Animated.parallel([
+            Animated.timing(swipeAnim, {
+                toValue: 0,
+                duration: 0,
+                useNativeDriver: true
+            }),
+            Animated.timing(progressAnim, {
+                toValue: 0,
+                duration: 0,
+                useNativeDriver: false
+            })
+        ]).start();
+    };
+
+    const handlePaymentSuccess = () => {
+        // Immediately stop and cleanup animations
+        swipeAnim.stopAnimation();
+        progressAnim.stopAnimation();
+        
+        // Reset all states first
+        resetState();
+        
+        // Use replace instead of navigate/reset
+        navigation.replace('MainApp');
+    };
+
     const panResponder = useRef(
         PanResponder.create({
-            onStartShouldSetPanResponder: () => true,
-            onMoveShouldSetPanResponder: () => true,
+            onStartShouldSetPanResponder: () => !isSwipeCompleted,
+            onMoveShouldSetPanResponder: () => !isSwipeCompleted,
+            onPanResponderTerminate: () => {
+                resetState();
+            },
             onPanResponderMove: (_, gesture) => {
+                if (isSwipeCompleted) return;
                 const { dx } = gesture;
                 const maxSwipe = 280;
                 if (dx >= 0 && dx <= maxSwipe) {
@@ -34,9 +75,11 @@ export default function CourtDetail() {
                 }
             },
             onPanResponderRelease: (_, gesture) => {
+                if (isSwipeCompleted) return;
                 const { dx } = gesture;
                 const maxSwipe = 280;
                 if (dx >= maxSwipe * 0.7) {
+                    setIsSwipeCompleted(true);
                     Animated.parallel([
                         Animated.timing(swipeAnim, {
                             toValue: maxSwipe,
@@ -48,11 +91,7 @@ export default function CourtDetail() {
                             duration: 200,
                             useNativeDriver: false,
                         })
-                    ]).start(() => {
-                        setShowConfirmModal(false);
-                        setShowPaymentModal(false);
-                        navigation.navigate('MainApp');
-                    });
+                    ]).start(handlePaymentSuccess);
                 } else {
                     Animated.parallel([
                         Animated.spring(swipeAnim, {
@@ -68,6 +107,24 @@ export default function CourtDetail() {
             },
         })
     ).current;
+
+    // Cleanup on unmount
+    useEffect(() => {
+        const cleanup = () => {
+            swipeAnim.stopAnimation();
+            progressAnim.stopAnimation();
+            resetState();
+        };
+
+        return cleanup;
+    }, []);
+
+    // Reset state when modal closes
+    useEffect(() => {
+        if (!showConfirmModal && !showPaymentModal) {
+            resetState();
+        }
+    }, [showConfirmModal, showPaymentModal]);
 
     const timeSlots = [
         { id: 1, time: '08:00', available: true },
@@ -287,6 +344,49 @@ export default function CourtDetail() {
                             <Text style={styles.selectDateHint}>Please select a date first</Text>
                         </View>
                     )}
+
+                    {/* Location Map */}
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Location</Text>
+                        <View style={styles.mapContainer}>
+                            <MapView
+                                style={styles.map}
+                                initialRegion={{
+                                    latitude: -6.2088,  // Jakarta coordinates
+                                    longitude: 106.8456,
+                                    latitudeDelta: 0.01,
+                                    longitudeDelta: 0.01,
+                                }}
+                            >
+                                <Marker
+                                    coordinate={{
+                                        latitude: -6.2088,
+                                        longitude: 106.8456,
+                                    }}
+                                    title={court.name}
+                                    description="Premium Badminton Court"
+                                >
+                                    <View style={styles.customMarker}>
+                                        <View style={styles.markerContent}>
+                                            <Ionicons name="location" size={20} color="#fff" />
+                                        </View>
+                                    </View>
+                                </Marker>
+                            </MapView>
+                            <View style={styles.mapOverlay}>
+                                <View style={styles.mapActions}>
+                                    <TouchableOpacity style={styles.mapActionButton}>
+                                        <Ionicons name="navigate" size={20} color="#1F2937" />
+                                        <Text style={styles.mapActionText}>Navigate</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={styles.mapActionButton}>
+                                        <Ionicons name="share-outline" size={20} color="#1F2937" />
+                                        <Text style={styles.mapActionText}>Share</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                    </View>
 
                     {/* Facilities */}
                     <View style={styles.section}>
@@ -1362,7 +1462,7 @@ const styles = StyleSheet.create({
         borderRadius: 28,
         justifyContent: 'center',
         alignItems: 'center',
-        shadowColor: '#000',
+        shadowColor: "#000",
         shadowOffset: {
             width: 0,
             height: 2,
@@ -1376,5 +1476,76 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         color: '#64748B',
         zIndex: 2,
+    },
+    // Map styles
+    mapContainer: {
+        height: 250,
+        borderRadius: 16,
+        overflow: 'hidden',
+        marginTop: 12,
+        position: 'relative',
+    },
+    map: {
+        ...StyleSheet.absoluteFillObject,
+    },
+    customMarker: {
+        width: 40,
+        height: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    markerContent: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        backgroundColor: '#EA580C',
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    mapOverlay: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: 80,
+        paddingHorizontal: 16,
+        paddingBottom: 16,
+        backgroundColor: 'rgba(255,255,255,0.9)',
+    },
+    mapActions: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        marginTop: 'auto',
+    },
+    mapActionButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 20,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    mapActionText: {
+        marginLeft: 4,
+        fontSize: 14,
+        fontWeight: '500',
+        color: '#1F2937',
     },
 });

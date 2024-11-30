@@ -11,7 +11,6 @@ import {
     TabView
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import BottomTabNavigator from '../components/BottomTabNavigator';
 
 const carouselData = [
     {
@@ -57,11 +56,11 @@ export default function Home() {
     return (
         <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
             {/* Header */}
-            <View style={styles.header}>
+            {/* <View style={styles.header}>
                 <Image source={require('../../assets/logo3.png')} style={styles.logo} />
                 <Text style={styles.title}>Shuttlecock Space</Text>
                 <Ionicons name="notifications-outline" size={24} color="#333" />
-            </View>
+            </View> */}
 
             {/* Search Section */}
             <View style={styles.searchSection}>
@@ -70,7 +69,7 @@ export default function Home() {
                 <View style={styles.searchBox}>
                     <Ionicons name="search" size={20} color="#aaa" />
                     <TextInput
-                        placeholder="Mau cari lapangan di mana?"
+                        placeholder="Mau cari lapangan dimana?"
                         placeholderTextColor="#aaa"
                         style={styles.searchInput}
                     />
@@ -79,7 +78,7 @@ export default function Home() {
 
             {/* Featured Courts */}
             <View style={styles.section}>
-                <Text style={styles.sectionTitle}>GOR Terdekat</Text>
+                <Text style={styles.sectionTitle}>GOR Near You</Text>
                 <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}
@@ -96,7 +95,7 @@ export default function Home() {
 
             {/* Popular Courts */}
             <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Populer di Sekitar</Text>
+                <Text style={styles.sectionTitle}>Most Popular</Text>
                 {popularCourts.map((court) => (
                     <TouchableOpacity key={court.id} style={styles.popularCard}>
                         <Image source={{ uri: court.image }} style={styles.popularCardImage} />
@@ -123,21 +122,6 @@ export default function Home() {
                 </View>
             </View>
             <View style={styles.container}>
-
-                {/* <View style={styles.bottomNav}>
-                    <TouchableOpacity>
-                        <Ionicons name="home-outline" size={24} color={index === 0 ? "black" : "gray"} />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigate.navigate("SearchUsers")}>
-                        <Ionicons name="search-outline" size={24} color="black" />
-                    </TouchableOpacity>
-                    <TouchableOpacity >
-                        <Ionicons name="log-out-outline" size={24} color="black" />
-                    </TouchableOpacity>
-                </View> */}
-                <View style={{ flex: 1 }}>
-                    <BottomTabNavigator />
-                </View>
             </View>
         </ScrollView>
     );

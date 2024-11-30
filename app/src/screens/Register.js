@@ -1,9 +1,42 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Alert, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 export default function Register() {
-    const navigation = useNavigation()
+    const navigation = useNavigation();
+    const [fullName, setFullName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [deviceId, setDeviceId] = useState('abc123');
+
+    const handleRegister = async () => {
+        try {
+            const response = await fetch('https://643b-103-121-170-7.ngrok-free.app/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    fullName,
+                    email,
+                    password,
+                    deviceId
+                }).toString(),
+            });
+
+            const data = await response.json();
+            console.log(data, '<<<<<<<<<<<< data');
+            if (response.ok) {
+                Alert.alert('Success', 'User registered successfully');
+                navigation.navigate('Login');
+            } else {
+                Alert.alert('Error', data.message || 'Something went wrong');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Alert.alert('Error', 'Failed to register user');
+        }
+    };
 
     return (
         <View style={styles.container}>
@@ -17,25 +50,30 @@ export default function Register() {
 
             <TextInput
                 style={styles.input}
+                value={fullName}
+                onChangeText={setFullName}
                 placeholder="Full Name"
                 placeholderTextColor="#aaa"
             />
 
-
             <TextInput
                 style={styles.input}
+                value={email}
+                onChangeText={setEmail}
                 placeholder="Email"
                 placeholderTextColor="#aaa"
             />
 
             <TextInput
                 style={styles.input}
+                value={password}
+                onChangeText={setPassword}
                 placeholder="Password"
                 placeholderTextColor="#aaa"
                 secureTextEntry
             />
 
-            <TouchableOpacity style={styles.registerButton} >
+            <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
                 <Text style={styles.registerButtonText}>Sign Up</Text>
             </TouchableOpacity>
 
@@ -70,7 +108,7 @@ const styles = StyleSheet.create({
     input: {
         width: '100%',
         backgroundColor: '#f8fbfc',
-        color: '#fff',
+        color: '#ccc',
         padding: 15,
         borderRadius: 8,
         marginVertical: 10,

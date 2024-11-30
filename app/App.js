@@ -44,10 +44,10 @@ const StackNavigator = createNativeStackNavigator({
         headerBackVisible: false
       },
     },
-    Home: {
-      screen: Home,
+    HomeNavigator: {
+      screen: BottomTabNavigator,
       options: {
-        title: "Home",
+        title: "Shuttlecock Space",
         headerTintColor: "white",
         headerBackground: () => (
           <LinearGradient

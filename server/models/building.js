@@ -18,7 +18,7 @@ export default class BuildingModel {
         const building = await collection.findOne({ _id });
 
         if (!building) {
-            throw new Error("Building not found");
+            throw { name: "NotFound" };
         }
 
         return building;
@@ -41,7 +41,7 @@ export default class BuildingModel {
         };
 
         const result = await collection.insertOne(newBuilding);
-        return result.ops[0];
+        return result.ops;
     }
 
     static async updateBuilding(id, body) {
@@ -75,7 +75,8 @@ export default class BuildingModel {
         const result = await collection.deleteOne({ _id });
 
         if (result.deletedCount === 0) {
-            throw new Error("Building not found");
+            // throw new Error("Building not found");
+            throw { name: "NotFound" };
         }
 
         return { message: "Building deleted successfully" };
@@ -118,10 +119,41 @@ export default class BuildingModel {
             },
         });
 
+
         if (!building) {
-            throw new Error("Building not found near the provided coordinates");
+            throw { name: 'BuildingNotFound' }
         }
 
         return building;
     }
+
+    static async findBuildingByUserLocation(longitude, latitude) {
+        const collection = this.getCollection();
+
+        // Ensure longitude and latitude are numbers
+        const long = parseFloat(longitude);
+        const lat = parseFloat(latitude);
+
+        if (isNaN(long) || isNaN(lat)) {
+            throw new Error("Invalid coordinates");
+        }
+
+        // mencari bangunan yang berada di radius 1000 meter dari lokasi user
+        const buildings = await collection.find({
+            location: {
+                $near: {
+                    $geometry: {
+                        type: "Point",
+                        coordinates: [long, lat]
+                    },
+                    $maxDistance: 1000
+                }
+            }
+        }).toArray();
+
+        return buildings
+
+    }
+
+
 }

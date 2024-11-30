@@ -1,6 +1,8 @@
 import { verifyToken } from "../helpers/jwt.js";
 import { User } from "../models/user.js";
+
 export const authentication = async (req, res, next) => {
+
     try {
         const { authorization } = req.headers
 
@@ -12,21 +14,18 @@ export const authentication = async (req, res, next) => {
 
         const payload = verifyToken(access_token)
 
-        const user = await User.findOne({
-            where: {
-                email: payload.email
-            }
-        })
+        const user = await User.getByEmail(payload.email)
 
         if (!user) throw { name: "Unauthorized" }
 
         req.loginInfo = {
-            userId: user.id,
+            userId: user._id,
             email: user.email,
             role: user.role
         }
 
         next()
+
     } catch (error) {
         next(error)
     }

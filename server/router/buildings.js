@@ -1,13 +1,18 @@
 
 import express from "express"
 import { BuildingController } from "../controllers/BuildingController.js"
- 
+
+
 export default function buildingRouter() {
+
     const router = express.Router()
 
-    router.get("/", BuildingController.getBuilding)
+    router.get("/", BuildingController.getAllBuildings)
+    router.post("/", BuildingController.createBuilding)
+    router.post("/coordinates", BuildingController.findBuildingByCoordinates)
+    // router.get("/find-nearest", BuildingController.findBuildingByUserLocation)
     router.get("/:id", BuildingController.getBuildingById)
-    router.post("/", BuildingController.addBuilding)
-    router.delete("/", BuildingController.deleteBuilding)
-    
+    router.delete("/:id", BuildingController.deleteBuilding)
+    return router;
+
 }

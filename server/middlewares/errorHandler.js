@@ -1,7 +1,7 @@
 export const errorHandler = (err, req, res, next) => {
     let status = 500
     let message = 'Internal Server Error'
-    console.log(err)
+
     if (err.name == 'SequelizeValidationError') {
         status = 400
         message = err.errors[0].message
@@ -15,6 +15,11 @@ export const errorHandler = (err, req, res, next) => {
     if (err.name == 'SequelizeDatabaseError' || err.name == 'SequelizeForeignKeyConstraintError') {
         status = 400
         message = 'Invalid input'
+    }
+
+    if (err.name == 'validationErrorId') {
+        status = 400
+        message = "Id must be 24 characters long"
     }
 
     if (err.name == 'BadRequest') {

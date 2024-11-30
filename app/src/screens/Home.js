@@ -11,6 +11,7 @@ import {
     TabView
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import BottomTabNavigator from '../components/BottomTabNavigator';
 
 const carouselData = [
     {
@@ -134,8 +135,9 @@ export default function Home() {
                         <Ionicons name="log-out-outline" size={24} color="black" />
                     </TouchableOpacity>
                 </View> */}
-
-
+                <View style={{ flex: 1 }}>
+                    <BottomTabNavigator />
+                </View>
             </View>
         </ScrollView>
     );

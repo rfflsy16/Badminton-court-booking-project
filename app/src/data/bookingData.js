@@ -7,7 +7,8 @@ export const bookingsData = [
         time: '09:00 - 10:00',
         status: 'Upcoming',
         price: 'Rp 75.000',
-        image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=2070&auto=format&fit=crop'
+        image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=2070&auto=format&fit=crop',
+        courtId: '1'
     },
     {
         id: '2',
@@ -17,7 +18,8 @@ export const bookingsData = [
         time: '16:00 - 17:00',
         status: 'Upcoming',
         price: 'Rp 60.000',
-        image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=2070&auto=format&fit=crop'
+        image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=2070&auto=format&fit=crop',
+        courtId: '3'
     },
 ];
 
@@ -31,7 +33,8 @@ export const transactionsData = [
         location: 'Jakarta Timur',
         date: '10 Mar 2024',
         time: '13:00 - 14:00',
-        image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=2070&auto=format&fit=crop'
+        image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=2070&auto=format&fit=crop',
+        courtId: '3'
     },
     {
         id: '2',
@@ -42,7 +45,8 @@ export const transactionsData = [
         location: 'Jakarta Pusat',
         date: '12 Mar 2024',
         time: '15:00 - 16:00',
-        image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=2070&auto=format&fit=crop'
+        image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=2070&auto=format&fit=crop',
+        courtId: '1'
     },
     {
         id: '3',
@@ -53,6 +57,7 @@ export const transactionsData = [
         location: 'Jakarta Selatan',
         date: '8 Mar 2024',
         time: '10:00 - 11:00',
-        image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=2070&auto=format&fit=crop'
+        image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=2070&auto=format&fit=crop',
+        courtId: '1'
     }
 ];

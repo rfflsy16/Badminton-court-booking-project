@@ -1,17 +1,37 @@
-import { View, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet, ScrollView, RefreshControl } from "react-native";
+import { useState, useCallback } from "react";
 import Header from "../components/home/Header";
+import PromoBanner from "../components/home/PromoBanner";
 import FeaturedCourts from "../components/home/FeaturedCourts";
-import QuickActions from "../components/home/QuickActions";
-import AvailableTimeSlots from "../components/home/AvailableTimeSlots";
 
 export default function Home() {
+    const [refreshing, setRefreshing] = useState(false);
+
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        // Di sini bs tambah logic utk refresh data
+        setTimeout(() => {
+            setRefreshing(false);
+        }, 1000);
+    }, []);
+
     return (
         <View style={styles.container}>
             <Header />
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView 
+                showsVerticalScrollIndicator={false}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        colors={["#EA580C"]}
+                    />
+                }
+            >
+                <PromoBanner />
                 <FeaturedCourts />
-                <QuickActions />
-                <AvailableTimeSlots />
+                {/* Kasih padding bottom spy scroll nya enak */}
+                <View style={{ height: 20 }} />
             </ScrollView>
         </View>
     );

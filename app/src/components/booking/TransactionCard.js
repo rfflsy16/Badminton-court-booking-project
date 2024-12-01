@@ -1,7 +1,10 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 export default function TransactionCard({ item }) {
+    const navigation = useNavigation();
+
     const getStatusColor = (status) => {
         switch (status.toLowerCase()) {
             case 'paid':
@@ -16,7 +19,10 @@ export default function TransactionCard({ item }) {
     };
 
     return (
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity 
+            style={styles.card}
+            onPress={() => navigation.navigate('Invoice', { item })}
+        >
             <Image source={{ uri: item.image }} style={styles.cardImage} />
             <View style={styles.cardContent}>
                 <View style={styles.cardHeader}>

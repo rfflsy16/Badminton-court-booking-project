@@ -1,5 +1,5 @@
 import { View, StyleSheet, FlatList, Animated, Dimensions } from "react-native";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Header from "../components/booking/Header";
 import TabBar from "../components/booking/TabBar";
 import BookingCard from "../components/booking/BookingCard";
@@ -8,10 +8,18 @@ import { bookingsData, transactionsData } from "../data/bookingData.js";
 
 const { width } = Dimensions.get('window');
 
-export default function Booking() {
+export default function Booking({ route }) {
     const [activeTab, setActiveTab] = useState('bookings');
     const scrollViewRef = useRef(null);
     const scrollX = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        if (route.params?.screen) {
+            const index = route.params.screen === 'transactions' ? 1 : 0;
+            setActiveTab(route.params.screen);
+            scrollViewRef.current?.scrollTo({ x: index * width, animated: true });
+        }
+    }, [route.params]);
 
     const handleTabPress = (tab, index) => {
         setActiveTab(tab);

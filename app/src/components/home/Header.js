@@ -1,14 +1,20 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 export default function Header() {
+    const navigation = useNavigation();
+
     return (
         <View style={styles.header}>
             <View>
                 <Text style={styles.greeting}>Hello, User! 👋</Text>
                 <Text style={styles.subtitle}>Find and book your court</Text>
             </View>
-            <TouchableOpacity style={styles.notificationButton}>
+            <TouchableOpacity 
+                style={styles.notificationButton}
+                onPress={() => navigation.navigate('Notifications')}
+            >
                 <Ionicons name="notifications-outline" size={24} color="#1F2937" />
             </TouchableOpacity>
         </View>

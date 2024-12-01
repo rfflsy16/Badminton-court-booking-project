@@ -28,7 +28,7 @@ export default function Register() {
       >
         <View style={styles.headerContainer}>
           <Image 
-            source={{ uri: 'https://cdn-icons-png.flaticon.com/512/491/491935.png' }}
+            source={{ uri: 'https://img.freepik.com/free-vector/abstract-badminton-logo_17005-995.jpg?t=st=1733051272~exp=1733054872~hmac=a371f1ab1ce27b8b790a609df8fe8363cf4cf17f7a98a38aac9318a345c801dc&w=826' }}
             style={styles.logo}
             resizeMode="contain"
           />

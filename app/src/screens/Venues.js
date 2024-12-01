@@ -1,70 +1,75 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, TextInput } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, TextInput, Modal } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { venuesData } from '../data/venuesData';
 
-const venuesData = [
-    {
-        id: '1',
-        name: 'GOR Senayan',
-        location: 'Jakarta Pusat',
-        rating: 4.8,
-        courts: 6,
-        price: 'Rp 75.000/hour',
-        image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=2070&auto=format&fit=crop'
-    },
-    {
-        id: '2',
-        name: 'Sport Center 88',
-        location: 'Jakarta Selatan',
-        rating: 4.6,
-        courts: 4,
-        price: 'Rp 60.000/hour',
-        image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=2070&auto=format&fit=crop'
-    },
-    {
-        id: '3',
-        name: 'Gelora Arena',
-        location: 'Jakarta Timur',
-        rating: 4.7,
-        courts: 8,
-        price: 'Rp 65.000/hour',
-        image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=2070&auto=format&fit=crop'
-    },
-];
-
-const VenueCard = ({ venue }) => (
-    <TouchableOpacity style={styles.card}>
-        <Image source={{ uri: venue.image }} style={styles.venueImage} />
-        <View style={styles.cardContent}>
-            <View style={styles.cardHeader}>
-                <Text style={styles.venueName}>{venue.name}</Text>
-                <View style={styles.ratingContainer}>
-                    <Ionicons name="star" size={16} color="#EA580C" />
-                    <Text style={styles.rating}>{venue.rating}</Text>
+const VenueCard = ({ venue }) => {
+    const navigation = useNavigation();
+    
+    return (
+        <TouchableOpacity 
+            style={styles.card}
+            onPress={() => navigation.navigate('BuildingCourts', { venue })}
+        >
+            <Image source={{ uri: venue.image }} style={styles.venueImage} />
+            <View style={styles.cardContent}>
+                <View style={styles.cardHeader}>
+                    <Text style={styles.venueName}>{venue.name}</Text>
+                    <View style={styles.ratingContainer}>
+                        <Ionicons name="star" size={16} color="#EA580C" />
+                        <Text style={styles.rating}>{venue.rating}</Text>
+                    </View>
+                </View>
+                <View style={styles.locationContainer}>
+                    <Ionicons name="location-outline" size={16} color="#94A3B8" />
+                    <Text style={styles.locationText}>{venue.location}</Text>
+                </View>
+                <View style={styles.detailsContainer}>
+                    <View style={styles.detail}>
+                        <MaterialCommunityIcons name="badminton" size={16} color="#94A3B8" />
+                        <Text style={styles.detailText}>{venue.courts} Courts</Text>
+                    </View>
+                    <Text style={styles.price}>{venue.price}</Text>
                 </View>
             </View>
-            <View style={styles.locationContainer}>
-                <Ionicons name="location-outline" size={16} color="#94A3B8" />
-                <Text style={styles.locationText}>{venue.location}</Text>
-            </View>
-            <View style={styles.detailsContainer}>
-                <View style={styles.detail}>
-                    <MaterialCommunityIcons name="badminton" size={16} color="#94A3B8" />
-                    <Text style={styles.detailText}>{venue.courts} Courts</Text>
-                </View>
-                <Text style={styles.price}>{venue.price}</Text>
-            </View>
-        </View>
-    </TouchableOpacity>
-);
+        </TouchableOpacity>
+    );
+};
 
 export default function Venues() {
     const [searchQuery, setSearchQuery] = useState('');
+    const [showFilterModal, setShowFilterModal] = useState(false);
+    const [sortBy, setSortBy] = useState(null); // 'price_low', 'price_high', 'rating'
 
-    const filteredVenues = venuesData.filter(venue =>
-        venue.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        venue.location.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredAndSortedVenues = () => {
+        let venues = venuesData.filter(venue =>
+            venue.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            venue.location.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+
+        if (sortBy) {
+            venues = [...venues].sort((a, b) => {
+                if (sortBy === 'price_low') {
+                    return parseInt(a.price.replace(/\D/g, '')) - parseInt(b.price.replace(/\D/g, ''));
+                }
+                if (sortBy === 'price_high') {
+                    return parseInt(b.price.replace(/\D/g, '')) - parseInt(a.price.replace(/\D/g, ''));
+                }
+                if (sortBy === 'rating') {
+                    return b.rating - a.rating;
+                }
+                return 0;
+            });
+        }
+
+        return venues;
+    };
+
+    const handleSort = (type) => {
+        setSortBy(type);
+        setShowFilterModal(false);
+    };
 
     return (
         <View style={styles.container}>
@@ -82,17 +87,76 @@ export default function Venues() {
                         onChangeText={setSearchQuery}
                     />
                 </View>
-                <TouchableOpacity style={styles.filterButton}>
+                <TouchableOpacity 
+                    style={styles.filterButton}
+                    onPress={() => setShowFilterModal(true)}
+                >
                     <Ionicons name="options-outline" size={20} color="#1F2937" />
                 </TouchableOpacity>
             </View>
+
             <FlatList
-                data={filteredVenues}
+                data={filteredAndSortedVenues()}
                 renderItem={({ item }) => <VenueCard venue={item} />}
                 keyExtractor={item => item.id}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.listContainer}
             />
+
+            {/* Filter Modal */}
+            <Modal
+                visible={showFilterModal}
+                transparent
+                animationType="slide"
+                onRequestClose={() => setShowFilterModal(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                        <View style={styles.modalHeader}>
+                            <Text style={styles.modalTitle}>Sort By</Text>
+                            <TouchableOpacity onPress={() => setShowFilterModal(false)}>
+                                <Ionicons name="close" size={24} color="#1F2937" />
+                            </TouchableOpacity>
+                        </View>
+
+                        <TouchableOpacity 
+                            style={[styles.sortOption, sortBy === 'price_low' && styles.selectedOption]}
+                            onPress={() => handleSort('price_low')}
+                        >
+                            <Text style={[styles.sortText, sortBy === 'price_low' && styles.selectedText]}>
+                                Price: Low to High
+                            </Text>
+                            {sortBy === 'price_low' && (
+                                <Ionicons name="checkmark" size={20} color="#EA580C" />
+                            )}
+                        </TouchableOpacity>
+
+                        <TouchableOpacity 
+                            style={[styles.sortOption, sortBy === 'price_high' && styles.selectedOption]}
+                            onPress={() => handleSort('price_high')}
+                        >
+                            <Text style={[styles.sortText, sortBy === 'price_high' && styles.selectedText]}>
+                                Price: High to Low
+                            </Text>
+                            {sortBy === 'price_high' && (
+                                <Ionicons name="checkmark" size={20} color="#EA580C" />
+                            )}
+                        </TouchableOpacity>
+
+                        <TouchableOpacity 
+                            style={[styles.sortOption, sortBy === 'rating' && styles.selectedOption]}
+                            onPress={() => handleSort('rating')}
+                        >
+                            <Text style={[styles.sortText, sortBy === 'rating' && styles.selectedText]}>
+                                Highest Rating
+                            </Text>
+                            {sortBy === 'rating' && (
+                                <Ionicons name="checkmark" size={20} color="#EA580C" />
+                            )}
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 }
@@ -213,5 +277,58 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '600',
         color: '#EA580C',
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'transparent',
+        justifyContent: 'flex-end',
+    },
+    modalContent: {
+        backgroundColor: '#fff',
+        borderTopLeftRadius: 24,
+        borderTopRightRadius: 24,
+        padding: 20,
+        minHeight: 300,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: -4,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 12,
+        elevation: 20,
+    },
+    modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 20,
+        paddingBottom: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: '#E2E8F0',
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontWeight: '600',
+        color: '#1F2937',
+    },
+    sortOption: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 16,
+        paddingHorizontal: 4,
+        borderRadius: 12,
+    },
+    selectedOption: {
+        backgroundColor: '#FFF7ED',
+    },
+    sortText: {
+        fontSize: 16,
+        color: '#1F2937',
+    },
+    selectedText: {
+        color: '#EA580C',
+        fontWeight: '500',
     },
 });

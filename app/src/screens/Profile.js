@@ -1,10 +1,16 @@
 import { ScrollView, StyleSheet } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import Header from "../components/profile/Header";
 import ProfileSection from "../components/profile/ProfileSection";
 import ProfileMenuItem from "../components/profile/ProfileMenuItem";
 import LogoutButton from "../components/profile/LogoutButton";
+import { useState } from 'react';
 
 export default function Profile() {
+    const navigation = useNavigation();
+    const [selectedLanguage, setSelectedLanguage] = useState('id');
+    const [isDarkMode, setIsDarkMode] = useState(false);
+
     const userInfo = {
         name: "John Doe",
         email: "john.doe@example.com",
@@ -16,6 +22,23 @@ export default function Profile() {
         // Handle logout logic
     };
 
+    const getLanguageInfo = () => {
+        const languages = {
+            'en': 'English (US)',
+            'en-gb': 'English (UK)',
+            'id': 'Bahasa Indonesia',
+            'ms': 'Bahasa Melayu',
+            'zh-cn': '简体中文',
+            'zh-tw': '繁體中文',
+            'zh-hk': '繁體中文',
+            'ja': '日本語',
+            'ko': '한국어',
+            'th': 'ภาษาไทย',
+            'vi': 'Tiếng Việt'
+        };
+        return languages[selectedLanguage] || 'English (US)';
+    };
+
     return (
         <ScrollView style={styles.container}>
             <Header userInfo={userInfo} />
@@ -25,7 +48,7 @@ export default function Profile() {
                     icon="calendar-outline"
                     title="My Bookings"
                     subtitle="View your booking history"
-                    onPress={() => {}}
+                    onPress={() => navigation.navigate('Booking', { screen: 'bookings' })}
                 />
                 <ProfileMenuItem
                     icon="heart-outline"
@@ -37,7 +60,7 @@ export default function Profile() {
                     icon="receipt-outline"
                     title="Transaction History"
                     subtitle="View your payment history"
-                    onPress={() => {}}
+                    onPress={() => navigation.navigate('Booking', { screen: 'transactions' })}
                 />
             </ProfileSection>
 
@@ -45,18 +68,19 @@ export default function Profile() {
                 <ProfileMenuItem
                     icon="person-outline"
                     title="Edit Profile"
-                    onPress={() => {}}
+                    onPress={() => navigation.navigate('EditProfile')}
                 />
                 <ProfileMenuItem
                     icon="notifications-outline"
                     title="Notifications"
                     subtitle="Configure push notifications"
-                    onPress={() => {}}
+                    onPress={() => navigation.navigate('NotificationSettings')}
                 />
                 <ProfileMenuItem
                     icon="card-outline"
                     title="Payment Methods"
-                    onPress={() => {}}
+                    subtitle="Manage your payment methods"
+                    onPress={() => navigation.navigate('PaymentMethods')}
                 />
             </ProfileSection>
 
@@ -64,14 +88,20 @@ export default function Profile() {
                 <ProfileMenuItem
                     icon="language-outline"
                     title="Language"
-                    subtitle="English"
-                    onPress={() => {}}
+                    subtitle={getLanguageInfo()}
+                    onPress={() => navigation.navigate('Language', {
+                        currentLanguage: selectedLanguage,
+                        onSelect: (langId) => setSelectedLanguage(langId)
+                    })}
                 />
                 <ProfileMenuItem
                     icon="moon-outline"
                     title="Dark Mode"
-                    subtitle="Off"
-                    onPress={() => {}}
+                    subtitle={isDarkMode ? "On" : "Off"}
+                    onPress={() => navigation.navigate('DarkMode', {
+                        currentMode: isDarkMode,
+                        onSelect: (value) => setIsDarkMode(value)
+                    })}
                 />
             </ProfileSection>
 
@@ -79,21 +109,24 @@ export default function Profile() {
                 <ProfileMenuItem
                     icon="help-circle-outline"
                     title="Help Center"
-                    onPress={() => {}}
+                    onPress={() => navigation.navigate('HelpCenter')}
                 />
                 <ProfileMenuItem
                     icon="document-text-outline"
                     title="Terms of Service"
-                    onPress={() => {}}
+                    onPress={() => navigation.navigate('TermsOfService')}
                 />
                 <ProfileMenuItem
                     icon="shield-checkmark-outline"
                     title="Privacy Policy"
-                    onPress={() => {}}
+                    onPress={() => navigation.navigate('PrivacyPolicy')}
                 />
             </ProfileSection>
 
-            <LogoutButton onPress={handleLogout} />
+            <LogoutButton 
+            // onPress={handleLogout}  
+            onPress={() => navigation.navigate('Login', { screen: 'Login' })}
+            />
         </ScrollView>
     );
 }

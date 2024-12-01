@@ -6,25 +6,7 @@ export default class CourtModel {
         return db.collection("Courts");
     }
 
-    static async readCourts() {
-        const collection = this.getCollection();
-        const courts = await collection.find().toArray();
-        return courts;
-    }
-
-    static async readByIdCourt(id) {
-        const _id = new ObjectId(id);
-        const collection = this.getCollection();
-
-        const court = await collection.findOne({ _id });
-        if (!court) {
-            throw { name: "CourtNotFound" };
-        }
-
-        return court;
-    }
-
-    static async createNewCourt(body) {
+    static async createCourt(data) {
         const {
             BuildingId,
             category,
@@ -36,21 +18,13 @@ export default class CourtModel {
             excludedDate,
             price,
             dp,
-        } = body;
+            location,
+        } = data;
 
-        if (
-            !BuildingId ||
-            !category ||
-            !type ||
-            !startTime ||
-            !endTime ||
-            !price ||
-            !dp
-        ) {
-            throw { name: "BADREQUEST" };
+        if (!BuildingId || !ObjectId.isValid(BuildingId)) {
+            throw new Error("Invalid BuildingId");
         }
 
-        const collection = this.getCollection();
         const newCourt = {
             BuildingId: new ObjectId(BuildingId),
             category,
@@ -58,22 +32,54 @@ export default class CourtModel {
             description,
             startTime,
             endTime,
-            excludedTime: excludedTime || [],
-            excludedDate: excludedDate || [],
+            excludedTime,
+            excludedDate,
             price,
             dp,
-            rating: [],
-            review: [],
+            location,
             createdAt: new Date(),
             updatedAt: new Date(),
         };
 
-        const result = await collection.insertOne(newCourt);
-        return result.ops[0];
+        const result = await this.getCollection().insertOne(newCourt);
+        return result.ops;
     }
 
-    static async updateCourt(id, body) {
-        const _id = new ObjectId(id);
+    static async readCourts() {
+        return await this.getCollection()
+            .aggregate([
+                {
+                    $lookup: {
+                        from: "Buildings",
+                        localField: "BuildingId",
+                        foreignField: "_id",
+                        as: "buildingDetails",
+                    },
+                },
+            ])
+            .toArray();
+    }
+
+    static async readCourtById(id) {
+        const court = await this.getCollection()
+            .aggregate([
+                { $match: { _id: new ObjectId(id) } },
+                {
+                    $lookup: {
+                        from: "Buildings",
+                        localField: "BuildingId",
+                        foreignField: "_id",
+                        as: "buildingDetails",
+                    },
+                },
+            ])
+            .toArray();
+
+        if (court.length === 0) throw { name: "CourtNotFound" };
+        return court[0];
+    }
+
+    static async updateCourt(id, data) {
         const {
             category,
             type,
@@ -84,7 +90,8 @@ export default class CourtModel {
             excludedDate,
             price,
             dp,
-        } = body;
+            location,
+        } = data;
 
         const updateData = {
             ...(category && { category }),
@@ -96,41 +103,23 @@ export default class CourtModel {
             ...(excludedDate && { excludedDate }),
             ...(price && { price }),
             ...(dp && { dp }),
+            ...(location && { location }),
             updatedAt: new Date(),
         };
 
-        const collection = this.getCollection();
-        const result = await collection.findOneAndUpdate(
-            { _id },
+        const result = await this.getCollection().findOneAndUpdate(
+            { _id: new ObjectId(id) },
             { $set: updateData },
             { returnDocument: "after" }
         );
 
-        if (!result.value) {
-            throw { name: "CourtNotFound" };
-        }
-
+        if (!result.value) throw { name: "CourtNotFound" };
         return result.value;
     }
 
     static async deleteCourt(id) {
-        const _id = new ObjectId(id);
-        const collection = this.getCollection();
-        const result = await collection.deleteOne({ _id });
-
-        if (result.deletedCount === 0) {
-            throw { name: "CourtNotFound" };
-        }
-
+        const result = await this.getCollection().deleteOne({ _id: new ObjectId(id) });
+        if (result.deletedCount === 0) throw { name: "CourtNotFound" };
         return { message: "Court deleted successfully" };
-    }
-
-    static async findCourtsByBuilding(BuildingId) {
-        const collection = this.getCollection();
-        const courts = await collection
-            .find({ BuildingId: new ObjectId(BuildingId) })
-            .toArray();
-
-        return courts;
     }
 }

@@ -1,4 +1,4 @@
-import CourtModel from "../models/court";
+import CourtModel from "../models/court.js";
 
 export default class CourtController {
     static async getAll(req, res, next) {
@@ -13,7 +13,7 @@ export default class CourtController {
     static async getById(req, res, next) {
         try {
             const { id } = req.params;
-            const court = await CourtModel.readByIdCourt(id);
+            const court = await CourtModel.readCourtById(id);
             res.status(200).json(court);
         } catch (error) {
             next(error);
@@ -22,7 +22,7 @@ export default class CourtController {
 
     static async create(req, res, next) {
         try {
-            const court = await CourtModel.createNewCourt(req.body);
+            const court = await CourtModel.createCourt(req.body);
             res.status(201).json(court);
         } catch (error) {
             next(error);

@@ -24,6 +24,7 @@ export default class CourtController {
         try {
             const court = await CourtModel.createCourt(req.body);
             res.status(201).json(court);
+            console.log(court, "<<<<<<< ini di controller")
         } catch (error) {
             next(error);
         }

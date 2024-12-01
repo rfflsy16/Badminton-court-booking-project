@@ -41,8 +41,9 @@ export default class CourtModel {
             updatedAt: new Date(),
         };
 
-        const result = await this.getCollection().insertOne(newCourt);
-        return result.ops;
+        await this.getCollection().insertOne(newCourt);
+
+        return { message: 'Success added new Court' };
     }
 
     static async readCourts() {

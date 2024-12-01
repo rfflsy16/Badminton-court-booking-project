@@ -4,9 +4,8 @@ import { MessageController } from "../controllers/MessageController.js"
 export default function messageRouter() {
     const router = express.Router()
     router.get("/", MessageController.getMessage)
-    router.get("/", MessageController.postMessage)
+    router.post("/", MessageController.postMessage)
 
     return router
 }
-
 

@@ -140,12 +140,12 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     userBubble: {
-        backgroundColor: '#EA580C',
+        backgroundColor: '#115E59',
         alignSelf: 'flex-end',
         borderTopRightRadius: 4,
     },
     otherBubble: {
-        backgroundColor: '#F1F5F9',
+        backgroundColor: '#E5F6F6',
         alignSelf: 'flex-start',
         borderTopLeftRadius: 4,
     },
@@ -202,6 +202,6 @@ const styles = StyleSheet.create({
         marginLeft: 8,
     },
     sendButtonActive: {
-        backgroundColor: '#EA580C',
+        backgroundColor: '#115E59',
     },
 });

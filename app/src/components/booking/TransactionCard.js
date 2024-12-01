@@ -8,11 +8,11 @@ export default function TransactionCard({ item }) {
     const getStatusColor = (status) => {
         switch (status.toLowerCase()) {
             case 'paid':
-                return '#22C55E';
+                return '#4ADE80';  
             case 'ongoing':
-                return '#EAB308';
+                return '#FBBF24';  
             case 'cancelled':
-                return '#EF4444';
+                return '#EF4444';  
             default:
                 return '#94A3B8';
         }
@@ -51,7 +51,7 @@ export default function TransactionCard({ item }) {
                     </View>
                 </View>
                 <View style={styles.priceContainer}>
-                    <Text style={styles.price}>{item.price}</Text>
+                    <Text style={[styles.price, { color: '#E11D48' }]}>{item.price}</Text>
                 </View>
             </View>
         </TouchableOpacity>
@@ -138,6 +138,6 @@ const styles = StyleSheet.create({
     price: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#EA580C',
+        color: '#E11D48',
     },
 });

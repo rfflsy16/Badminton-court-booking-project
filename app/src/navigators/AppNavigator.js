@@ -18,7 +18,7 @@ import Notifications from '../screens/Notifications';
 import Invoice from '../screens/Invoice';
 
 const RootStack = createNativeStackNavigator({
-    initialRouteName: "Login",
+    initialRouteName: "MainApp",
     screenOptions: {
         headerShown: false,
         contentStyle: { backgroundColor: 'white' },

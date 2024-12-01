@@ -149,7 +149,7 @@ export default function CourtDetail() {
                         <View style={styles.mainInfo}>
                             <Text style={styles.courtName}>{court.name}</Text>
                             <View style={styles.ratingContainer}>
-                                <Ionicons name="star" size={16} color="#EA580C" />
+                                <Ionicons name="star" size={16} color="#F59E0B" />
                                 <Text style={styles.rating}>4.8</Text>
                                 <Text style={styles.ratingCount}>(128 reviews)</Text>
                             </View>
@@ -165,6 +165,16 @@ export default function CourtDetail() {
                                 <View style={styles.statusDot} />
                                 <Text style={styles.statusText}>Open Now</Text>
                             </View>
+                            <TouchableOpacity 
+                                style={styles.chatButton}
+                                onPress={() => navigation.navigate('ChatDetail', { 
+                                    chatId: `court_${court.id}`,
+                                    name: `Admin ${court.name}`,
+                                })}
+                            >
+                                <Ionicons name="chatbubble-outline" size={20} color="#fff" />
+                                <Text style={styles.chatButtonText}>Chat Admin</Text>
+                            </TouchableOpacity>
                         </View>
                     </View>
 
@@ -349,7 +359,7 @@ const styles = StyleSheet.create({
     price: {
         fontSize: 20,
         fontWeight: '700',
-        color: '#EA580C',
+        color: '#E11D48',
     },
     priceUnit: {
         fontSize: 14,
@@ -377,6 +387,21 @@ const styles = StyleSheet.create({
         color: '#22C55E',
         fontWeight: '500',
     },
+    chatButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#115E59',
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        borderRadius: 20,
+        marginTop: 12,
+        gap: 6,
+    },
+    chatButtonText: {
+        color: '#fff',
+        fontSize: 14,
+        fontWeight: '600',
+    },
     bottomContainer: {
         backgroundColor: '#fff',
         borderTopWidth: 1,
@@ -400,7 +425,7 @@ const styles = StyleSheet.create({
         color: '#1F2937',
     },
     bookButton: {
-        backgroundColor: '#EA580C',
+        backgroundColor: '#E11D48',
         paddingVertical: 12,
         paddingHorizontal: 32,
         borderRadius: 12,
@@ -429,7 +454,7 @@ const styles = StyleSheet.create({
         color: '#64748B',
     },
     readMore: {
-        color: '#EA580C',
+        color: '#E11D48',
         fontWeight: '600',
         marginTop: 8,
     },

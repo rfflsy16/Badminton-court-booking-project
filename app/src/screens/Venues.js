@@ -28,7 +28,7 @@ const VenueCard = ({ venue }) => {
                 <View style={styles.detailsContainer}>
                     <View style={styles.detail}>
                         <MaterialCommunityIcons name="badminton" size={16} color="#94A3B8" />
-                        <Text style={styles.detailText}>{venue.courts} Courts</Text>
+                        <Text style={styles.detailText}>{venue.totalCourts} Courts</Text>
                     </View>
                     <Text style={styles.price}>{venue.price}</Text>
                 </View>

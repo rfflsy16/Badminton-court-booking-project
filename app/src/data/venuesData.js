@@ -8,7 +8,8 @@ export const venuesData = [
         image: 'https://images.pexels.com/photos/3660204/pexels-photo-3660204.jpeg',
         type: 'Premium',
         courtType: 'Indoor',
-        facilities: ['Parking', 'Toilet', 'Canteen', 'Shower']
+        facilities: ['Parking', 'Toilet', 'Canteen', 'Shower'],
+        totalCourts: 8  
     },
     {
         id: '2',
@@ -19,7 +20,8 @@ export const venuesData = [
         image: 'https://images.pexels.com/photos/2277981/pexels-photo-2277981.jpeg',
         type: 'Basic',
         courtType: 'Outdoor',
-        facilities: ['Parking', 'Toilet']
+        facilities: ['Parking', 'Toilet'],
+        totalCourts: 6  
     },
     {
         id: '3',
@@ -27,6 +29,7 @@ export const venuesData = [
         location: 'Jakarta Timur',
         rating: 4.7,
         price: 'Rp 65.000/hour',
-        image: 'https://images.pexels.com/photos/1866149/pexels-photo-1866149.jpeg'
+        image: 'https://images.pexels.com/photos/1866149/pexels-photo-1866149.jpeg',
+        totalCourts: 10  
     },
 ];

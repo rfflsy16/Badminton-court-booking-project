@@ -116,7 +116,7 @@ export default function FeaturedCourts() {
                             </View>
                             <View style={styles.infoRow}>
                                 <View style={styles.ratingContainer}>
-                                    <Ionicons name="star" size={14} color="#EA580C" />
+                                    <Ionicons name="star" size={14} color="#F59E0B" />
                                     <Text style={styles.rating}>{court.rating}</Text>
                                     <Text style={styles.reviews}>({court.reviews})</Text>
                                 </View>
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     },
     seeAll: {
         fontSize: 14,
-        color: '#EA580C',
+        color: '#115E59',
         fontWeight: '600',
     },
     featuredContainer: {
@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
     price: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#EA580C',
+        color: '#E11D48', // Changed to rose-600 - a vibrant contrasting color
     },
     priceUnit: {
         fontSize: 13,

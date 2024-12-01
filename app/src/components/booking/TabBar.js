@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 0,
         height: 3,
-        backgroundColor: '#EA580C',
+        backgroundColor: '#006D77',
         borderRadius: 4,
     },
     tabText: {
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
         color: '#94A3B8',
     },
     activeTabText: {
-        color: '#1F2937',
+        color: '#006D77',
         fontWeight: '700',
     },
 });

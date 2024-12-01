@@ -5,7 +5,7 @@ export const bookingsData = [
         courtNumber: 'Court 1',
         date: '15 Mar 2024',
         time: '09:00 - 10:00',
-        status: 'Upcoming',
+        status: 'Today',
         price: 'Rp 75.000',
         image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=2070&auto=format&fit=crop',
         courtId: '1'
@@ -20,6 +20,17 @@ export const bookingsData = [
         price: 'Rp 60.000',
         image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=2070&auto=format&fit=crop',
         courtId: '3'
+    },
+    {
+        id: '3',
+        venueName: 'Gelora Arena',
+        courtNumber: 'Court 2',
+        date: '10 Mar 2024',
+        time: '13:00 - 14:00',
+        status: 'Expired',
+        price: 'Rp 65.000',
+        image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=2070&auto=format&fit=crop',
+        courtId: '2'
     },
 ];
 

@@ -32,6 +32,8 @@ GOR Senayan jg sering menjadi tuan rumah berbagai turnamen nasional dan internas
         facilities: ['Parking', 'Shower', 'Wifi', 'Canteen'],
         image: 'https://images.pexels.com/photos/1866149/pexels-photo-1866149.jpeg',
         venueId: '1',
+        adminId: "admin_1",
+        adminName: "John Admin"
     },
     {
         id: 2,
@@ -66,6 +68,8 @@ Lokasi strategis dan jam operasional yg fleksibel (06.00-22.00) membuat Sport Ce
         facilities: ['Parking', 'Wifi', 'Locker'],
         image: 'https://images.pexels.com/photos/2277981/pexels-photo-2277981.jpeg',
         venueId: '2',
+        adminId: "admin_2",
+        adminName: "Jane Admin"
     },
     {
         id: 3,
@@ -100,6 +104,8 @@ Gelora Arena jg aktif mengadakan turnamen lokal dan liga internal untuk komunita
         facilities: ['Parking', 'Shower', 'Canteen'],
         image: 'https://images.pexels.com/photos/1722384/pexels-photo-1722384.jpeg',
         venueId: '3',
+        adminId: "admin_3",
+        adminName: "Bob Admin"
     },
     {
         id: 4,
@@ -141,6 +147,8 @@ PB Djarum jg menyediakan program pembinaan bakat dan sering mengadakan coaching 
         facilities: ['Parking', 'Shower', 'Wifi', 'Locker', 'Canteen'],
         image: 'https://images.pexels.com/photos/3660204/pexels-photo-3660204.jpeg',
         venueId: '1',
+        adminId: "admin_1",
+        adminName: "John Admin"
     },
     {
         id: 5,
@@ -182,6 +190,8 @@ GOR Kuningan jg menyediakan paket khusus utk corporate gathering dan team buildi
         facilities: ['Parking', 'Wifi', 'Canteen'],
         image: 'https://images.pexels.com/photos/2116469/pexels-photo-2116469.jpeg',
         venueId: '2',
+        adminId: "admin_2",
+        adminName: "Jane Admin"
     },
     {
         id: 6,
@@ -227,5 +237,7 @@ Istora Arena adalah pilihan utama utk event badminton besar dan pemain yg mencar
         facilities: ['Parking', 'Shower', 'Wifi', 'Locker', 'Canteen', 'AC'],
         image: 'https://images.pexels.com/photos/3069869/pexels-photo-3069869.jpeg',
         venueId: '3',
+        adminId: "admin_3",
+        adminName: "Bob Admin"
     }
 ];

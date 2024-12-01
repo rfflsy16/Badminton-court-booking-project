@@ -25,7 +25,7 @@ const ChatIconWithBadge = ({ focused, color }) => {
                     position: 'absolute',
                     right: -6,
                     top: -6,
-                    backgroundColor: '#EA580C',
+                    backgroundColor: '#006D77',
                     borderRadius: 10,
                     minWidth: 20,
                     height: 20,
@@ -66,7 +66,7 @@ export const TabStack = () => {
                         shadowOpacity: 0.1,
                         shadowRadius: 4,
                     },
-                    tabBarActiveTintColor: "#EA580C",
+                    tabBarActiveTintColor: "#006D77",
                     tabBarInactiveTintColor: "#94A3B8",
                     tabBarLabelStyle: {
                         fontSize: 12,

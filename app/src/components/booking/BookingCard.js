@@ -2,6 +2,33 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function BookingCard({ item }) {
+    const getStatusStyle = (status) => {
+        switch (status) {
+            case 'Today':
+                return {
+                    backgroundColor: '#4ADE8020',  // Bright green with opacity
+                    textColor: '#4ADE80'  // Bright green
+                };
+            case 'Upcoming':
+                return {
+                    backgroundColor: '#FBBF2420',  // Yellow with opacity
+                    textColor: '#FBBF24'  // Yellow
+                };
+            case 'Expired':
+                return {
+                    backgroundColor: '#EF444420',  // Bright red with opacity
+                    textColor: '#EF4444'  // Bright red
+                };
+            default:
+                return {
+                    backgroundColor: '#F3F4F6',
+                    textColor: '#6B7280'
+                };
+        }
+    };
+
+    const statusStyle = getStatusStyle(item.status);
+
     return (
         <TouchableOpacity style={styles.card}>
             <Image source={{ uri: item.image }} style={styles.cardImage} />
@@ -12,10 +39,10 @@ export default function BookingCard({ item }) {
                         <Text style={styles.courtNumber}>{item.courtNumber}</Text>
                     </View>
                     <View style={[styles.statusBadge, 
-                        { backgroundColor: item.status === 'Upcoming' ? '#FEF3C7' : '#F3F4F6' }
+                        { backgroundColor: statusStyle.backgroundColor }
                     ]}>
                         <Text style={[styles.statusText, 
-                            { color: item.status === 'Upcoming' ? '#D97706' : '#6B7280' }
+                            { color: statusStyle.textColor }
                         ]}>{item.status}</Text>
                     </View>
                 </View>
@@ -30,7 +57,7 @@ export default function BookingCard({ item }) {
                     </View>
                 </View>
                 <View style={styles.priceContainer}>
-                    <Text style={styles.price}>{item.price}</Text>
+                    <Text style={[styles.price, { color: '#E11D48' }]}>{item.price}</Text>
                 </View>
             </View>
         </TouchableOpacity>
@@ -102,6 +129,6 @@ const styles = StyleSheet.create({
     price: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#EA580C',
+        color: '#E11D48',
     },
 });

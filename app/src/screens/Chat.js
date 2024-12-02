@@ -1,52 +1,43 @@
-import React, { useState, useCallback } from 'react';
-import {
-    Text,
-    View,
-    StyleSheet,
-    Dimensions,
-    Platform,
-    KeyboardAvoidingView,
-    SafeAreaView,
-} from 'react-native';
-import { GiftedChat } from 'react-native-gifted-chat';
+import { View, StyleSheet } from "react-native";
+import { useState, useEffect } from "react";
+import { useChat } from '../context/ChatContext';
+import Header from "../components/chat/Header";
+import SearchBar from "../components/chat/SearchBar";
+import ChatList from "../components/chat/ChatList";
 
-const { width } = Dimensions.get('window');
+export default function Chat({ navigation }) {
+    const [searchQuery, setSearchQuery] = useState('');
+    const { chatData: chats, markAsRead, updateUnreadCount } = useChat();
 
-export default function Chat() {
-    const [messages, setMessages] = useState([
-        {
-            _id: 1,
-            text: 'Hello developer jsdnsj',
-            createdAt: new Date(),
-            user: {
-                _id: 2,
-                name: 'GiftedChat',
-                avatar: 'https://cdn-icons-png.flaticon.com/512/8686/8686332.png',
-            },
-        },
-    ]);
-
-    const onSend = useCallback((newMessages = []) => {
-        setMessages((prevMessages) => GiftedChat.append(prevMessages, newMessages));
+    useEffect(() => {
+        updateUnreadCount();
     }, []);
 
+    const handleChatPress = (chatId) => {
+        const chat = chats.find(c => c.id === chatId);
+        markAsRead(chatId);
+        navigation.navigate('ChatDetail', {
+            chatId,
+            name: chat.name
+        });
+    };
+
+    const filteredChats = chats.filter(chat =>
+        chat.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     return (
-        <SafeAreaView style={styles.container}>
-            <KeyboardAvoidingView
-                style={{ flex: 1 }}
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                keyboardVerticalOffset={Platform.OS === 'ios' ? 44 : 0}
-            >
-                <GiftedChat
-                    messages={messages}
-                    onSend={onSend}
-                    user={{
-                        _id: 1,
-                    }}
-                    alwaysShowSend
-                />
-            </KeyboardAvoidingView>
-        </SafeAreaView>
+        <View style={styles.container}>
+            <Header />
+            <SearchBar
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+            />
+            <ChatList
+                chats={filteredChats}
+                onChatPress={handleChatPress}
+            />
+        </View>
     );
 }
 
@@ -54,6 +45,5 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
-
     },
 });

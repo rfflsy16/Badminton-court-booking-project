@@ -1,163 +1,139 @@
-import React from 'react';
-import { Text, StyleSheet, View, Image, TouchableOpacity, Alert, Switch } from "react-native";
-import { Ionicons } from '@expo/vector-icons';
+import { ScrollView, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import Header from "../components/profile/Header";
+import ProfileSection from "../components/profile/ProfileSection";
+import ProfileMenuItem from "../components/profile/ProfileMenuItem";
+import LogoutButton from "../components/profile/LogoutButton";
+import { useState } from 'react';
 
 export default function Profile() {
-    const [isPushNotificationsEnabled, setPushNotificationsEnabled] = React.useState(true);
-    const [isFaceIDEnabled, setFaceIDEnabled] = React.useState(false);
     const navigation = useNavigation();
+    const [selectedLanguage, setSelectedLanguage] = useState('id');
+    const [isDarkMode, setIsDarkMode] = useState(false);
 
-    const togglePushNotifications = () => setPushNotificationsEnabled(prev => !prev);
-    const toggleFaceID = () => setFaceIDEnabled(prev => !prev);
+    const userInfo = {
+        name: "John Doe",
+        email: "john.doe@example.com",
+        avatar: "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400",
+        memberSince: "2023"
+    };
 
     const handleLogout = () => {
-        // Clear any stored user data (e.g., authentication tokens)
-        // For example, if you are using AsyncStorage:
-        // await AsyncStorage.removeItem('userToken');
+        // Handle logout logic
+    };
 
-        Alert.alert(
-            "Logout",
-            "Are you sure you want to logout?",
-            [
-                {
-                    text: "Cancel",
-                    style: "cancel"
-                },
-                {
-                    text: "Logout",
-                    onPress: () => {
-                        // Navigate to the login screen
-                        navigation.navigate('Login');
-                    }
-                }
-            ]
-        );
+    const getLanguageInfo = () => {
+        const languages = {
+            'en': 'English (US)',
+            'en-gb': 'English (UK)',
+            'id': 'Bahasa Indonesia',
+            'ms': 'Bahasa Melayu',
+            'zh-cn': '简体中文',
+            'zh-tw': '繁體中文',
+            'zh-hk': '繁體中文',
+            'ja': '日本語',
+            'ko': '한국어',
+            'th': 'ภาษาไทย',
+            'vi': 'Tiếng Việt'
+        };
+        return languages[selectedLanguage] || 'English (US)';
     };
 
     return (
-        <View style={styles.profileContainer}>
-            {/* Profile Avatar */}
-            <Image
-                source={{ uri: 'https://cdn-icons-png.flaticon.com/512/8686/8686332.png' }}
-                style={styles.profileAvatar}
+        <ScrollView style={styles.container}>
+            <Header userInfo={userInfo} />
+
+            <ProfileSection title="Booking History">
+                <ProfileMenuItem
+                    icon="calendar-outline"
+                    title="My Bookings"
+                    subtitle="View your booking history"
+                    onPress={() => navigation.navigate('Booking', { screen: 'bookings' })}
+                />
+                <ProfileMenuItem
+                    icon="heart-outline"
+                    title="Favorite Courts"
+                    subtitle="Manage your favorite venues"
+                    onPress={() => { }}
+                />
+                <ProfileMenuItem
+                    icon="receipt-outline"
+                    title="Transaction History"
+                    subtitle="View your payment history"
+                    onPress={() => navigation.navigate('Booking', { screen: 'transactions' })}
+                />
+            </ProfileSection>
+
+            <ProfileSection title="Account Settings">
+                <ProfileMenuItem
+                    icon="person-outline"
+                    title="Edit Profile"
+                    onPress={() => navigation.navigate('EditProfile')}
+                />
+                <ProfileMenuItem
+                    icon="notifications-outline"
+                    title="Notifications"
+                    subtitle="Configure push notifications"
+                    onPress={() => navigation.navigate('NotificationSettings')}
+                />
+                <ProfileMenuItem
+                    icon="card-outline"
+                    title="Payment Methods"
+                    subtitle="Manage your payment methods"
+                    onPress={() => navigation.navigate('PaymentMethods')}
+                />
+            </ProfileSection>
+
+            <ProfileSection title="Preferences">
+                <ProfileMenuItem
+                    icon="language-outline"
+                    title="Language"
+                    subtitle={getLanguageInfo()}
+                    onPress={() => navigation.navigate('Language', {
+                        currentLanguage: selectedLanguage,
+                        onSelect: (langId) => setSelectedLanguage(langId)
+                    })}
+                />
+                <ProfileMenuItem
+                    icon="moon-outline"
+                    title="Dark Mode"
+                    subtitle={isDarkMode ? "On" : "Off"}
+                    onPress={() => navigation.navigate('DarkMode', {
+                        currentMode: isDarkMode,
+                        onSelect: (value) => setIsDarkMode(value)
+                    })}
+                />
+            </ProfileSection>
+
+            <ProfileSection title="Support">
+                <ProfileMenuItem
+                    icon="help-circle-outline"
+                    title="Help Center"
+                    onPress={() => navigation.navigate('HelpCenter')}
+                />
+                <ProfileMenuItem
+                    icon="document-text-outline"
+                    title="Terms of Service"
+                    onPress={() => navigation.navigate('TermsOfService')}
+                />
+                <ProfileMenuItem
+                    icon="shield-checkmark-outline"
+                    title="Privacy Policy"
+                    onPress={() => navigation.navigate('PrivacyPolicy')}
+                />
+            </ProfileSection>
+
+            <LogoutButton
+                // onPress={handleLogout}  
+                onPress={() => navigation.navigate('Login', { screen: 'Login' })}
             />
-            {/* User Info */}
-            <Text style={styles.profileName}>Adella Java</Text>
-            <Text style={styles.profileEmail}>adella@mail.com</Text>
-            {/* <Text style={styles.profileDeviceId}>Device ID: device-12345</Text> */}
-
-            {/* Edit Profile Button */}
-            <TouchableOpacity style={styles.editProfileButton}>
-                <Text style={styles.editProfileText}>Edit Profile</Text>
-            </TouchableOpacity>
-
-            {/* Preferences Section */}
-            <View style={styles.preferencesSection}>
-                <Text style={styles.sectionTitle}>Preferences</Text>
-
-                <View style={styles.preferenceItem}>
-                    <Text style={styles.preferenceText}>Push Notifications</Text>
-                    <Switch
-                        value={isPushNotificationsEnabled}
-                        onValueChange={togglePushNotifications}
-                    />
-                </View>
-
-                <View style={styles.preferenceItem}>
-                    <Text style={styles.preferenceText}>Face ID</Text>
-                    <Switch
-                        value={isFaceIDEnabled}
-                        onValueChange={toggleFaceID}
-                    />
-                </View>
-            </View>
-
-            {/* Logout Section */}
-            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-                <Ionicons name="log-out-outline" size={20} color="red" />
-                <Text style={styles.logoutText}>Logout</Text>
-            </TouchableOpacity>
-        </View>
+        </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
-    profileContainer: {
+    container: {
         flex: 1,
         backgroundColor: '#fff',
-        alignItems: 'center',
-        padding: 20,
-    },
-    profileAvatar: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        marginBottom: 10,
-    },
-    profileName: {
-        fontSize: 22,
-        fontWeight: 'bold',
-        color: '#000',
-        marginBottom: 5,
-    },
-    profileEmail: {
-        fontSize: 16,
-        color: '#666',
-        marginBottom: 30,
-    },
-    profileRole: {
-        fontSize: 14,
-        color: '#444',
-        marginBottom: 5,
-    },
-    profileDeviceId: {
-        fontSize: 14,
-        color: '#444',
-        marginBottom: 20,
-    },
-    editProfileButton: {
-        backgroundColor: '#1e3c72',
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 50,
-        marginBottom: 20,
-    },
-    editProfileText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    preferencesSection: {
-        width: '100%',
-        paddingHorizontal: 20,
-    },
-    sectionTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#000',
-        marginBottom: 10,
-    },
-    preferenceItem: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingVertical: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#eee',
-    },
-    preferenceText: {
-        fontSize: 16,
-        color: '#333',
-    },
-    logoutButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 30,
-    },
-    logoutText: {
-        fontSize: 16,
-        color: 'red',
-        marginLeft: 10,
     },
 });

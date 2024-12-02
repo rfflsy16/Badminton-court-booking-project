@@ -3,7 +3,7 @@ export class MessageController {
     // Mendapatkan pesan di dalam Room tertentu dengan pagination
     static async getMessage(req, res, next) {
         try {
-            const { roomId } = req.query; // Room ID diambil dari query
+            const { roomId } = req.params; // Room ID diambil dari query
             const page = parseInt(req.query.page) || 1;
             const limit = parseInt(req.query.limit) || 10;
 

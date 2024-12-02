@@ -1,11 +1,12 @@
 
 import express from "express"
 import { BuildingController } from "../controllers/BuildingController.js"
+import { isAdmin } from "../middlewares/authorization.js"
 
 export default function buildingRouter() {
     const router = express.Router()
 
-    router.post("/", BuildingController.createBuilding)
+    router.post("/", isAdmin, BuildingController.createBuilding)
     router.get("/", BuildingController.getAllBuildings)
     router.get("/:id", BuildingController.getBuildingById)
     router.put("/:id", BuildingController.updateBuilding)

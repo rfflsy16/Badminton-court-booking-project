@@ -1,12 +1,13 @@
 import { db } from "../config/mongoDB.js";
 import { ObjectId } from "mongodb";
+import BuildingModel from "./building.js";
 
 export default class CourtModel {
     static getCollection() {
         return db.collection("Courts");
     }
 
-    static async createCourt(data) {
+    static async createCourt(body) {
         const {
             BuildingId,
             category,
@@ -19,9 +20,11 @@ export default class CourtModel {
             price,
             dp,
             location,
-        } = data;
+        } = body;
 
-        if (!BuildingId || !ObjectId.isValid(BuildingId)) {
+        const findBuildingByBuildingId = await BuildingModel.readByIdBuilding(BuildingId)
+
+        if (!findBuildingByBuildingId) {
             throw new Error("Invalid BuildingId");
         }
 
@@ -122,5 +125,28 @@ export default class CourtModel {
         const result = await this.getCollection().deleteOne({ _id: new ObjectId(id) });
         if (result.deletedCount === 0) throw { name: "CourtNotFound" };
         return { message: "Court deleted successfully" };
+    }
+
+    static async findBuildingWithCourt(courtId) {
+        const collection = this.getCollection();
+
+        const pipeline = [
+            { $match: { _id: new ObjectId(courtId) } },
+            {
+                $lookup: {
+                    from: "Courts",
+                    localField: "_id",
+                    foreignField: "BuildingId",
+                    as: "courts",
+                },
+            },
+        ]
+
+        const result = await collection.aggregate(pipeline).toArray();
+        console.log(result, "<<<<<<<")
+        if (!result.length) {
+            throw { name: "BuildingNotFound" };
+        }
+        return result[0];
     }
 }

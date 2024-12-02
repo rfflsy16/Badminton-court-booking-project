@@ -52,8 +52,8 @@ export default class CourtController {
 
     static async getCourtsByBuilding(req, res, next) {
         try {
-            const { BuildingId } = req.params;
-            const courts = await CourtModel.findCourtsByBuilding(BuildingId);
+            const { courtId } = req.params;
+            const courts = await CourtModel.findBuildingWithCourt(courtId);
             res.status(200).json(courts);
         } catch (error) {
             next(error);

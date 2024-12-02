@@ -2,6 +2,22 @@ import RoomModel from "../models/room.js";
 import { User } from "../models/user.js";
 
 
+export const isAdmin = async (req, res, next) => {
+    try {
+        const { role } = req.loginInfo
+
+        if (role !== 'admin') {
+            return res.status(403).json({
+                message: 'U are not admin'
+            })
+        }
+
+        next()
+    } catch (error) {
+        next(error)
+    }
+}
+
 export const authorization = async (req, res, next) => {
     try {
         const { role, userId } = req.loginInfo;
@@ -28,3 +44,8 @@ export const authorization = async (req, res, next) => {
         next(error); // Lempar error ke error handler
     }
 };
+
+export const checkRoomAndMessage = async (req, res, next) => {
+    const { UserId } = req.loginInfo
+
+}

@@ -24,7 +24,7 @@ export default class BuildingModel {
         return building;
     }
 
-    static async createNewBuilding(body) {
+    static async createNewBuilding(body, userId) {
         const { name, address, location } = body;
 
         if (!name || !address || !location || !location.type || !location.coordinates) {
@@ -36,6 +36,7 @@ export default class BuildingModel {
             name,
             address,
             location,
+            userId,
             createdAt: new Date(),
             updatedAt: new Date(),
         };
@@ -126,4 +127,5 @@ export default class BuildingModel {
 
         return building;
     }
+
 }

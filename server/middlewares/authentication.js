@@ -18,7 +18,7 @@ export const authentication = async (req, res, next) => {
         if (!user) throw { name: "Unauthorized" }
 
         req.loginInfo = {
-            userId: user.id,
+            userId: user._id,
             email: user.email,
             role: user.role
         }

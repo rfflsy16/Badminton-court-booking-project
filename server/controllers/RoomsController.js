@@ -1,26 +1,24 @@
 import RoomModel from "../models/room.js";
 import { ObjectId } from "mongodb";
+import BuildingModel from "../models/building.js";
+import CourtModel from "../models/court.js";
 export class RoomController {
-    // Membuat room baru
     static async createRoom(req, res, next) {
         try {
-
-            // console.log(req.loginInfo, "login info")
             const { courtId } = req.body;
+            const { userId } = req.loginInfo;
 
-            const { userId } = req.loginInfo; // User yang login
-            // console.log(userId, "userr ini yang login")
-            const adminId = new ObjectId("6749c89fb1e40e4b8b37de9d");
+            const building = await CourtModel.findBuildingWithCourt(courtId);
+            const id = building.BuildingId
+            const adminId = await BuildingModel.readByIdBuilding(id)
 
-            // Cek apakah room dengan courtId dan userId sudah ada
             const existingRoom = await RoomModel.getRoomByCourtAndParticipants(courtId, userId);
 
             if (existingRoom) {
                 return res.status(400).json({ message: "Room already exists for this court with the same participants" });
             }
 
-            // Buat room baru jika belum ada
-            const newRoom = await RoomModel.addRoom(courtId, userId, adminId);
+            const newRoom = await RoomModel.addRoom(courtId, userId, adminId.UserId);
 
             res.status(201).json({
                 message: "Room created successfully",
@@ -30,7 +28,7 @@ export class RoomController {
             next(err);
         }
     }
-    // Mendapatkan room berdasarkan ID
+
     static async getRoomById(req, res, next) {
         try {
             const { roomId } = req.params;
@@ -42,7 +40,6 @@ export class RoomController {
         }
     }
 
-    // Mendapatkan semua room
     static async getAllRooms(req, res, next) {
         try {
             const rooms = await RoomModel.getRoom();
@@ -52,21 +49,17 @@ export class RoomController {
         }
     }
 
-    // Menghapus room hanya jika admin
-    // Menghapus room hanya jika admin
     static async deleteRoom(req, res, next) {
         try {
-            const { roomId } = req.params; // Ambil roomId dari URL
+            const { roomId } = req.params;
             console.log(`Deleting Room with ID: ${roomId}`);
 
-            // Periksa apakah room dengan ID tersebut ada
             const room = await RoomModel.getRoomById(roomId);
 
             if (!room) {
                 return res.status(404).json({ message: "Room not found" });
             }
 
-            // Hapus room
             const success = await RoomModel.deleteRoomById(roomId);
 
             if (!success) {

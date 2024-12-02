@@ -91,6 +91,31 @@ export default function App() {
     getValueFor()
   },[])
 
+
+  useEffect(() => {
+    const getNearestCourts = async () => {
+        try {
+            const { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                console.log('Permission to access location was denied');
+                return;
+            }
+            const location = await Location.getCurrentPositionAsync({});
+            
+
+            const sorted = courtsWithDistance.sort((a, b) => a.distance - b.distance);
+            
+        } catch (error) {
+            console.log(error);
+          
+            
+        }
+    };
+
+    getNearestCourts();
+}, []);
+
+
   async function getValueFor() {
     let result = await SecureStore.getItemAsync('userToken');
     

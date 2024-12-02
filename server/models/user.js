@@ -37,26 +37,31 @@ export class User {
   // Register user baru
   static async register(body) {
     const { fullName, email, password, role = "user", deviceId } = body;
+
+    if (!fullName || !email || !password) {
+      throw { name: 'BADREQUEST' }
+    }
+    if (password.length < 1) {
+      throw { name: 'BADREQUEST' }
+    }
+
     const collection = this.getCollection();
 
-    // Validasi email unik
     const existingUser = await collection.findOne({ email });
     if (existingUser) throw { name: "EmailUnique" };
 
-    // Hash password
     const hashedPassword = hashPassword(password);
 
     const defaultImgUrl = "https://example.com/default-profile.png";
     // const generatedDeviceId = crypto.randomBytes(16).toString("hex");
 
-    // Data user baru
     const newUser = {
       fullName,
       email,
       password: hashedPassword,
       role,
       imgUrl: defaultImgUrl,
-      deviceId: generatedDeviceId, // Diisi otomatis
+      deviceId,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

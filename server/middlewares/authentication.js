@@ -21,6 +21,7 @@ export const authentication = async (req, res, next) => {
 
         req.loginInfo = {
             userId: user._id,
+            username: user.fullName,
             email: user.email,
             role: user.role
         }

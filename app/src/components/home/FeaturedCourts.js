@@ -6,68 +6,26 @@ import * as Location from 'expo-location';
 import { useState, useEffect } from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { venuesData } from '../../data/venuesData';
+import axios from 'axios';
 
 export default function FeaturedCourts() {
     const navigation = useNavigation();
     const [nearestCourts, setNearestCourts] = useState([]);
+    const [latitude, setLatitude] = useState("");
+    const [longitude, setLongitude] = useState("");
     
     useEffect(() => {
-        const getNearestCourts = async () => {
-            try {
-                const { status } = await Location.requestForegroundPermissionsAsync();
-                
-                const validCourts = courtsData.filter(court => {
-                    const matchingVenue = venuesData.find(venue => venue.id === court.venueId);
-                    return matchingVenue !== undefined;
-                });
+        async function getCurrentLocation() {
+          let location = await Location.getCurrentPositionAsync({});
+          setLatitude(location.coords.latitude);
+          setLongitude(location.coords.longitude)
+        }
+        getCurrentLocation();
+      }, []);
 
-                if (status !== 'granted') {
-                    setNearestCourts(validCourts);
-                    return;
-                }
 
-                const location = await Location.getCurrentPositionAsync({});
-                const courtsWithDistance = validCourts.map(court => {
-                    const distance = calculateDistance(
-                        location.coords.latitude,
-                        location.coords.longitude,
-                        court.location.latitude,
-                        court.location.longitude
-                    );
-                    return { ...court, distance };
-                });
 
-                const sorted = courtsWithDistance.sort((a, b) => a.distance - b.distance);
-                setNearestCourts(sorted);
-            } catch (error) {
-                console.log(error);
-                const validCourts = courtsData.filter(court => {
-                    const matchingVenue = venuesData.find(venue => venue.id === court.venueId);
-                    return matchingVenue !== undefined;
-                });
-                setNearestCourts(validCourts);
-            }
-        };
-
-        getNearestCourts();
-    }, []);
-
-    const calculateDistance = (lat1, lon1, lat2, lon2) => {
-        const R = 6371; // Radius bumi dalam km
-        const dLat = deg2rad(lat2 - lat1);
-        const dLon = deg2rad(lon2 - lon1);
-        const a = 
-            Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-            Math.sin(dLon/2) * Math.sin(dLon/2); 
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-        return R * c; // Jarak dalam km
-    };
-
-    const deg2rad = (deg) => {
-        return deg * (Math.PI/180);
-    };
-
+      
     return (
         <View style={styles.section}>
             <View style={styles.sectionHeader}>

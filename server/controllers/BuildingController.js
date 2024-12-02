@@ -3,6 +3,7 @@ import { User } from "../models/user.js";
 
 export class BuildingController {
     static async createBuilding(req, res, next) {
+        // console.log('masukkkkkk')
         try {
             const { userId } = req.loginInfo
             console.log(userId)
@@ -27,6 +28,7 @@ export class BuildingController {
     }
 
     static async getBuildingById(req, res, next) {
+        // console.log('masullll')
         try {
             const { id } = req.params;
 
@@ -80,6 +82,7 @@ export class BuildingController {
     }
 
     static async findBuildingByCoordinates(req, res, next) {
+        // console.log('masullll')
         try {
             const { longitude, latitude } = req.body;
 

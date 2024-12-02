@@ -70,6 +70,28 @@ afterAll(async () => {
     await collection.deleteMany()
 })
 
+describe('POST /buildings', () => {
+    describe('POST /buildings - succeed', () => {
+        it('should be return an message Building created successfully', async () => {
+            const response = await request(app)
+                .post('/buildings')
+                .send({
+                    "name": "GOR Bintaro",
+                    "address": "Jl. Bintaro Utama No.76, Bintaro, Tangerang Selatan",
+                    "location": {
+                        "type": "Point",
+                        "coordinates": [106.748156, -6.269657]
+                    }
+                }
+                )
+                .set('Authorization', `Bearer ${access_token_admin}`)
+
+            expect(response.status).toBe(201)
+            expect(response.body.message).toBe("Building created successfully")
+        })
+    })
+})
+
 describe('GET /buildings', () => {
     describe('GET /buildings - succeed', () => {
         it('should be return data of buildings', async () => {

@@ -14,10 +14,12 @@ export default class PaymentModel {
     }
 
     static async readByIdPayment(id) {
+
         const _id = new ObjectId(id)
         const collection = this.getCollection()
 
         const payment = await collection.findOne({ _id })
+
 
         if (!payment) {
             throw { name: 'NotFound' }

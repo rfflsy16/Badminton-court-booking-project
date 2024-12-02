@@ -95,6 +95,7 @@ export class User {
   static async findByEmail(email) {
     const collection = this.getCollection()
     const findUser = await collection.findOne({ email: email })
+    // console.log('masukkk')
     if (!findUser) throw { name: 'NotFound' }
     return findUser
   }

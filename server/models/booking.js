@@ -33,4 +33,10 @@ export default class BookingModel {
         const collection = this.getCollection();
         return await collection.updateOne({ _id }, { $set: updateData });
     }
+
+    static async findByCourtAndDate(courtId, date) {
+        const collection = this.getCollection();
+        return await collection.find({ courtId, date }).toArray();
+    }
+
 }

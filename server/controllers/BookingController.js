@@ -14,7 +14,7 @@ export class BookingController {
     // Add a new booking
     static async addBooking(req, res, next) {
         try {
-            const { userId, username } = req.loginInfo
+            const { userId, username } = req.loginInfo;
             const { courtId, date, selectedTime, paymentType, price } = req.body;
 
             // Validate input
@@ -22,8 +22,26 @@ export class BookingController {
                 return res.status(400).json({ message: "Missing required fields" });
             }
 
+
+            // Validasi apakah waktu sudah di-booking
+            const existingBookings = await BookingModel.findByCourtAndDate(courtId, date);
+            const conflictingTimes = existingBookings.flatMap(booking => booking.selectedTime)
+                .filter(time => selectedTime.includes(time));
+
+            if (conflictingTimes.length > 0) {
+                return res.status(400).json({
+                    message: `Lapangan penuh pada waktu ${conflictingTimes.join(', ')}`
+                });
+            }
+
             // Calculate total price
             const totalPrice = selectedTime.length * price;
+
+            //validasi untuk booking dp
+            let paymentAmount = totalPrice; // Default to full price
+            if (paymentType === "Dp") {
+                paymentAmount = totalPrice * 0.5; // Set DP to 50%
+            }
 
             const bookingData = {
                 userId,
@@ -38,25 +56,29 @@ export class BookingController {
                 updatedAt: new Date(),
             };
 
+            // Simpan booking
             const newBooking = await BookingModel.create(bookingData, userId);
 
-            // simpan ke data payment
+            // Simpan ke data payment
+            const bodyPayment = {
+                BookingId: newBooking.insertedId,
+                type: paymentType,
+                amount: paymentAmount,
+                status: "pending"
+            };
+            const newPayment = await PaymentModel.createNewPayment(bodyPayment, username);
 
-            // const bodyPayment = {
-            //     BookingId: newBooking.insertedId, type: paymentType, amount, status = "pending" 
-            // }
-            const newPayment = await PaymentModel.createNewPayment(req.body, username)
             res.status(201).json({
-                newPayment
-            })
-
-            // simpan data ke midtrans / create invoice
-
-            res.status(201).json({ message: "Booking created successfully", booking: newBooking.ops[0], paymentUrl: "" });
+                message: "Booking created successfully",
+                booking: newBooking,
+                paymentUrl: "",
+                newPayment,
+            });
         } catch (error) {
             next(error);
         }
     }
+
 
     // Delete a booking
     static async deleteBooking(req, res, next) {

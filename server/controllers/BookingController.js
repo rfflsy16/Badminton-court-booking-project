@@ -1,5 +1,5 @@
 import BookingModel from "../models/booking.js";
-
+import PaymentModel from "../models/payment.js";
 export class BookingController {
     // Get all bookings
     static async getBooking(req, res, next) {
@@ -14,10 +14,11 @@ export class BookingController {
     // Add a new booking
     static async addBooking(req, res, next) {
         try {
-            const { UserId, CourtId, date, selectedTime, paymentType, price } = req.body;
+            const { userId, username } = req.loginInfo
+            const { courtId, date, selectedTime, paymentType, price } = req.body;
 
             // Validate input
-            if (!UserId || !CourtId || !date || !selectedTime || !paymentType || !price) {
+            if (!courtId || !date || !selectedTime || !paymentType || !price) {
                 return res.status(400).json({ message: "Missing required fields" });
             }
 
@@ -25,8 +26,8 @@ export class BookingController {
             const totalPrice = selectedTime.length * price;
 
             const bookingData = {
-                UserId,
-                CourtId,
+                userId,
+                courtId,
                 date,
                 selectedTime,
                 paymentType,
@@ -37,9 +38,17 @@ export class BookingController {
                 updatedAt: new Date(),
             };
 
-            const newBooking = await BookingModel.create(bookingData);
+            const newBooking = await BookingModel.create(bookingData, userId);
 
             // simpan ke data payment
+
+            // const bodyPayment = {
+            //     BookingId: newBooking.insertedId, type: paymentType, amount, status = "pending" 
+            // }
+            const newPayment = await PaymentModel.createNewPayment(req.body, username)
+            res.status(201).json({
+                newPayment
+            })
 
             // simpan data ke midtrans / create invoice
 

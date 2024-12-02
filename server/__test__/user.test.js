@@ -130,4 +130,17 @@ describe('POST /login', () => {
             expect(response.body.message).toBe('Please input email or password')
         })
     })
+    describe('POST /login - failed', () => {
+        it('should be return an error message because email or password is invalid', async () => {
+            const response = await request(app)
+                .post('/login')
+                .send({
+                    email: 'udin@mail.com',
+                    password: ''
+                })
+
+            expect(response.status).toBe(401)
+            expect(response.body.message).toBe('Please input email or password')
+        })
+    })
 })

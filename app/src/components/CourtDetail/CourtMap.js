@@ -2,10 +2,10 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import MapView, { Marker } from 'react-native-maps';
 
-export default function CourtMap({ 
-    court, 
-    onNavigate, 
-    onShare 
+export default function CourtMap({
+    court,
+    onNavigate,
+    onShare
 }) {
     return (
         <View style={styles.section}>
@@ -37,14 +37,14 @@ export default function CourtMap({
                 </MapView>
                 <View style={styles.mapOverlay}>
                     <View style={styles.mapActions}>
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             style={styles.mapActionButton}
                             onPress={onNavigate}
                         >
                             <Ionicons name="navigate" size={20} color="#1F2937" />
                             <Text style={styles.mapActionText}>Navigate</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             style={styles.mapActionButton}
                             onPress={onShare}
                         >

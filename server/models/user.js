@@ -63,7 +63,6 @@ export class User {
     return result
   }
 
-  // Login user
   static async login(body) {
     const { email, password } = body;
     const collection = this.getCollection();
@@ -72,11 +71,9 @@ export class User {
       throw { name: "BadRequest" };
     }
 
-    // Cari user berdasarkan email
     const user = await collection.findOne({ email });
     if (!user) throw { name: "LoginError" };
 
-    // Cocokkan password
     if (!comparePassword(password, user.password)) {
       throw { name: "LoginError" };
     }

@@ -33,7 +33,7 @@ describe('POST /register', () => {
         })
     })
     describe('POST /register -failed', () => {
-        it('should be return an error message', async () => {
+        it('should be return an error message because email must be unique', async () => {
             const response = await request(app)
                 .post('/register')
                 .send({
@@ -42,8 +42,79 @@ describe('POST /register', () => {
                     password: '123456'
                 })
 
-            expect(response.status).toBe(201)
-            expect(response.body.message).toBe('Register Successfully')
+            expect(response.status).toBe(400)
+            expect(response.body.message).toBe('Email already exists')
+        })
+    })
+    describe('POST /register -failed', () => {
+        it('should be return an error message because password is empty', async () => {
+            const response = await request(app)
+                .post('/register')
+                .send({
+                    fullName: 'udinaja',
+                    email: 'udin@mail.com',
+                    password: ''
+                })
+
+            expect(response.status).toBe(400)
+            expect(response.body.message).toBe('Please input all of the field')
+        })
+    })
+    describe('POST /register -failed', () => {
+        it('should be return an error message because email is empty', async () => {
+            const response = await request(app)
+                .post('/register')
+                .send({
+                    fullName: 'udinaja',
+                    email: '',
+                    password: '123456'
+                })
+
+            expect(response.status).toBe(400)
+            expect(response.body.message).toBe('Please input all of the field')
+        })
+    })
+    describe('POST /register -failed', () => {
+        it('should be return an error message because fullName is empty', async () => {
+            const response = await request(app)
+                .post('/register')
+                .send({
+                    fullName: '',
+                    email: 'mamang@mail.com',
+                    password: '123456'
+                })
+
+            expect(response.status).toBe(400)
+            expect(response.body.message).toBe('Please input all of the field')
+        })
+    })
+})
+
+describe('POST /login', () => {
+    describe('POST /login - succeed', () => {
+        it('should be return an access_token and message Login successful', async () => {
+            const response = await request(app)
+                .post('/login')
+                .send({
+                    email: 'udin@mail.com',
+                    password: '123456'
+                })
+
+            expect(response.status).toBe(200)
+            expect(response.body.message).toBe('Login successful')
+        })
+    })
+    describe('POST /login - failed', () => {
+        it('should be return an error message because email or password is invalid', async () => {
+            const response = await request(app)
+                .post('/login')
+                .send({
+                    email: 'udin@mail.com',
+                    password: '1234567'
+                })
+
+            expect(response.status).toBe(401)
+            expect(response.body.message).toBe('Invalid email or password')
         })
     })
 })

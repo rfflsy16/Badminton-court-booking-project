@@ -18,7 +18,7 @@ export default function Home() {
     return (
         <View style={styles.container}>
             <Header />
-            <ScrollView 
+            <ScrollView
                 showsVerticalScrollIndicator={false}
                 refreshControl={
                     <RefreshControl

@@ -16,9 +16,11 @@ import TermsOfService from '../screens/profile/TermsOfService';
 import PrivacyPolicy from '../screens/profile/PrivacyPolicy';
 import Notifications from '../screens/Notifications';
 import Invoice from '../screens/Invoice';
+import useIsSignedOut from "../hooks/useIsSignedOut";
+import useIsSignedIn from "../hooks/useIsSignedIn";    
 
 const RootStack = createNativeStackNavigator({
-    initialRouteName: "MainApp",
+    // initialRouteName: "MainApp",
     screenOptions: {
         headerShown: false,
         contentStyle: { backgroundColor: 'white' },
@@ -26,56 +28,73 @@ const RootStack = createNativeStackNavigator({
     screens: {
         // Authentication
         Login: {
+            if: useIsSignedOut,
             screen: Login,
         },
         Register: {
+            if: useIsSignedOut,
             screen: Register
         },
         // Main App
         MainApp: {
+            if: useIsSignedIn,
             screen: TabStack
         },
         // Other Screens
         CourtDetail: {
+            if: useIsSignedIn,
             screen: CourtDetail
         },
         ChatDetail: {
+            if: useIsSignedIn,
             screen: ChatDetail
         },
         Maps: {
+            if: useIsSignedIn,
             screen: Maps
         },
         BuildingCourts: {
+            if: useIsSignedIn,
             screen: BuildingCourts
         },
         EditProfile: {
+            if: useIsSignedIn,
             screen: EditProfile
         },
         NotificationSettings: {
+            if: useIsSignedIn,
             screen: NotificationSettings
         },
         PaymentMethods: {
+            if: useIsSignedIn,
             screen: PaymentMethods
         },
         Language: {
+            if: useIsSignedIn,
             screen: Language
         },
         DarkMode: {
+            if: useIsSignedIn,
             screen: DarkMode
         },
         HelpCenter: {
+            if: useIsSignedIn,
             screen: HelpCenter
         },
         TermsOfService: {
+            if: useIsSignedIn,
             screen: TermsOfService
         },
         PrivacyPolicy: {
+            if: useIsSignedIn,
             screen: PrivacyPolicy
         },
         Notifications: {
+            if: useIsSignedIn,
             screen: Notifications
         },
         Invoice: {
+            if: useIsSignedIn,
             screen: Invoice
         },
     },

@@ -29,11 +29,11 @@ export default function Chat({ navigation }) {
     return (
         <View style={styles.container}>
             <Header />
-            <SearchBar 
+            <SearchBar
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
             />
-            <ChatList 
+            <ChatList
                 chats={filteredChats}
                 onChatPress={handleChatPress}
             />

@@ -54,7 +54,7 @@ export default function Profile() {
                     icon="heart-outline"
                     title="Favorite Courts"
                     subtitle="Manage your favorite venues"
-                    onPress={() => {}}
+                    onPress={() => { }}
                 />
                 <ProfileMenuItem
                     icon="receipt-outline"
@@ -123,9 +123,9 @@ export default function Profile() {
                 />
             </ProfileSection>
 
-            <LogoutButton 
-            // onPress={handleLogout}  
-            onPress={() => navigation.navigate('Login', { screen: 'Login' })}
+            <LogoutButton
+                // onPress={handleLogout}  
+                onPress={() => navigation.navigate('Login', { screen: 'Login' })}
             />
         </ScrollView>
     );

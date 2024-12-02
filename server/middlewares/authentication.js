@@ -1,6 +1,8 @@
 import { verifyToken } from "../helpers/jwt.js";
 import { User } from "../models/user.js";
+
 export const authentication = async (req, res, next) => {
+
     try {
         const { authorization } = req.headers
 
@@ -24,6 +26,7 @@ export const authentication = async (req, res, next) => {
         }
 
         next()
+
     } catch (error) {
         next(error)
     }

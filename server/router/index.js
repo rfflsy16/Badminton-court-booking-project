@@ -3,6 +3,7 @@ import { UserController } from '../controllers/UserController.js'
 import { errorHandler } from '../middlewares/errorHandler.js'
 import { authentication } from '../middlewares/authentication.js'
 import roomRouter from '../router/room.js'
+
 import buildingRouter from './buildings.js'
 import messageRouter from "./message.js"
 import courtRouter from './courts.js'

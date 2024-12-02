@@ -39,6 +39,22 @@ export class BuildingController {
         }
     }
 
+    static async findBuildingByCoordinates(req, res, next) {
+        try {
+            const { longitude, latitude } = req.body;
+
+            if (typeof longitude !== 'number' || typeof latitude !== 'number') {
+                return res.status(400).json({ message: "Invalid coordinates" });
+            }
+
+            const building = await BuildingModel.findBuildingByCoordinates(longitude, latitude);
+
+            res.status(200).json(building);
+        } catch (err) {
+            next(err);
+        }
+    }
+
     static async updateBuilding(req, res, next) {
         try {
             const { id } = req.params;
@@ -55,6 +71,9 @@ export class BuildingController {
     static async deleteBuilding(req, res, next) {
         try {
             const { id } = req.params;
+            if (id.length !== 24) { // Check if id is a valid ObjectId
+                throw { name: "validationErrorId" }; // If not, throw an error       
+            }
             await BuildingModel.deleteBuilding(id);
             res.status(200).json({ message: "Building deleted successfully" });
         } catch (err) {
@@ -62,36 +81,16 @@ export class BuildingController {
         }
     }
 
-    static async findNearestBuildings(req, res, next) {
+    static async findBuildingByUserLocation(req, res, next) {
         try {
-            const { deviceId } = req.params;
-            const user = await User.getByDeviceId(deviceId);
-            if (!user || !user.location) {
-                return res.status(404).json({ message: "User location not found" });
-            }
-
-            const userLocation = user.location.coordinates;
-
-            const buildings = await BuildingModel.findNearestBuildings(userLocation, 1000); // Menggunakan radius 1000 meter
+            const { longitude, latitude } = req.query;
+            const buildings = await BuildingModel.findBuildingByUserLocation(longitude, latitude);
             res.status(200).json(buildings);
         } catch (err) {
-            next(err);
-        }
-    }
-
-    static async findBuildingByCoordinates(req, res, next) {
-        try {
-            const { longitude, latitude } = req.body;
-
-            if (typeof longitude !== 'number' || typeof latitude !== 'number') {
-                return res.status(400).json({ message: "Invalid coordinates" });
-            }
-
-            const building = await BuildingModel.findBuildingByCoordinates(longitude, latitude);
-
-            res.status(200).json(building);
-        } catch (err) {
+            console.error('Error finding buildings:', err);
             next(err);
         }
     }
 }
+
+

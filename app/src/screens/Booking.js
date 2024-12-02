@@ -38,7 +38,7 @@ export default function Booking({ route }) {
     return (
         <View style={styles.container}>
             <Header />
-            <TabBar 
+            <TabBar
                 activeTab={activeTab}
                 scrollX={scrollX}
                 handleTabPress={handleTabPress}

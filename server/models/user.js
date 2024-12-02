@@ -54,7 +54,7 @@ export class User {
     };
 
     const result = await collection.insertOne(newUser);
-    return result.ops;
+    return result
   }
 
   // Login user

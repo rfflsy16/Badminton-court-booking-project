@@ -16,6 +16,7 @@ import TermsOfService from '../screens/profile/TermsOfService';
 import PrivacyPolicy from '../screens/profile/PrivacyPolicy';
 import Notifications from '../screens/Notifications';
 import Invoice from '../screens/Invoice';
+import Test from '../screens/test'
 
 const RootStack = createNativeStackNavigator({
     initialRouteName: "MainApp",
@@ -25,6 +26,9 @@ const RootStack = createNativeStackNavigator({
     },
     screens: {
         // Authentication
+        // Test: {
+        //     screen: Test,
+        // },
         Login: {
             screen: Login,
         },

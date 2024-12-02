@@ -1,8 +1,18 @@
 import { TouchableOpacity, Text, StyleSheet } from "react-native";
+import * as SecureStore from 'expo-secure-store';
+import { useContext } from "react";
+import AuthContext from "../../context/AuthContext";
 
 export default function LogoutButton({ onPress }) {
+    const authContext = useContext(AuthContext);
+
     return (
-        <TouchableOpacity style={styles.logoutButton} onPress={onPress}>
+        <TouchableOpacity style={styles.logoutButton} 
+        onPress={async () => {
+            await SecureStore.deleteItemAsync("token");
+            authContext.setIsLogin(false);
+        }}
+        >
             <Text style={styles.logoutText}>Log Out</Text>
         </TouchableOpacity>
     );

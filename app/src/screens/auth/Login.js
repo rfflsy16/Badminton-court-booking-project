@@ -1,7 +1,10 @@
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigation } from "@react-navigation/native";
+import AuthContext from "../../context/AuthContext";
+import * as SecureStore from 'expo-secure-store';
+import axios from 'axios';
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -9,6 +12,7 @@ export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
     const [isFormValid, setIsFormValid] = useState(false);
     const navigation = useNavigation();
+    const authContext = useContext(AuthContext);
 
     useEffect(() => {
         // Check if both email and password are filled
@@ -20,15 +24,34 @@ export default function Login() {
         validateForm();
     }, [email, password]);
 
-    const handleLogin = () => {
-        if (isFormValid) {
-            // Here you would typically handle authentication
-            // For now, we'll just navigate to the main app
-            navigation.replace("MainApp");
+    const handleLogin = async () => {
+        
+        if (!isFormValid) return alert('Please fill in all fields');
+
+        try {
+            // Call login API
+            const response = await axios.post('https://3f51-2a09-bac5-3a24-18be-00-277-3e.ngrok-free.app/login', {
+                email,
+                password
+            });
+            
+            // If login successful
+            if (response.data.access_token) {
+                // Store token
+                await SecureStore.setItemAsync('userToken', response.data.access_token);
+                
+                // Update auth context
+                authContext.setIsLogin(true);
+                
+                // Navigate to main app
+                navigation.replace('MainApp');
+            }
+        } catch (error) {
+            console.log(error, '<<<<<<<<<<<<<<<<<<<<')
+            alert('Invalid email or password');
         }
     };
-
-    return (
+            return (
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={styles.container}

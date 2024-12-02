@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { db } from "../config";
+import { db } from "../config/mongoDB.js";
 
 export default class PaymentModel {
     static getCollection() {
@@ -27,7 +27,7 @@ export default class PaymentModel {
     }
 
     static async createNewPayment(body, username) {
-        const { BookingId, type, amount, } = body
+        const { BookingId, type, amount, status = "pending" } = body
 
         if (!BookingId || !type || !amount) {
             throw { name: 'BADREQUEST' }
@@ -39,6 +39,7 @@ export default class PaymentModel {
             BookingId,
             type,
             amount,
+            status,
             createdAt: new Date(),
             updatedAt: new Date()
         }

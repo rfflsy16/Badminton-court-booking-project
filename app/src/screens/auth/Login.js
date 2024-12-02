@@ -24,6 +24,12 @@ export default function Login() {
         validateForm();
     }, [email, password]);
 
+    useEffect(() => {
+        if (authContext.isLogin) {
+            navigation.navigate('MainApp'); 
+        }
+    }, [authContext.isLogin]);
+
     const handleLogin = async () => {
 
         if (!isFormValid) return alert('Please fill in all fields');
@@ -34,7 +40,7 @@ export default function Login() {
                 email,
                 password
             });
-
+            
             // If login successful
             if (response.data.access_token) {
                 // Store token
@@ -44,7 +50,7 @@ export default function Login() {
                 authContext.setIsLogin(true);
 
                 // Navigate to main app
-                navigation.replace('MainApp');
+                // navigation.navigate('MainApp');
             }
         } catch (error) {
             alert('Invalid email or password');

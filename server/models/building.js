@@ -121,9 +121,9 @@ export default class BuildingModel {
 
 
         if (!building) {
-            throw { name: 'BuildingNotFound' }
+            return []
         }
-
+ 
         return building;
     }
 

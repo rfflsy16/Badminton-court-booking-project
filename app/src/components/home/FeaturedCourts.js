@@ -7,12 +7,27 @@ import { useState, useEffect } from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { venuesData } from '../../data/venuesData';
 import axios from 'axios';
+import * as SecureStore from 'expo-secure-store';
 
 export default function FeaturedCourts() {
     const navigation = useNavigation();
     const [nearestCourts, setNearestCourts] = useState([]);
     const [latitude, setLatitude] = useState("");
     const [longitude, setLongitude] = useState("");
+    const base_url = process.env.EXPO_PUBLIC_BASE_URL;
+    const [userToken, setUserToken] = useState("");
+
+
+    useEffect(() => {
+        
+        async function getToken() {
+            const token = await SecureStore.getItemAsync('userToken');
+            setUserToken(token);
+
+        }
+        getToken();
+    
+    },[])
     
     useEffect(() => {
         async function getCurrentLocation() {
@@ -23,9 +38,41 @@ export default function FeaturedCourts() {
         getCurrentLocation();
       }, []);
 
+      useEffect(() => {
+        getNearestCourts();
+      }, [userToken, latitude, longitude]);
 
+      const getNearestCourts = async () => {
+          
+          try {
+            console.log(longitude, '<<<<<<<<<<<<<<<<<<<<<<<<<longitude 123')
+            console.log(latitude, '<<<<<<<<<<<<<<<<<<<<<<<<<latitude 123')
+            const venuesData = await axios.post(`${base_url}/buildings/coordinates`,
+                {
+                    "longitude": longitude ,
+                    "latitude":latitude              
+                  },
+                {  
+                headers: {              
+                Authorization: `Bearer ${userToken}` }}
+            );
+           console.log(venuesData.data, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
-      
+            // const sorted = venuesData.map((court) => ({
+            //     ...court,
+            //     distance: getDistanceFromLatLonInKm(
+            //         location.coords.latitude,
+            //         location.coords.longitude,
+            //         court.location.latitude,
+            //         court.location.longitude
+            //     )
+            // })).sort((a, b) => a.distance - b.distance);
+            // setNearestCourts(sorted);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     return (
         <View style={styles.section}>
             <View style={styles.sectionHeader}>

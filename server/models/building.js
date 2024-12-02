@@ -122,9 +122,9 @@ export default class BuildingModel {
         console.log(building, '<<<<<<')
 
         if (!building) {
-            throw { name: 'BuildingNotFound' }
+            return []
         }
-
+ 
         return building;
     }
 

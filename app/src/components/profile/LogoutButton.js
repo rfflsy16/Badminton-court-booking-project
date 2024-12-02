@@ -9,7 +9,7 @@ export default function LogoutButton({ onPress }) {
     return (
         <TouchableOpacity style={styles.logoutButton} 
         onPress={async () => {
-            await SecureStore.deleteItemAsync("token");
+            await SecureStore.deleteItemAsync("userToken");
             authContext.setIsLogin(false);
         }}
         >

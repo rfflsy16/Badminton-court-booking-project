@@ -1,8 +1,9 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, KeyboardAvoidingView, Platform, Alert } from "react-native";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
+import AuthContext from "../../context/AuthContext"; 
 
 export default function Register() {
   const navigation = useNavigation();
@@ -12,7 +13,8 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [deviceId, setDeviceId] = useState('abc123');
+  const authContext = useContext(AuthContext);
+  
 
   const handleRegister = async () => {
     try {
@@ -26,12 +28,11 @@ export default function Register() {
           fullName:name,
           email,
           password,
-          deviceId
+          deviceId: authContext.expoPushToken,
         }).toString(),
       });
 
       const responseText = await response.text();
-      console.log(responseText, '<<<<<<<<<<<< raw response text');
 
       // Attempt to parse the response as JSON
       const data = JSON.parse(responseText);

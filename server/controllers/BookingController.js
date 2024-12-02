@@ -38,7 +38,12 @@ export class BookingController {
             };
 
             const newBooking = await BookingModel.create(bookingData);
-            res.status(201).json({ message: "Booking created successfully", booking: newBooking.ops[0] });
+
+            // simpan ke data payment
+
+            // simpan data ke midtrans / create invoice
+
+            res.status(201).json({ message: "Booking created successfully", booking: newBooking.ops[0], paymentUrl: "" });
         } catch (error) {
             next(error);
         }

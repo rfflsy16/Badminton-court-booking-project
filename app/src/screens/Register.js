@@ -9,19 +9,16 @@ export default function Register() {
     const [password, setPassword] = useState('');
     const [deviceId, setDeviceId] = useState('abc123');
 
-    const handleRegister = async () => {
+    const handleRegister = async () => { 
         try {
-            const response = await fetch('https://02f4-103-121-170-7.ngrok-free.app/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({
+            const response = await axios.post('https://02f4-103-121-170-7.ngrok-free.app/register', {
+              
+                
                     fullName,
                     email,
                     password,
                     deviceId
-                }).toString(),
+                
             });
 
             const responseText = await response.text();

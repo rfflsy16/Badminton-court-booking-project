@@ -21,7 +21,7 @@ export default function Login() {
             });
 
             const data = await response.json();
-            console.log(data, '<<<<<<<<<<<< data');
+            
             if (response.ok) {
                 Alert.alert('Success', 'Logged in successfully');
                 navigation.navigate('HomeNavigator');

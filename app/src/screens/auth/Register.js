@@ -1,7 +1,8 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, KeyboardAvoidingView, Platform, Alert } from "react-native";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
 
 export default function Register() {
   const navigation = useNavigation();
@@ -11,23 +12,54 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [deviceId, setDeviceId] = useState('abc123');
 
-  const handleRegister = () => {
-    // TODO: Implement register logic
-    console.log("Register with:", name, email, password);
+  const handleRegister = async () => {
+    try {
+
+      const response= await fetch('https://3f51-2a09-bac5-3a24-18be-00-277-3e.ngrok-free.app/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          fullName:name,
+          email,
+          password,
+          deviceId
+        }).toString(),
+      });
+
+      const responseText = await response.text();
+      console.log(responseText, '<<<<<<<<<<<< raw response text');
+
+      // Attempt to parse the response as JSON
+      const data = JSON.parse(responseText);
+      console.log(data, '<<<<<<<<<<<< parsed data');
+
+      if (response.ok) {
+        Alert.alert('Success', 'User registered successfully');
+        navigation.navigate('Login');
+      } else {
+        Alert.alert('Error', data.message || 'Something went wrong');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      Alert.alert('Error', 'Failed to register user');
+    }
   };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.headerContainer}>
-          <Image 
+          <Image
             source={{ uri: 'https://img.freepik.com/free-vector/abstract-badminton-logo_17005-995.jpg?t=st=1733051272~exp=1733054872~hmac=a371f1ab1ce27b8b790a609df8fe8363cf4cf17f7a98a38aac9318a345c801dc&w=826' }}
             style={styles.logo}
             resizeMode="contain"
@@ -70,10 +102,10 @@ export default function Register() {
               secureTextEntry={!showPassword}
             />
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-              <Ionicons 
-                name={showPassword ? "eye-outline" : "eye-off-outline"} 
-                size={20} 
-                color="#94A3B8" 
+              <Ionicons
+                name={showPassword ? "eye-outline" : "eye-off-outline"}
+                size={20}
+                color="#94A3B8"
               />
             </TouchableOpacity>
           </View>
@@ -88,10 +120,10 @@ export default function Register() {
               secureTextEntry={!showConfirmPassword}
             />
             <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-              <Ionicons 
-                name={showConfirmPassword ? "eye-outline" : "eye-off-outline"} 
-                size={20} 
-                color="#94A3B8" 
+              <Ionicons
+                name={showConfirmPassword ? "eye-outline" : "eye-off-outline"}
+                size={20}
+                color="#94A3B8"
               />
             </TouchableOpacity>
           </View>

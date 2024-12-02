@@ -25,7 +25,7 @@ export default function Login() {
     }, [email, password]);
 
     const handleLogin = async () => {
-        
+
         if (!isFormValid) return alert('Please fill in all fields');
 
         try {
@@ -34,24 +34,23 @@ export default function Login() {
                 email,
                 password
             });
-            
+
             // If login successful
             if (response.data.access_token) {
                 // Store token
                 await SecureStore.setItemAsync('userToken', response.data.access_token);
-                
+
                 // Update auth context
                 authContext.setIsLogin(true);
-                
+
                 // Navigate to main app
                 navigation.replace('MainApp');
             }
         } catch (error) {
-            console.log(error, '<<<<<<<<<<<<<<<<<<<<')
             alert('Invalid email or password');
         }
     };
-            return (
+    return (
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={styles.container}

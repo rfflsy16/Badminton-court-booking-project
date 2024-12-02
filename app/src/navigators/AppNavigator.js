@@ -18,6 +18,7 @@ import Notifications from '../screens/Notifications';
 import Invoice from '../screens/Invoice';
 import useIsSignedOut from "../hooks/useIsSignedOut";
 import useIsSignedIn from "../hooks/useIsSignedIn";    
+import Test from '../screens/test'
 
 const RootStack = createNativeStackNavigator({
     // initialRouteName: "MainApp",
@@ -27,6 +28,9 @@ const RootStack = createNativeStackNavigator({
     },
     screens: {
         // Authentication
+        // Test: {
+        //     screen: Test,
+        // },
         Login: {
             if: useIsSignedOut,
             screen: Login,

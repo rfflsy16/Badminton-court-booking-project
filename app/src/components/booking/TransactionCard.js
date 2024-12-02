@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     statusContainer: {
         paddingHorizontal: 12,
         paddingVertical: 6,
-        borderRadius: 20,
+        borderRadius: 6,
     },
     statusText: {
         fontSize: 12,

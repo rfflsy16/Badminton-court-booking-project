@@ -1,3 +1,4 @@
+import { RoomController } from "../controllers/RoomsController.js";
 import RoomModel from "../models/room.js";
 import { User } from "../models/user.js";
 
@@ -46,6 +47,25 @@ export const authorization = async (req, res, next) => {
 };
 
 export const checkRoomAndMessage = async (req, res, next) => {
-    const { UserId } = req.loginInfo
+    try {
+        const { userId, role } = req.loginInfo;
+        const { roomId } = req.params;
 
-}
+        if (role !== 'admin') {
+            const findRoom = await RoomModel.getRoomById(roomId);
+
+            if (!findRoom) {
+                return res.status(404).json({ message: "Room not found" });
+            }
+
+            const participants = findRoom.participants; // Ambil array participants
+            if (participants[0].toString() !== userId.toString()) {
+                return res.status(403).json({ message: "You are not a participant in this room" });
+            }
+        }
+        next();
+    } catch (error) {
+        console.error(error);
+        next(error); // Oper error ke middleware error handler
+    }
+};

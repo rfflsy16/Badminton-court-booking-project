@@ -27,7 +27,8 @@ export class MessageController {
     // Menambahkan pesan baru
     static async postMessage(req, res, next) {
         try {
-            const { roomId, text } = req.body;
+            const { roomId } = req.params
+            const { text } = req.body;
             const { userId } = req.loginInfo; // User yang login
 
             if (!roomId || !text) {

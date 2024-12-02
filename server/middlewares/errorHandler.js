@@ -61,9 +61,9 @@ export const errorHandler = (err, req, res, next) => {
         message = err.message
     }
 
-    if (err.name === "LoginError" || err.name === "EmailUnique") {
+    if (err.name === "EmailUnique") {
         status = 400
-        message = 'Invalid Credentials'
+        message = 'Email already exists'
     }
 
     if (err.name === 'BuildingNotFound') {

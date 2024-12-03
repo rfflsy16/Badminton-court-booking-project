@@ -86,7 +86,6 @@ export default function BuildingCourts() {
     const route = useRoute();
     const navigation = useNavigation();
     const { venue } = route.params;
-    console.log(venue, "<<<< venue")
     const [userToken, setUserToken] = useState("");
     const [courtsData, setCourtsData] = useState([]);
 
@@ -114,7 +113,7 @@ export default function BuildingCourts() {
             console.log(error)
         }
     }
-
+    console.log(venue, "<<<<<<< venue")
     return (
         <View style={styles.container}>
             {/* Header */}
@@ -137,7 +136,7 @@ export default function BuildingCourts() {
                 </View>
                 <View style={styles.infoItem}>
                     <MaterialCommunityIcons name="badminton" size={20} color="#64748B" />
-                    <Text style={styles.infoText}>{venue.courts.length} Courts</Text>
+                    <Text style={styles.infoText}>{venue?.courts?.length} Courts</Text>
                 </View>
             </View>
 

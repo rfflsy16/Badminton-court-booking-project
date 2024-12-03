@@ -23,7 +23,6 @@ export default function BookingModal({
     handleConfirm,
     timeSlots 
 }) {
-    console.log(court,"<<<< court di modal")
     const swipeAnim = useRef(new Animated.Value(0)).current;
     const progressAnim = useRef(new Animated.Value(0)).current;
     const [isSwipeCompleted, setIsSwipeCompleted] = useState(false);

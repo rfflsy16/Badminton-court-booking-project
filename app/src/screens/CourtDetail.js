@@ -177,9 +177,6 @@ export default function CourtDetail() {
         navigation.replace('MainApp');
     };
 
-
-    console.log(courtDetails, "<<<< court details")
-
     if (isLoading || !courtDetails) {
         return (
             <View style={[styles.container, styles.loadingContainer]}>

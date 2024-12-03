@@ -92,7 +92,7 @@ export default function FeaturedCourts() {
                         <TouchableOpacity 
                             key={court._id || court.id} 
                             style={styles.featuredCard}
-                            onPress={() => navigation.navigate('CourtDetail', { court })}
+                            onPress={() => navigation.navigate('BuildingCourts', { venue: court })}
                         >
                             <Image
                                 source={{ uri: court.imgUrl || court.image }}

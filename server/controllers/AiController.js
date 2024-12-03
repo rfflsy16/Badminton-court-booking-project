@@ -11,14 +11,13 @@ export default class AIController {
                     message: 'Lapangan ini sudah di booking',
                     status: 'Booked'
                 })
-            } else {
-                const availableCourt = await CourtModel.readCourts()
-
-                const genAi = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
-                const model = genAi.getGenerativeModel({ model: 'gemini-1.5-flash' })
-
-                const prompt = ``
             }
+            const availableCourt = await CourtModel.readCourts()
+
+            const genAi = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
+            const model = genAi.getGenerativeModel({ model: 'gemini-1.5-flash' })
+
+            const prompt = ``
 
         } catch (error) {
             console.log(error)

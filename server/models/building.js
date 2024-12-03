@@ -123,7 +123,7 @@ export default class BuildingModel {
                 },
             },
         });
-
+        // console.log(building, "<<<<<<<<< ini di controller")
         if (!building) {
             throw { name: 'BuildingNotFound' }
         }

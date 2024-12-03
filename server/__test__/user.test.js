@@ -8,11 +8,11 @@ import { User } from '../models/user'
 // beforeAll(async () => {
 // })
 
-afterAll(async () => {
-    const collection = User.getCollection()
+// afterAll(async () => {
+//     const collection = User.getCollection()
 
-    await collection.deleteMany()
-})
+//     await collection.deleteMany()
+// })
 
 describe('POST /register', () => {
     describe('POST /register -succeed', () => {

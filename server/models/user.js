@@ -96,7 +96,7 @@ export class User {
     const collection = this.getCollection()
     const findUser = await collection.findOne({ email: email })
     // console.log('masukkk')
-    if (!findUser) throw { name: 'NotFound' }
+    if (!findUser) throw { name: 'Unauthorized' }
     return findUser
   }
 

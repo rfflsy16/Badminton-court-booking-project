@@ -85,6 +85,7 @@ export class BookingController {
         try {
             const { id } = req.params;
 
+
             const result = await BookingModel.deleteById(id);
             if (result.deletedCount === 0) {
                 return res.status(404).json({ message: "Booking not found" });

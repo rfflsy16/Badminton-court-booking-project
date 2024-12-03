@@ -6,6 +6,7 @@ import CourtModel from '../models/court.js'
 import RoomModel from '../models/room.js'
 import MessageModel from '../models/message.js'
 import BookingModel from '../models/booking.js'
+import PaymentModel from '../models/payment.js'
 
 import { hashPassword } from '../helpers/bcrypt.js'
 import { signToken } from '../helpers/jwt'
@@ -17,8 +18,9 @@ const courtCollection = CourtModel.getCollection()
 const roomcollection = RoomModel.getCollection()
 const messageCollection = MessageModel.getCollection()
 const bookingCollection = BookingModel.getCollection()
+const paymentCollection = PaymentModel.getCollection()
 
-let access_token_admin, access_token_user, dataOfBuilding, dataOfCourt, dataOfRoom, dataOfMessage, dataOfBooking
+let access_token_admin, access_token_user, dataOfBuilding, dataOfCourt, dataOfRoom, dataOfMessage, dataOfBooking, dataOfPayment
 beforeAll(async () => {
     await userCollection.insertMany([
         {
@@ -195,7 +197,23 @@ beforeAll(async () => {
 
     const booking = await BookingModel.read()
     dataOfBooking = booking[0]
-    console.log(dataOfBooking, '<<<<<< ini id booking')
+
+    await paymentCollection.insertMany([{
+        "username": "mamang",
+        "BookingId": dataOfBooking._id,
+        "type": "dp",
+        "amount": 100000,
+        "status": "paid",
+        "createdAt": {
+            "$date": "2024-12-03T10:40:09.239Z"
+        },
+        "updatedAt": {
+            "$date": "2024-12-03T10:42:53.411Z"
+        }
+    }])
+
+    const payment = await PaymentModel.readPayment()
+    dataOfPayment = payment[0]
 
     const users = await userCollection.find().toArray()
     const admin = {
@@ -223,145 +241,4 @@ afterAll(async () => {
     await bookingCollection.deleteMany()
 })
 
-
-describe('GET /booking', () => {
-    describe('GET /booking - succeed', () => {
-        it('should be return data of booking', async () => {
-            const response = await request(app)
-                .get('/booking')
-                .set('Authorization', `Bearer ${access_token_admin}`)
-
-            expect(response.status).toBe(200)
-            expect(response.body).toBeInstanceOf(Object)
-        })
-    })
-    describe('GET /booking - failed', () => {
-        it('should be return an error message because user does not login', async () => {
-            const response = await request(app)
-                .get('/booking')
-
-            expect(response.status).toBe(401)
-            expect(response.body.message).toBe('Please login first')
-        })
-    })
-    describe('GET /booking - failed', () => {
-        it('should be return an error message because invalid token', async () => {
-            const response = await request(app)
-                .get('/booking')
-                .set('Authorization', `Bearer kdjnckelnr`)
-            expect(response.status).toBe(401)
-            expect(response.body.message).toBe('Please login first')
-        })
-    })
-})
-
-describe('POST /booking', () => {
-    describe('POST /booking - succeed', () => {
-        it('should be return the detail of bookings', async () => {
-            const response = await request(app)
-                .post(`/booking`)
-                .set('Authorization', `Bearer ${access_token_admin}`)
-                .send({
-                    "courtId": "123456789abcdef123456789",
-                    "date": "2024-12-16",
-                    "selectedTime": [8],
-                    "paymentType": "Dp",
-                    "price": 150000
-                })
-
-            expect(response.status).toBe(201)
-            expect(response.body).toBeInstanceOf(Object)
-        })
-    })
-    describe('POST /booking - failed', () => {
-        it('should be return an error message because has been booked by other user', async () => {
-            const response = await request(app)
-                .post(`/booking`)
-                .set('Authorization', `Bearer ${access_token_admin}`)
-                .send({
-                    "courtId": "123456789abcdef123456789",
-                    "date": "2024-12-16",
-                    "selectedTime": [8],
-                    "paymentType": "Dp",
-                    "price": 150000
-                })
-
-            expect(response.status).toBe(400)
-            expect(response.body.message).toBe('Lapangan penuh pada waktu 8')
-        })
-    })
-    describe('POST /booking - failed', () => {
-        it('should be return an error message because user doesnt login', async () => {
-            const response = await request(app)
-                .post(`/booking`)
-                .send({
-                    "courtId": "123456789abcdef123456789",
-                    "date": "2024-12-16",
-                    "selectedTime": [8],
-                    "paymentType": "Dp",
-                    "price": 150000
-                })
-
-            expect(response.status).toBe(401)
-            expect(response.body.message).toBe('Please login first')
-        })
-    })
-    describe('POST /booking - failed', () => {
-        it('should be return an error message because invalid token', async () => {
-            const response = await request(app)
-                .post(`/booking`)
-                .send({
-                    "courtId": "123456789abcdef123456789",
-                    "date": "2024-12-16",
-                    "selectedTime": [8],
-                    "paymentType": "Dp",
-                    "price": 150000
-                })
-                .set('Authorization', `Bearer sdcnjkdnck`)
-            expect(response.status).toBe(401)
-            expect(response.body.message).toBe('Please login first')
-        })
-    })
-})
-
-describe('DELETE /booking/:id', () => {
-    describe('DELETE /booking/:id - succeed', () => {
-        it('should be return an succesfull deleted data message', async () => {
-            const response = await request(app)
-                .delete(`/booking/${dataOfBooking._id}`)
-                .set('Authorization', `Bearer ${access_token_admin}`)
-
-            expect(response.status).toBe(200)
-            expect(response.body.message).toBe('Booking deleted successfully')
-        })
-    })
-    describe('DELETE /booking/:id - failed', () => {
-        it('should be return an error message because user not login', async () => {
-            const response = await request(app)
-                .delete(`/booking/${dataOfBooking._id}`)
-
-            expect(response.status).toBe(401)
-            expect(response.body.message).toBe('Please login first')
-        })
-    })
-    describe('DELETE /booking/:id - failed', () => {
-        it('should be return an error message because invalid token', async () => {
-            const response = await request(app)
-                .delete(`/booking/${dataOfBooking._id}`)
-                .set('Authorization', `Bearer lekcmelkn`)
-
-            expect(response.status).toBe(401)
-            expect(response.body.message).toBe('Please login first')
-        })
-    })
-    describe('DELETE /booking/:id - failed', () => {
-        it('should be return an error message because invalid token', async () => {
-            const response = await request(app)
-                .delete(`/booking/123456789123456789123456`)
-                .set('Authorization', `Bearer ${access_token_admin}`)
-
-            expect(response.status).toBe(404)
-            expect(response.body.message).toBe('Booking not found')
-        })
-    })
-})
+// describe('')

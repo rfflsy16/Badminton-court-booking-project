@@ -46,7 +46,7 @@ export default class PaymentModel {
             updatedAt: new Date()
         }
 
-        await collection.insertOne(newPayment)
-        return { message: 'Succeess Payment' }
+       const payment = await collection.insertOne(newPayment)
+        return { message: 'Succeess Payment', _id: payment.insertedId }
     }
 }

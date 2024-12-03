@@ -1,5 +1,8 @@
 import BookingModel from "../models/booking.js";
 import PaymentModel from "../models/payment.js";
+import midtransClient from 'midtrans-client';
+import { User } from "../models/user.js";
+
 export class BookingController {
     // Get all bookings
     static async getBooking(req, res, next) {
@@ -13,6 +16,7 @@ export class BookingController {
 
     // Add a new booking
     static async addBooking(req, res, next) {
+
         try {
             const { userId, username } = req.loginInfo;
             const { courtId, date, selectedTime, paymentType, price } = req.body;
@@ -51,7 +55,7 @@ export class BookingController {
                 paymentType,
                 price,
                 totalPrice,
-                statusBooking: paymentType === "fullpayment" ? "paid" : "ongoing",
+                statusBooking: "pending",
                 createdAt: new Date(),
                 updatedAt: new Date(),
             };
@@ -68,11 +72,40 @@ export class BookingController {
             };
             const newPayment = await PaymentModel.createNewPayment(bodyPayment, username);
 
+            let snap = new midtransClient.Snap({
+                // Set to true if you want Production Environment (accept real transaction).
+                isProduction : false,
+                serverKey : 'SB-Mid-server-oAaRKJgPgm-N4NnVCMyViSkx'
+            });
+
+            //panggil model user
+            const userData = await User.getById(userId);
+
+            let parameter = {
+                "transaction_details": {
+                    "order_id": newPayment._id,
+                    "gross_amount": bodyPayment.amount
+                },
+                "credit_card":{
+                    "secure" : true
+                },
+
+                "customer_details": {
+                    "first_name": userData.fullName,
+                    "last_name": "",
+                    "email": userData.email,
+                    "phone": ""
+                }
+            };
+
+       const transaction = await snap.createTransaction(parameter)
+
             res.status(201).json({
                 message: "Booking created successfully",
                 booking: newBooking,
                 paymentUrl: "",
                 newPayment,
+                midtransUrl: transaction.redirect_url
             });
         } catch (error) {
             next(error);

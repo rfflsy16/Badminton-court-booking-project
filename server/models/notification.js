@@ -1,4 +1,4 @@
-import { db } from "../config";
+import { db } from "../config/mongoDB.js"
 
 export default class NotificationModel {
     static getCollection() {

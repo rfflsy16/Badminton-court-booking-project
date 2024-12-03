@@ -1,10 +1,8 @@
 import request from 'supertest'
 import { app } from '../app'
 import BuildingModel from '../models/building'
-import { ObjectId } from 'mongodb'
-import { signToken, verifyToken } from '../helpers/jwt';
+import { signToken } from '../helpers/jwt';
 import { User } from '../models/user';
-import CourtModel from '../models/court';
 import { hashPassword } from '../helpers/bcrypt';
 
 let access_token_admin, access_token_user;
@@ -58,7 +56,7 @@ beforeAll(async () => {
     const building = await BuildingModel.readBuilding()
     dataOfBuilding = building[0]
 
-    const userCollection = await User.getCollection()
+    const userCollection = User.getCollection()
     await userCollection.insertMany([
         {
             fullName: 'udinaja',
@@ -367,7 +365,7 @@ describe('DELETE /buildings', () => {
                 .delete(`/buildings/${dataOfBuilding._id}`)
                 .set('Authorization', `Bearer ${access_token_user}`)
             expect(response.status).toBe(403)
-            expect(response.body.message).toBe('U are not admin')
+            expect(response.body.message).toBe('You are not admin')
         })
     })
     describe('DELETE /buildings - failed', () => {

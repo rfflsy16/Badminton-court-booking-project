@@ -79,7 +79,7 @@ export class User {
     console.log(email, password, "<<<<<<< ini setelah distructer")
 
     if (!email || !password) {
-      throw { name: "NotFound" };
+      throw { name: "BADREQUEST" };
     }
 
     const user = await collection.findOne({ email });
@@ -121,7 +121,7 @@ export class User {
     const updateData = {
       location: {
         type: "Point",
-        coordinates: location.coordinates, // [longitude, latitude]
+        coordinates: location.coordinates,
       },
       updatedAt: new Date(),
     };

@@ -22,6 +22,10 @@ export default class CourtModel {
             location,
         } = body;
 
+        if (!BuildingId || !category || !type || !description || !startTime || !endTime || !excludedTime || !excludedDate || !price || !dp) {
+            throw { name: 'BADREQUEST' }
+        }
+
         const findBuildingByBuildingId = await BuildingModel.readByIdBuilding(BuildingId)
 
         // console.log(findBuildingByBuildingId, "<<<<<<<,")

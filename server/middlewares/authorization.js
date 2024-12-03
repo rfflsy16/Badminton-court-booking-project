@@ -9,7 +9,7 @@ export const isAdmin = async (req, res, next) => {
 
         if (role !== 'admin') {
             return res.status(403).json({
-                message: 'U are not admin'
+                message: 'You are not admin'
             })
         }
 

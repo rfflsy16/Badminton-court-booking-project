@@ -23,6 +23,11 @@ export const errorHandler = (err, req, res, next) => {
         status = 400
     }
 
+    if (err.name == 'validationErrorId') {
+        status = 400
+        message = "Id must be 24 characters long"
+    }
+
     if (err.name == 'BadRequest') {
         message = 'Please input email or password'
         status = 401

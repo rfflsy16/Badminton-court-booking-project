@@ -4,6 +4,7 @@ import { BuildingController } from "../controllers/BuildingController.js"
 import { isAdmin } from "../middlewares/authorization.js"
 
 export default function buildingRouter() {
+
     const router = express.Router()
 
     router.post("/", isAdmin, BuildingController.createBuilding)
@@ -11,7 +12,7 @@ export default function buildingRouter() {
     router.get("/:id", BuildingController.getBuildingById)
     router.put("/:id", BuildingController.updateBuilding)
     router.delete("/:id", isAdmin, BuildingController.deleteBuilding)
-    router.get("/near/:deviceId", BuildingController.findNearestBuildings);
+    // router.get("/near/:deviceId", BuildingController.findNearestBuildings);
     router.post("/coordinates", BuildingController.findBuildingByCoordinates)
 
     return router

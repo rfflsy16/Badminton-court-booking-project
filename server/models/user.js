@@ -26,6 +26,14 @@ export class User {
     return user;
   }
 
+  // Mendapatkan user berdasarkan email
+  static async getByEmail(email) {
+
+    const collection = this.getCollection();
+    const user = await collection.findOne({ email });
+    if (!user) throw { name: "NotFound" };
+    return user;
+  }
   // Register user baru
   static async register(body) {
     const { fullName, email, password, role = "user", deviceId } = body;
@@ -47,7 +55,6 @@ export class User {
     const defaultImgUrl = "https://example.com/default-profile.png";
     // const generatedDeviceId = crypto.randomBytes(16).toString("hex");
 
-
     const newUser = {
       fullName,
       email,
@@ -64,11 +71,15 @@ export class User {
   }
 
   static async login(body) {
+
+    console.log(body, "<<<<< ini dari model")
     const { email, password } = body;
     const collection = this.getCollection();
 
+    console.log(email, password, "<<<<<<< ini setelah distructer")
+
     if (!email || !password) {
-      throw { name: "BadRequest" };
+      throw { name: "NotFound" };
     }
 
     const user = await collection.findOne({ email });

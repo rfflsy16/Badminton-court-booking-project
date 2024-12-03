@@ -38,12 +38,16 @@ export default function Login() {
 
         try {
             // Call login API
-            const response = await axios.post(`https://ed9b-27-50-29-117.ngrok-free.app/login`, {
+            const response = await axios.post(`${process.env.EXPO_PUBLIC_BASE_URL}/login`, {
                 email,
                 password
             });
-            
-            console.log('Login response:', response.data);
+
+            const responseProfile = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/profile`,{
+                headers: {
+                    'Authorization': `Bearer ${response.data.access_token}`
+                }
+            })
             
             // If login successful
             if (response.data.access_token) {
@@ -52,17 +56,14 @@ export default function Login() {
                 
                 // Store user info
                 const userInfo = {
-                    userId: response.data.userId,
-                    username: response.data.username,
-                    email: response.data.email,
-                    role: response.data.role
+                    userId: responseProfile.data._id,
+                    username: responseProfile.data.username,
+                    email: responseProfile.data.email,
+                    role: responseProfile.data.role
                 };
                 await SecureStore.setItemAsync('userInfo', JSON.stringify(userInfo));
                 // Update auth context
                 authContext.setIsLogin(true);
-
-                // Navigate to main app
-                // navigation.navigate('MainApp');
             }
         } catch (error) {
             console.error('Login error:', error.response?.data || error.message);

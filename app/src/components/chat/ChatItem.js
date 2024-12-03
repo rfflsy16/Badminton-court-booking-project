@@ -1,35 +1,21 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 
 export default function ChatItem({ chat, onPress }) {
-    const lastMessage = chat.lastMessage || 'No messages yet';
-    const time = chat.lastMessageTime 
-        ? new Date(chat.lastMessageTime).toLocaleTimeString([], { 
-            hour: '2-digit', 
-            minute: '2-digit',
-            hour12: false 
-        }) 
-        : '';
-
     return (
         <TouchableOpacity style={styles.chatItem} onPress={onPress}>
-            <View style={styles.avatar}>
-                <Ionicons name="person" size={24} color="#fff" />
-            </View>
+            <Image source={{ uri: chat.avatar }} style={styles.avatar} />
             <View style={styles.chatContent}>
                 <View style={styles.chatHeader}>
-                    <Text style={styles.chatName} numberOfLines={1}>
-                        {chat.name}
-                    </Text>
-                    {time && <Text style={styles.chatTime}>{time}</Text>}
+                    <Text style={styles.chatName}>{chat.name}</Text>
+                    <Text style={styles.chatTime}>{chat.time}</Text>
                 </View>
                 <View style={styles.chatFooter}>
                     <Text style={styles.lastMessage} numberOfLines={1}>
-                        {lastMessage}
+                        {chat.lastMessage}
                     </Text>
-                    {chat.unreadCount > 0 && (
+                    {chat.unread > 0 && (
                         <View style={styles.unreadBadge}>
-                            <Text style={styles.unreadText}>{chat.unreadCount}</Text>
+                            <Text style={styles.unreadText}>{chat.unread}</Text>
                         </View>
                     )}
                 </View>
@@ -44,15 +30,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 12,
         borderBottomWidth: 1,
-        borderBottomColor: '#E2E8F0',
+        borderBottomColor: '#F1F5F9',
     },
     avatar: {
-        width: 48,
-        height: 48,
-        borderRadius: 24,
-        backgroundColor: '#115E59',
-        justifyContent: 'center',
-        alignItems: 'center',
+        width: 50,
+        height: 50,
+        borderRadius: 25,
         marginRight: 12,
     },
     chatContent: {
@@ -85,10 +68,13 @@ const styles = StyleSheet.create({
         marginRight: 8,
     },
     unreadBadge: {
-        backgroundColor: '#115E59',
+        backgroundColor: '#EA580C',
         borderRadius: 12,
+        minWidth: 24,
+        height: 24,
+        justifyContent: 'center',
+        alignItems: 'center',
         paddingHorizontal: 8,
-        paddingVertical: 4,
     },
     unreadText: {
         color: '#fff',

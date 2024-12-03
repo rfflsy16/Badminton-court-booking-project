@@ -1,8 +1,9 @@
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Share } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import { useRoute, useNavigation } from '@react-navigation/native';
-import { useState, useEffect } from 'react';
-import CourtCalendar from '../components/CourtDetail/CourtCalendar';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import * as SecureStore from 'expo-secure-store';import CourtCalendar from '../components/CourtDetail/CourtCalendar';
 import CourtTimeSlots from '../components/CourtDetail/CourtTimeSlots';
 import BookingModal from '../components/CourtDetail/BookingModal';
 import CourtMap from '../components/CourtDetail/CourtMap';
@@ -13,6 +14,7 @@ export default function CourtDetail() {
     const route = useRoute();
     const navigation = useNavigation();
     const { court } = route.params;
+    console.log(court._id, "<<<<<<< ini di court detail")
     const [selectedTimes, setSelectedTimes] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
     const [selectedDate, setSelectedDate] = useState('');
@@ -22,6 +24,36 @@ export default function CourtDetail() {
     const [promoCode, setPromoCode] = useState('');
     const [promoDiscount, setPromoDiscount] = useState(0);
     const [showFullDesc, setShowFullDesc] = useState(false);
+    const [courtDetails, setCourtDetails] = useState(null)
+    const [userToken, setUserToken] = useState("");
+
+    useEffect(() => {
+        async function getToken() {
+            const token = await SecureStore.getItemAsync('userToken');
+            setUserToken(token);
+        }
+        getToken();
+    },[])
+
+    useEffect(() => {
+        getCourtById()
+    },[userToken])
+
+    const getCourtById = async () => {          
+        try {
+            const response = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/courts/${court._id}`,{
+                headers: {              
+                    Authorization: `Bearer ${userToken}` 
+                }
+            })
+            setCourtDetails(response.data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+
+
 
     const handleTimeSelection = (slotId) => {
         setSelectedTimes(prev => {
@@ -34,11 +66,11 @@ export default function CourtDetail() {
     };
 
     // Calculate total price whenever selected times change
-    useEffect(() => {
-        const pricePerHour = parseInt(court.price.replace(/[^0-9]/g, ''));
-        const totalAmount = pricePerHour * selectedTimes.length;
-        setTotalPrice(totalAmount);
-    }, [selectedTimes, court.price]);
+    // useEffect(() => {
+    //     const pricePerHour = parseInt(court.price.replace(/[^0-9]/g, ''));
+    //     const totalAmount = pricePerHour * selectedTimes.length;
+    //     setTotalPrice(totalAmount);
+    // }, [selectedTimes, court.price]);
 
     const reviews = [
         { id: 1, user: 'John Doe', rating: 5, comment: 'Excellent court condition!', date: '2023-10-15' },
@@ -129,11 +161,13 @@ export default function CourtDetail() {
         navigation.replace('MainApp');
     };
 
+
+
     return (
         <View style={styles.container}>
             <ScrollView showsVerticalScrollIndicator={false}>
                 {/* Court Image */}
-                <Image source={{ uri: court.image }} style={styles.courtImage} />
+                <Image source={{ uri: courtDetails?.buildingDetails.imgUrl }} style={styles.courtImage} />
                 
                 {/* Back Button */}
                 <TouchableOpacity 
@@ -147,7 +181,7 @@ export default function CourtDetail() {
                 <View style={styles.content}>
                     <View style={styles.headerInfo}>
                         <View style={styles.mainInfo}>
-                            <Text style={styles.courtName}>{court.name}</Text>
+                            <Text style={styles.courtName}>{courtDetails?.buildingDetails.name}</Text>
                             <View style={styles.ratingContainer}>
                                 <Ionicons name="star" size={16} color="#F59E0B" />
                                 <Text style={styles.rating}>4.8</Text>
@@ -155,11 +189,11 @@ export default function CourtDetail() {
                             </View>
                             <View style={styles.locationInfo}>
                                 <Ionicons name="location-outline" size={16} color="#64748B" />
-                                <Text style={styles.locationText}>Jl. Raya Serpong No. 8D</Text>
+                                <Text style={styles.locationText}>{courtDetails?.buildingDetails.address}</Text>
                             </View>
                         </View>
                         <View style={styles.priceInfo}>
-                            <Text style={styles.price}>{court.price}</Text>
+                            <Text style={styles.price}>{courtDetails?.price.toLocaleString()}</Text>
                             <Text style={styles.priceUnit}>/hour</Text>
                             <View style={styles.statusContainer}>
                                 <View style={styles.statusDot} />
@@ -170,6 +204,9 @@ export default function CourtDetail() {
                                 onPress={() => navigation.navigate('ChatDetail', { 
                                     chatId: `court_${court.id}`,
                                     name: `Admin ${court.name}`,
+                                    userId: courtDetails?.buildingDetails.userId,
+                                    courtId: courtDetails?._id,
+                                    buildingId: courtDetails?.buildingDetails._id
                                 })}
                             >
                                 <Ionicons name="chatbubble-outline" size={20} color="#fff" />
@@ -184,10 +221,10 @@ export default function CourtDetail() {
                         <View>
                             <Text style={styles.description}>
                                 {showFullDesc 
-                                    ? court.description 
-                                    : court.description?.slice(0, 150) + (court.description?.length > 150 ? '...' : '')}
+                                    ? courtDetails?.description 
+                                    : courtDetails?.description?.slice(0, 150) + (courtDetails?.buildingDetails.description?.length > 150 ? '...' : '')}
                             </Text>
-                            {court.description?.length > 150 && (
+                            {courtDetails?.description?.length > 150 && (
                                 <TouchableOpacity onPress={() => setShowFullDesc(!showFullDesc)}>
                                     <Text style={styles.readMore}>
                                         {showFullDesc ? 'Show Less' : 'Read More'}

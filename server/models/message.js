@@ -8,6 +8,7 @@ export default class MessageModel {
 
     // Menambahkan pesan baru
     static async addMessage({ userId, roomId, text }) {
+        console.log(userId, roomId, text)
         const collection = this.getCollection();
         const newMessage = {
             userId: new ObjectId(userId),

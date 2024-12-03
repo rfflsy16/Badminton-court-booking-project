@@ -1,37 +1,38 @@
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, TextInput, Modal } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { venuesData } from '../data/venuesData';
+import axios from 'axios';
+import * as SecureStore from 'expo-secure-store';
+
 
 const VenueCard = ({ venue }) => {
     const navigation = useNavigation();
-    
     return (
-        <TouchableOpacity 
+        <TouchableOpacity
             style={styles.card}
             onPress={() => navigation.navigate('BuildingCourts', { venue })}
         >
-            <Image source={{ uri: venue.image }} style={styles.venueImage} />
+            <Image source={{ uri: venue.imgUrl }} style={styles.venueImage} />
             <View style={styles.cardContent}>
                 <View style={styles.cardHeader}>
-                    <Text style={styles.venueName}>{venue.name}</Text>
-                    <View style={styles.ratingContainer}>
-                        <Ionicons name="star" size={16} color="#EA580C" />
-                        <Text style={styles.rating}>{venue.rating}</Text>
-                    </View>
-                </View>
-                <View style={styles.locationContainer}>
-                    <Ionicons name="location-outline" size={16} color="#94A3B8" />
-                    <Text style={styles.locationText}>{venue.location}</Text>
-                </View>
-                <View style={styles.detailsContainer}>
-                    <View style={styles.detail}>
-                        <MaterialCommunityIcons name="badminton" size={16} color="#94A3B8" />
-                        <Text style={styles.detailText}>{venue.totalCourts} Courts</Text>
-                    </View>
-                    <Text style={styles.price}>{venue.price}</Text>
-                </View>
+                     <Text style={styles.venueName}>{venue.name}</Text>
+                     <View style={styles.ratingContainer}>
+                         <Ionicons name="star" size={16} color="#EA580C" />
+                         <Text style={styles.rating}>4.7</Text>
+                     </View>
+                 </View>
+                 <View style={styles.locationContainer}>
+                     <Ionicons name="location-outline" size={16} color="#94A3B8" />
+                     <Text style={styles.locationText}>{venue.address}</Text>
+                 </View>
+                 <View style={styles.detailsContainer}>
+                     <View style={styles.detail}>
+                         <MaterialCommunityIcons name="badminton" size={16} color="#94A3B8" />
+                         <Text style={styles.detailText}>{venue.courts.length} Courts</Text>
+                     </View>
+                     <Text style={styles.price}>{venue.price}</Text>
+                 </View>
             </View>
         </TouchableOpacity>
     );
@@ -40,12 +41,42 @@ const VenueCard = ({ venue }) => {
 export default function Venues() {
     const [searchQuery, setSearchQuery] = useState('');
     const [showFilterModal, setShowFilterModal] = useState(false);
-    const [sortBy, setSortBy] = useState(null); // 'price_low', 'price_high', 'rating'
+    const [sortBy, setSortBy] = useState(null); // 'price_low', 'price_high', 'rating' atau JABODETABEK
+    const [buildings, setBuildings] = useState([])
+    const [userToken, setUserToken] = useState("");
+
+
+    useEffect(() => {
+        async function getToken() {
+            const token = await SecureStore.getItemAsync('userToken');
+            setUserToken(token);
+        }
+        getToken();
+    
+    },[])
+
+    useEffect(() => {
+        getBuildings();
+    },[userToken])
+
+    const getBuildings = async () => {          
+        try {
+            const response = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/buildings`,{
+                headers: {              
+                    Authorization: `Bearer ${userToken}` 
+                }
+            })
+            setBuildings(response.data.buildings)
+            // console.log(response.data.buildings)
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     const filteredAndSortedVenues = () => {
-        let venues = venuesData.filter(venue =>
+        let venues = buildings.filter(venue =>
             venue.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            venue.location.toLowerCase().includes(searchQuery.toLowerCase())
+            venue.address.toLowerCase().includes(searchQuery.toLowerCase())
         );
 
         if (sortBy) {

@@ -38,6 +38,17 @@ export default class RoomModel {
         return await collection.findOne({ _id: new ObjectId(roomId) });
     }
 
+    static async checkRoom(courtId, userId, adminId){
+        const collection = this.getCollection();
+
+        const room = await collection.findOne({
+            courtId,
+            participants: { $in: [userId, adminId] },
+        });
+
+        return room
+    }
+
     // Mendapatkan semua room
     static async getRoom() {
         const collection = this.getCollection();

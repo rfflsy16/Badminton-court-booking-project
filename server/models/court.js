@@ -24,10 +24,13 @@ export default class CourtModel {
 
         const findBuildingByBuildingId = await BuildingModel.readByIdBuilding(BuildingId)
 
+        // console.log(findBuildingByBuildingId, "<<<<<<<,")
         if (!findBuildingByBuildingId) {
             throw new Error("Invalid BuildingId");
         }
 
+        const locationBuilding = await findBuildingByBuildingId.address
+        // console.log(locationBuilding, "<<<<<<")
         const newCourt = {
             BuildingId: new ObjectId(BuildingId),
             category,
@@ -39,7 +42,7 @@ export default class CourtModel {
             excludedDate,
             price,
             dp,
-            location,
+            location: locationBuilding,
             createdAt: new Date(),
             updatedAt: new Date(),
         };
@@ -76,6 +79,12 @@ export default class CourtModel {
                         as: "buildingDetails",
                     },
                 },
+                {
+                    $unwind: {
+                        path: "$buildingDetails",
+                        preserveNullAndEmptyArrays: true,
+                    },
+                }
             ])
             .toArray();
 

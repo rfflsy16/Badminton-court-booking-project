@@ -79,7 +79,7 @@ export class User {
     console.log(email, password, "<<<<<<< ini setelah distructer")
 
     if (!email || !password) {
-      throw { name: "NotFound" };
+      throw { name: "BADREQUEST" };
     }
 
     const user = await collection.findOne({ email });

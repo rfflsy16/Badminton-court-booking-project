@@ -2,7 +2,7 @@ export const errorHandler = (err, req, res, next) => {
     let status = 500
     let message = 'Internal Server Error'
 
-    // console.log(err, "<<<<,")
+    console.log(err, "<<<<,")
 
     if (err.name == 'SequelizeValidationError') {
         status = 400
@@ -71,6 +71,11 @@ export const errorHandler = (err, req, res, next) => {
     if (err.name === 'BuildingNotFound') {
         status = 404
         message = 'Cannot find GOR'
+    }
+
+    if (err.name === 'CourtNotFound') {
+        status = 404
+        message = 'Cannot find Court'
     }
     res.status(status).json({
         message

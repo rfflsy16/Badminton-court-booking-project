@@ -139,8 +139,8 @@ describe('POST /login', () => {
                     password: '123456'
                 })
 
-            expect(response.status).toBe(401)
-            expect(response.body.message).toBe('Please input email or password')
+            expect(response.status).toBe(400)
+            expect(response.body.message).toBe('Please input all of the field')
         })
     })
     describe('POST /login - failed', () => {
@@ -152,8 +152,8 @@ describe('POST /login', () => {
                     password: ''
                 })
 
-            expect(response.status).toBe(401)
-            expect(response.body.message).toBe('Please input email or password')
+            expect(response.status).toBe(400)
+            expect(response.body.message).toBe('Please input all of the field')
         })
     })
 })

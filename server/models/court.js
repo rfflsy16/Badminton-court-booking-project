@@ -146,7 +146,7 @@ export default class CourtModel {
         ]
 
         const result = await collection.aggregate(pipeline).toArray();
-        console.log(result, "<<<<<<<")
+        // console.log(result, "<<<<<<<")
         if (!result.length) {
             throw { name: "BuildingNotFound" };
         }

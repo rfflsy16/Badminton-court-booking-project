@@ -13,12 +13,13 @@ export default function Login() {
     const [isFormValid, setIsFormValid] = useState(false);
     const navigation = useNavigation();
     const authContext = useContext(AuthContext);
+    const base_url = process.env.EXPO_PUBLIC_BASE_URL;
+
 
     useEffect(() => {
-        // Check if both email and password are filled
         const validateForm = () => {
             const isEmailValid = email.trim() !== "" && email.includes("@");
-            const isPasswordValid = password.trim().length >= 6;
+            const isPasswordValid = password.trim().length >= 5;
             setIsFormValid(isEmailValid && isPasswordValid);
         };
         validateForm();
@@ -27,6 +28,7 @@ export default function Login() {
     useEffect(() => {
         if (authContext.isLogin) {
             navigation.navigate('MainApp'); 
+            
         }
     }, [authContext.isLogin]);
 
@@ -36,16 +38,26 @@ export default function Login() {
 
         try {
             // Call login API
-            const response = await axios.post('https://3f51-2a09-bac5-3a24-18be-00-277-3e.ngrok-free.app/login', {
+            const response = await axios.post(`https://ed9b-27-50-29-117.ngrok-free.app/login`, {
                 email,
                 password
             });
+            
+            console.log('Login response:', response.data);
             
             // If login successful
             if (response.data.access_token) {
                 // Store token
                 await SecureStore.setItemAsync('userToken', response.data.access_token);
-
+                
+                // Store user info
+                const userInfo = {
+                    userId: response.data.userId,
+                    username: response.data.username,
+                    email: response.data.email,
+                    role: response.data.role
+                };
+                await SecureStore.setItemAsync('userInfo', JSON.stringify(userInfo));
                 // Update auth context
                 authContext.setIsLogin(true);
 
@@ -53,6 +65,7 @@ export default function Login() {
                 // navigation.navigate('MainApp');
             }
         } catch (error) {
+            console.error('Login error:', error.response?.data || error.message);
             alert('Invalid email or password');
         }
     };

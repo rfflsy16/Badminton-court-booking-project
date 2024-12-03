@@ -1,7 +1,8 @@
 import { createStaticNavigation } from "@react-navigation/native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import RootStack from "./src/navigators/AppNavigator";
-import AuthContext from "./src/context/AuthContext"
+import AuthContext from "./src/context/AuthContext";
+import { ChatProvider } from "./src/context/ChatContext";
 import { Text, View, Button, Platform } from 'react-native';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
@@ -15,7 +16,6 @@ function handleRegistrationError(errorMessage) {
   alert(errorMessage);
   throw new Error(errorMessage);
 }
-
 
 async function registerForPushNotificationsAsync() {
   if (Platform.OS === 'android') {
@@ -35,10 +35,9 @@ async function registerForPushNotificationsAsync() {
       finalStatus = status;
     }
     if (finalStatus !== 'granted') {
-      handleRegistrationError('Permission not granted to get push token for push notification!');
+      handleRegistrationError('Failed to get push token for push notification!');
       return;
     }
-    
     const projectId = 
       Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
     if (!projectId) {
@@ -69,7 +68,7 @@ export default function App() {
   useEffect(() => {
     registerForPushNotificationsAsync()
       .then(token => setExpoPushToken(token ?? ''))
-      .catch((error: any) => setExpoPushToken(`${error}`));
+      .catch((error) => setExpoPushToken(`${error}`));
 
     notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
       setNotification(notification);
@@ -128,12 +127,14 @@ export default function App() {
   
   return (
   <AuthContext.Provider value={{ isLogin, setIsLogin, expoPushToken }}>
+  <ChatProvider>
   <SafeAreaProvider>
       <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
     
         <Navigation />
       </SafeAreaView>
     </SafeAreaProvider>
+    </ChatProvider>
     </AuthContext.Provider>
 
   )

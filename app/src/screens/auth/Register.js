@@ -19,7 +19,7 @@ export default function Register() {
   const handleRegister = async () => {
     try {
 
-      const response= await fetch('https://3f51-2a09-bac5-3a24-18be-00-277-3e.ngrok-free.app/register', {
+      const response= await fetch('https://ed9b-27-50-29-117.ngrok-free.app/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',

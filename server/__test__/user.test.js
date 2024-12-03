@@ -1,12 +1,9 @@
 // const request = require('supertest')
 // const app = require('../app')
 // const { User } = require('../models/user')
-
-
 import request from 'supertest'
 import { app } from '../app'
 import { User } from '../models/user'
-
 
 // beforeAll(async () => {
 // })
@@ -25,7 +22,23 @@ describe('POST /register', () => {
                 .send({
                     fullName: 'udinaja',
                     email: 'udin@mail.com',
-                    password: '123456'
+                    password: '123456',
+                    role: 'user'
+                })
+
+            expect(response.status).toBe(201)
+            expect(response.body.message).toBe('Register Successfully')
+        })
+    })
+    describe('POST /register -succeed', () => {
+        it('should be return an message Register Successfully', async () => {
+            const response = await request(app)
+                .post('/register')
+                .send({
+                    fullName: 'udinaja',
+                    email: 'admin@mail.com',
+                    password: '123456',
+                    role: 'admin'
                 })
 
             expect(response.status).toBe(201)

@@ -3,9 +3,10 @@ import { User } from "../models/user.js";
 
 export class BuildingController {
     static async createBuilding(req, res, next) {
+        // console.log('masukkkkkk')
         try {
             const { userId } = req.loginInfo
-            console.log(userId)
+            // console.log(userId)
             const newBuilding = await BuildingModel.createNewBuilding(req.body, userId);
             res.status(201).json({
                 message: "Building created successfully",
@@ -27,6 +28,7 @@ export class BuildingController {
     }
 
     static async getBuildingById(req, res, next) {
+        // console.log('masullll')
         try {
             const { id } = req.params;
 

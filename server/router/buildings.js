@@ -11,8 +11,8 @@ export default function buildingRouter() {
     router.get("/", BuildingController.getAllBuildings)
     router.get("/:id", BuildingController.getBuildingById)
     router.put("/:id", BuildingController.updateBuilding)
-    router.delete("/:id", BuildingController.deleteBuilding)
-    // router.get("/near/:deviceId", BuildingController.findNearestBuildings);
+    router.delete("/:id", isAdmin, BuildingController.deleteBuilding)
+    router.get("/near/:deviceId", BuildingController.findNearestBuildings);
     router.post("/coordinates", BuildingController.findBuildingByCoordinates)
 
     return router

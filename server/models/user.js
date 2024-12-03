@@ -70,7 +70,6 @@ export class User {
     return result
   }
 
-  // Login user
   static async login(body) {
 
     console.log(body, "<<<<< ini dari model")
@@ -83,12 +82,9 @@ export class User {
       throw { name: "NotFound" };
     }
 
-
-    // Cari user berdasarkan email
     const user = await collection.findOne({ email });
     if (!user) throw { name: "LoginError" };
 
-    // Cocokkan password
     if (!comparePassword(password, user.password)) {
       throw { name: "LoginError" };
     }
@@ -110,7 +106,8 @@ export class User {
   static async findByEmail(email) {
     const collection = this.getCollection()
     const findUser = await collection.findOne({ email: email })
-    if (!findUser) throw { name: 'NotFound' }
+    // console.log('masukkk')
+    if (!findUser) throw { name: 'Unauthorized' }
     return findUser
   }
 

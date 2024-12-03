@@ -3,7 +3,7 @@ import Login from "../screens/auth/Login";
 import Register from "../screens/auth/Register";
 import { TabStack } from "./BottomTabNavigator";
 import CourtDetail from "../screens/CourtDetail";
-import ChatDetail from "../screens/chat/ChatDetail";
+import ChatDetail from "../screens/ChatDetail";
 import Maps from '../screens/Maps';
 import BuildingCourts from '../screens/BuildingCourts';
 import EditProfile from '../screens/profile/EditProfile';

@@ -12,7 +12,7 @@ export const promoData = [
         id: 2,
         title: "Weekend Special! 🎉",
         description: "Diskon 20% utk booking di hari Sabtu & Minggu",
-        image: "https://images.pexels.com/photos/2277981/pexels-photo-2277981.jpeg",
+        image: "https://asset.ayo.co.id/image/venue/171078136964346.image_cropper_BE027B3D-DC95-4D69-8380-9E612826D231-28326-00000769A5BC9BA7_large.jpg",
         validUntil: "2024-06-30",
         discount: "20%",
         code: "WEEKEND20"
@@ -21,7 +21,7 @@ export const promoData = [
         id: 3,
         title: "Flash Sale! ⚡",
         description: "Diskon 50% utk 10 booking pertama hari ini",
-        image: "https://images.pexels.com/photos/1866149/pexels-photo-1866149.jpeg",
+        image: "https://asset-2.tstatic.net/tribunnews/foto/bank/images/ganda-putra-indonesia-fajar-alfianmuhammad-rian-ardianto-dalam-laga.jpg",
         validUntil: "2024-04-20",
         discount: "50%",
         code: "FLASH50"

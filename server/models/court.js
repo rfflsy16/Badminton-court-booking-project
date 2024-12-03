@@ -22,12 +22,19 @@ export default class CourtModel {
             location,
         } = body;
 
+        if (!BuildingId || !category || !type || !description || !startTime || !endTime || !excludedTime || !excludedDate || !price || !dp) {
+            throw { name: 'BADREQUEST' }
+        }
+
         const findBuildingByBuildingId = await BuildingModel.readByIdBuilding(BuildingId)
 
+        // console.log(findBuildingByBuildingId, "<<<<<<<,")
         if (!findBuildingByBuildingId) {
             throw new Error("Invalid BuildingId");
         }
 
+        const locationBuilding = await findBuildingByBuildingId.address
+        // console.log(locationBuilding, "<<<<<<")
         const newCourt = {
             BuildingId: new ObjectId(BuildingId),
             category,
@@ -39,7 +46,7 @@ export default class CourtModel {
             excludedDate,
             price,
             dp,
-            location,
+            location: locationBuilding,
             createdAt: new Date(),
             updatedAt: new Date(),
         };
@@ -143,7 +150,7 @@ export default class CourtModel {
         ]
 
         const result = await collection.aggregate(pipeline).toArray();
-        console.log(result, "<<<<<<<")
+        // console.log(result, "<<<<<<<")
         if (!result.length) {
             throw { name: "BuildingNotFound" };
         }

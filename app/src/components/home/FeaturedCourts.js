@@ -43,33 +43,34 @@ export default function FeaturedCourts() {
       }, [userToken, latitude, longitude]);
 
       const getNearestCourts = async () => {
+          if (!latitude || !longitude || !userToken) return;
           
           try {
-            console.log(longitude, '<<<<<<<<<<<<<<<<<<<<<<<<<longitude 123')
-            console.log(latitude, '<<<<<<<<<<<<<<<<<<<<<<<<<latitude 123')
-            const venuesData = await axios.post(`${base_url}/buildings/coordinates`,
+            console.log('Fetching courts with:', {
+                longitude,
+                latitude,
+                userToken: userToken ? 'Present' : 'Missing'
+            });
+
+            const response = await axios.post(`https://ed9b-27-50-29-117.ngrok-free.app/buildings/coordinates`,
                 {
-                    "longitude": longitude ,
-                    "latitude":latitude              
-                  },
+                    longitude,
+                    latitude              
+                },
                 {  
                 headers: {              
-                Authorization: `Bearer ${userToken}` }}
-            );
-           console.log(venuesData.data, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+                    Authorization: `Bearer ${userToken}` 
+                }
+            });
+           
+            console.log('API Response:', response.data);
+            
+            // Convert single object to array if it's not already an array
+            const courtsData = Array.isArray(response.data) ? response.data : [response.data];
+            setNearestCourts(courtsData);
 
-            // const sorted = venuesData.map((court) => ({
-            //     ...court,
-            //     distance: getDistanceFromLatLonInKm(
-            //         location.coords.latitude,
-            //         location.coords.longitude,
-            //         court.location.latitude,
-            //         court.location.longitude
-            //     )
-            // })).sort((a, b) => a.distance - b.distance);
-            // setNearestCourts(sorted);
         } catch (error) {
-            console.log(error);
+            console.error('Error fetching nearest courts:', error.response?.data || error.message);
         }
     }
 
@@ -86,78 +87,82 @@ export default function FeaturedCourts() {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.featuredContainer}
             >
-                {nearestCourts.map((court) => (
-                    <TouchableOpacity 
-                        key={court.id} 
-                        style={styles.featuredCard}
-                        onPress={() => navigation.navigate('CourtDetail', { court })}
-                    >
-                        <Image
-                            source={{ uri: court.image }}
-                            style={styles.courtImage}
-                        />
-                        <View style={[styles.badge, {
-                            backgroundColor: court.type === 'Premium' ? '#818CF8' : '#6EE7B7'
-                        }]}>
-                            <Text style={styles.badgeText}>{court.type}</Text>
-                        </View>
-                        <View style={styles.cardContent}>
-                            <Text style={styles.courtName}>{court.name}</Text>
-                            <View style={styles.infoRow}>
-                                <View style={styles.courtTypeContainer}>
-                                    <MaterialCommunityIcons 
-                                        name={court.courtType === 'Indoor' ? 'home-variant' : 'tree'} 
-                                        size={14} 
-                                        color="#64748B" 
-                                    />
-                                    <Text style={styles.courtTypeText}>{court.courtType}</Text>
-                                </View>
-                                <View style={styles.locationContainer}>
-                                    <Ionicons name="location-outline" size={14} color="#64748B" />
-                                    <Text style={styles.locationText} numberOfLines={1}>
-                                        {court.location.address}
-                                    </Text>
-                                </View>
+                {nearestCourts && nearestCourts.length > 0 ? (
+                    nearestCourts.map((court) => (
+                        <TouchableOpacity 
+                            key={court._id || court.id} 
+                            style={styles.featuredCard}
+                            onPress={() => navigation.navigate('CourtDetail', { court })}
+                        >
+                            <Image
+                                source={{ uri: court.imgUrl || court.image }}
+                                style={styles.courtImage}
+                            />
+                            <View style={[styles.badge, {
+                                backgroundColor: court.type === 'Premium' ? '#818CF8' : '#6EE7B7'
+                            }]}>
+                                <Text style={styles.badgeText}>{court.type || 'Standard'}</Text>
                             </View>
-                            <View style={styles.infoRow}>
-                                <View style={styles.ratingContainer}>
-                                    <Ionicons name="star" size={14} color="#F59E0B" />
-                                    <Text style={styles.rating}>{court.rating}</Text>
-                                    <Text style={styles.reviews}>({court.reviews})</Text>
-                                </View>
-                                {court.distance && (
-                                    <Text style={styles.distance}>
-                                        {court.distance.toFixed(1)} km
-                                    </Text>
-                                )}
-                            </View>
-                            <View style={styles.priceRow}>
-                                <Text style={styles.price}>{court.price}</Text>
-                                <Text style={styles.priceUnit}>/hour</Text>
-                            </View>
-                            <View style={styles.facilitiesRow}>
-                                {court.facilities.slice(0, 3).map((facility, index) => (
-                                    <View key={index} style={styles.facilityTag}>
+                            <View style={styles.cardContent}>
+                                <Text style={styles.courtName}>{court.name}</Text>
+                                <View style={styles.infoRow}>
+                                    <View style={styles.courtTypeContainer}>
                                         <MaterialCommunityIcons 
-                                            name={
-                                                facility === 'AC' ? 'air-conditioner' :
-                                                facility === 'Shower' ? 'shower' :
-                                                facility === 'WiFi' ? 'wifi' :
-                                                facility === 'Parking' ? 'parking' :
-                                                facility === 'Toilet' ? 'toilet' :
-                                                facility === 'Locker' ? 'locker' : 
-                                                'food'
-                                            } 
-                                            size={12} 
+                                            name={court.courtType === 'Indoor' ? 'home-variant' : 'tree'} 
+                                            size={14} 
                                             color="#64748B" 
                                         />
-                                        <Text style={styles.facilityText}>{facility}</Text>
+                                        <Text style={styles.courtTypeText}>{court.courtType || 'Indoor'}</Text>
                                     </View>
-                                ))}
+                                    <View style={styles.locationContainer}>
+                                        <Ionicons name="location-outline" size={14} color="#64748B" />
+                                        <Text style={styles.locationText} numberOfLines={1}>
+                                            {court.address || court.location?.address || 'Location not available'}
+                                        </Text>
+                                    </View>
+                                </View>
+                                <View style={styles.infoRow}>
+                                    <View style={styles.ratingContainer}>
+                                        <Ionicons name="star" size={14} color="#F59E0B" />
+                                        <Text style={styles.rating}>{court.rating || '4.5'}</Text>
+                                        <Text style={styles.reviews}>({court.reviews || '236'})</Text>
+                                    </View>
+                                    {court.distance && (
+                                        <Text style={styles.distance}>
+                                            {typeof court.distance === 'number' ? `${court.distance.toFixed(1)} km` : court.distance}
+                                        </Text>
+                                    )}
+                                </View>
+                                <View style={styles.priceRow}>
+                                    <Text style={styles.price}>{court.price || 'Contact for price'}</Text>
+                                    <Text style={styles.priceUnit}>/hour</Text>
+                                </View>
+                                <View style={styles.facilitiesRow}>
+                                    {(court.facilities || []).slice(0, 3).map((facility, index) => (
+                                        <View key={index} style={styles.facilityTag}>
+                                            <MaterialCommunityIcons 
+                                                name={
+                                                    facility === 'AC' ? 'air-conditioner' :
+                                                    facility === 'Shower' ? 'shower' :
+                                                    facility === 'WiFi' ? 'wifi' :
+                                                    facility === 'Parking' ? 'parking' :
+                                                    facility === 'Toilet' ? 'toilet' :
+                                                    facility === 'Locker' ? 'locker' : 
+                                                    'food'
+                                                } 
+                                                size={12} 
+                                                color="#64748B" 
+                                            />
+                                            <Text style={styles.facilityText}>{facility}</Text>
+                                        </View>
+                                    ))}
+                                </View>
                             </View>
-                        </View>
-                    </TouchableOpacity>
-                ))}
+                        </TouchableOpacity>
+                    ))
+                ) : (
+                    <Text style={{ padding: 20, color: '#64748B' }}>No nearby courts found</Text>
+                )}
             </ScrollView>
         </View>
     );

@@ -1,11 +1,9 @@
 import BuildingModel from "../models/building.js";
-import { User } from "../models/user.js";
 
 export class BuildingController {
     static async createBuilding(req, res, next) {
         try {
             const { userId } = req.loginInfo
-            console.log(userId)
             const newBuilding = await BuildingModel.createNewBuilding(req.body, userId);
             res.status(201).json({
                 message: "Building created successfully",
@@ -19,7 +17,6 @@ export class BuildingController {
     static async getAllBuildings(req, res, next) {
         try {
             const buildings = await BuildingModel.readBuilding();
-            // console.log(buildings, '<<<<<<< ini building model')
             res.status(200).json({ buildings });
         } catch (err) {
             next(err);
@@ -81,16 +78,16 @@ export class BuildingController {
         }
     }
 
-    static async findBuildingByUserLocation(req, res, next) {
-        try {
-            const { longitude, latitude } = req.query;
-            const buildings = await BuildingModel.findBuildingByUserLocation(longitude, latitude);
-            res.status(200).json(buildings);
-        } catch (err) {
-            console.error('Error finding buildings:', err);
-            next(err);
-        }
-    }
+    // static async findBuildingByUserLocation(req, res, next) {
+    //     try {
+    //         const { longitude, latitude } = req.query;
+    //         const buildings = await BuildingModel.findBuildingByUserLocation(longitude, latitude);
+    //         res.status(200).json(buildings);
+    //     } catch (err) {
+    //         console.error('Error finding buildings:', err);
+    //         next(err);
+    //     }
+    // }
 }
 
 

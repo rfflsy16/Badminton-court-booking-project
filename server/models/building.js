@@ -25,16 +25,20 @@ export default class BuildingModel {
     }
 
     static async createNewBuilding(body, userId) {
-        const { name, address, location } = body;
+        const { name, address, location, city, imgUrl } = body;
 
-        if (!name || !address || !location || !location.type || !location.coordinates) {
+        if (!name || !address || !city || !imgUrl || !location || !location.type || !location.coordinates) {
             throw { name: "BADREQUEST" }
         }
+
+        // console.log(body, "<<<<<<")
 
         const collection = this.getCollection();
         const newBuilding = {
             name,
             address,
+            city,
+            imgUrl,
             location,
             userId,
             createdAt: new Date(),
@@ -42,6 +46,7 @@ export default class BuildingModel {
         };
 
         const result = await collection.insertOne(newBuilding);
+        // console.log(result, "<<<<<<,")
         return result.ops;
     }
 
@@ -107,25 +112,25 @@ export default class BuildingModel {
             throw new Error("Invalid coordinates");
         }
 
-        const building = await collection.findOne({
+        const buildings = await collection.find({
             location: {
                 $nearSphere: {
                     $geometry: {
                         type: "Point",
                         coordinates: [longitude, latitude],
                     },
-                    $maxDistance: 1000,
+                    $maxDistance: 5000,
                 },
             },
-        });
+        }).toArray();
 
-        console.log(building, '<<<<<<')
+        console.log('Found nearby courts:', buildings.length);
 
-        if (!building) {
-            return []
+        if (!buildings || buildings.length === 0) {
+            return [];
         }
  
-        return building;
+        return buildings;
     }
 
 }

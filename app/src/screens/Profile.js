@@ -1,25 +1,65 @@
-import { ScrollView, StyleSheet } from "react-native";
+import { ScrollView, StyleSheet, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Header from "../components/profile/Header";
 import ProfileSection from "../components/profile/ProfileSection";
 import ProfileMenuItem from "../components/profile/ProfileMenuItem";
 import LogoutButton from "../components/profile/LogoutButton";
-import { useState } from 'react';
+import { useState, useContext, useEffect } from 'react';
+import axios from 'axios';
+import * as SecureStore from 'expo-secure-store';
+import AuthContext from '../context/AuthContext';
 
 export default function Profile() {
     const navigation = useNavigation();
     const [selectedLanguage, setSelectedLanguage] = useState('id');
     const [isDarkMode, setIsDarkMode] = useState(false);
+    const { isLogin, setIsLogin } = useContext(AuthContext);
+    const [userToken, setUserToken] = useState("");
+    const [myProfile, setMyProfile] = useState({});
+    
+    useEffect(() => {
+        
+        async function getToken() {
+            const token = await SecureStore.getItemAsync('userToken');
+            setUserToken(token);
+
+        }
+        getToken();
+    
+    },[])
+
+    useEffect(() => {
+        getMyProfile();
+      }, [userToken]);
+
+    
+    const getMyProfile = async () => {
+        try {
+            const response = await axios.get('https://ed9b-27-50-29-117.ngrok-free.app/profile',{
+                headers: {
+                    'Authorization': `Bearer ${userToken}`
+                }
+            })
+            console.log(response.data, "<<<<<<<<<<<<<<<<<<< ini response data");
+            setMyProfile(response.data);
+        } catch (error) {
+            console.log(error);
+        }
+    
+    }
+
+    console.log(myProfile, "<<<<<<<<<<<<<<<<<<< ini my profile");
 
     const userInfo = {
-        name: "John Doe",
-        email: "john.doe@example.com",
+        name: myProfile.fullName,
+        email: myProfile.email,
         avatar: "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400",
-        memberSince: "2023"
+        memberSince: new Date(myProfile.createdAt).getFullYear(),
     };
 
-    const handleLogout = () => {
-        // Handle logout logic
+
+    const handleLogout = async() => {
+        await SecureStore.deleteItemAsync("userToken"); setIsLogin(false);
     };
 
     const getLanguageInfo = () => {
@@ -125,7 +165,8 @@ export default function Profile() {
 
             <LogoutButton
                 // onPress={handleLogout}  
-                onPress={() => navigation.navigate('Login', { screen: 'Login' })}
+                // onPress={() => navigation.navigate('Login', { screen: 'Login' })}
+                onPress={handleLogout}
             />
         </ScrollView>
     );

@@ -77,7 +77,7 @@ export default function FeaturedCourts() {
     return (
         <View style={styles.section}>
             <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Nearby Courts</Text>
+                <Text style={styles.sectionTitle}>Nearby Gor</Text>
                 <TouchableOpacity>
                     <Text style={styles.seeAll}>See All</Text>
                 </TouchableOpacity>

@@ -23,6 +23,7 @@ export default function BookingModal({
     handleConfirm,
     timeSlots 
 }) {
+    console.log(court,"<<<< court di modal")
     const swipeAnim = useRef(new Animated.Value(0)).current;
     const progressAnim = useRef(new Animated.Value(0)).current;
     const [isSwipeCompleted, setIsSwipeCompleted] = useState(false);
@@ -89,6 +90,47 @@ export default function BookingModal({
         setShowPaymentConfirm(true);
     };
 
+    const renderBookingSummary = () => {
+        if (!court?.buildingDetails) return null;
+
+        return (
+            <View style={[styles.section, { marginTop: 0 }]}>
+                <Text style={styles.sectionTitle}>Booking Summary</Text>
+                <View style={styles.summaryCard}>
+                    <Text style={styles.summaryTitle}>{court.buildingDetails.name}</Text>
+                    <View style={styles.summaryRow}>
+                        <Text style={styles.summaryLabel}>Date</Text>
+                        <Text style={styles.summaryValue}>{selectedDate}</Text>
+                    </View>
+                    <View style={styles.summaryRow}>
+                        <Text style={styles.summaryLabel}>Time</Text>
+                        <Text style={styles.summaryValue}>
+                            {selectedTimes
+                                .map(id => timeSlots.find(slot => slot.id === id)?.time)
+                                .filter(Boolean)
+                                .join(', ')}
+                        </Text>
+                    </View>
+                    <View style={styles.summaryRow}>
+                        <Text style={styles.summaryLabel}>Duration</Text>
+                        <Text style={styles.summaryValue}>{selectedTimes.length} hours</Text>
+                    </View>
+                    <View style={styles.summaryRow}>
+                        <Text style={styles.summaryLabel}>Total Price</Text>
+                        <Text style={styles.summaryValue}>
+                            {new Intl.NumberFormat('id-ID', { 
+                                style: 'currency', 
+                                currency: 'IDR',
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0
+                            }).format(totalPrice)}
+                        </Text>
+                    </View>
+                </View>
+            </View>
+        );
+    };
+
     return (
         <>
             <Modal
@@ -114,30 +156,7 @@ export default function BookingModal({
                             showsVerticalScrollIndicator={false}
                             contentContainerStyle={styles.modalScrollContent}
                         >
-                            {/* Booking Summary */}
-                            <View style={[styles.section, { marginTop: 0 }]}>
-                                <Text style={styles.sectionTitle}>Booking Summary</Text>
-                                <View style={styles.summaryCard}>
-                                    <Text style={styles.summaryTitle}>{court.name}</Text>
-                                    <View style={styles.summaryRow}>
-                                        <Text style={styles.summaryLabel}>Date</Text>
-                                        <Text style={styles.summaryValue}>{selectedDate}</Text>
-                                    </View>
-                                    <View style={styles.summaryRow}>
-                                        <Text style={styles.summaryLabel}>Time</Text>
-                                        <Text style={styles.summaryValue}>{formatTimeSlot(selectedTimes)}</Text>
-                                    </View>
-                                    <View style={styles.summaryRow}>
-                                        <Text style={styles.summaryLabel}>Duration</Text>
-                                        <Text style={styles.summaryValue}>{selectedTimes.length} hours</Text>
-                                    </View>
-                                    <View style={styles.summaryRow}>
-                                        <Text style={styles.summaryLabel}>Total Price</Text>
-                                        <Text style={styles.summaryValue}>Rp {totalPrice.toLocaleString()}</Text>
-                                    </View>
-                                </View>
-                            </View>
-
+                            {renderBookingSummary()}
                             {/* Payment Type Selection */}
                             <View style={styles.section}>
                                 <Text style={styles.sectionTitle}>Payment Type</Text>
@@ -155,7 +174,12 @@ export default function BookingModal({
                                         <View style={styles.paymentTypeContent}>
                                             <Text style={styles.paymentTypeTitle}>Full Payment</Text>
                                             <Text style={styles.paymentTypeAmount}>
-                                                Rp {totalPrice.toLocaleString()}
+                                                {new Intl.NumberFormat('id-ID', { 
+                                                    style: 'currency', 
+                                                    currency: 'IDR',
+                                                    minimumFractionDigits: 0,
+                                                    maximumFractionDigits: 0
+                                                }).format(totalPrice)}
                                             </Text>
                                         </View>
                                     </TouchableOpacity>
@@ -173,7 +197,12 @@ export default function BookingModal({
                                         <View style={styles.paymentTypeContent}>
                                             <Text style={styles.paymentTypeTitle}>Down Payment (50%)</Text>
                                             <Text style={styles.paymentTypeAmount}>
-                                                Rp {(totalPrice * 0.5).toLocaleString()}
+                                                {new Intl.NumberFormat('id-ID', { 
+                                                    style: 'currency', 
+                                                    currency: 'IDR',
+                                                    minimumFractionDigits: 0,
+                                                    maximumFractionDigits: 0
+                                                }).format(totalPrice * 0.5)}
                                             </Text>
                                         </View>
                                     </TouchableOpacity>
@@ -253,7 +282,12 @@ export default function BookingModal({
                                         </Text>
                                     )}
                                     <Text style={styles.totalValue}>
-                                        Rp {getFinalAmount().toLocaleString()}
+                                        {new Intl.NumberFormat('id-ID', { 
+                                            style: 'currency', 
+                                            currency: 'IDR',
+                                            minimumFractionDigits: 0,
+                                            maximumFractionDigits: 0
+                                        }).format(getFinalAmount())}
                                     </Text>
                                 </View>
                             </View>

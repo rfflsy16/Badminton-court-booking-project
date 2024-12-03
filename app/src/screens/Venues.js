@@ -129,7 +129,7 @@ export default function Venues() {
             <FlatList
                 data={filteredAndSortedVenues()}
                 renderItem={({ item }) => <VenueCard venue={item} />}
-                keyExtractor={item => item.id}
+                keyExtractor={item => item._id.toString()}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.listContainer}
             />

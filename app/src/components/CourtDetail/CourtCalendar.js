@@ -1,49 +1,62 @@
-import { View, Text, StyleSheet } from 'react-native'
-import { Calendar } from 'react-native-calendars'
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { format, addDays, isSameDay } from 'date-fns';
 
-export default function CourtCalendar({ selectedDate, onDateSelect }) {
-    // Get today's date in YYYY-MM-DD format
-    const today = new Date().toISOString().split('T')[0]
+export default function CourtCalendar({ selectedDate, onDateSelect, excludedDates }) {
+    const dates = Array.from({ length: 14 }, (_, i) => addDays(new Date(), i));
 
-    // Calculate min and max dates (today to 3 months from now)
-    const maxDate = new Date()
-    maxDate.setMonth(maxDate.getMonth() + 3)
-    const maxDateStr = maxDate.toISOString().split('T')[0]
+    const isExcludedDate = (date) => {
+        return excludedDates.includes(format(date, 'yyyy-MM-dd'));
+    };
 
     return (
         <View style={styles.section}>
             <Text style={styles.sectionTitle}>Select Date</Text>
-            <Calendar
-                minDate={today}
-                maxDate={maxDateStr}
-                onDayPress={day => onDateSelect(day.dateString)}
-                markedDates={{
-                    [selectedDate]: {
-                        selected: true,
-                        selectedColor: '#EA580C',
-                    }
-                }}
-                theme={{
-                    todayTextColor: '#EA580C',
-                    selectedDayBackgroundColor: '#EA580C',
-                    selectedDayTextColor: '#ffffff',
-                    textDayFontWeight: '500',
-                    textMonthFontWeight: 'bold',
-                    textDayHeaderFontWeight: '500',
-                    textDayFontSize: 14,
-                    textMonthFontSize: 16,
-                    textDayHeaderFontSize: 14,
-                }}
-                style={styles.calendar}
-            />
+            <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false}
+                style={styles.datesContainer}
+            >
+                {dates.map((date) => {
+                    const formattedDate = format(date, 'yyyy-MM-dd');
+                    const isSelected = selectedDate === formattedDate;
+                    const isExcluded = isExcludedDate(date);
+
+                    return (
+                        <TouchableOpacity
+                            key={formattedDate}
+                            style={[
+                                styles.dateButton,
+                                isSelected && styles.selectedDate,
+                                isExcluded && styles.excludedDate
+                            ]}
+                            onPress={() => !isExcluded && onDateSelect(formattedDate)}
+                            disabled={isExcluded}
+                        >
+                            <Text style={[
+                                styles.dayName,
+                                isSelected && styles.selectedText,
+                                isExcluded && styles.excludedText
+                            ]}>
+                                {format(date, 'EEE')}
+                            </Text>
+                            <Text style={[
+                                styles.dayNumber,
+                                isSelected && styles.selectedText,
+                                isExcluded && styles.excludedText
+                            ]}>
+                                {format(date, 'd')}
+                            </Text>
+                        </TouchableOpacity>
+                    );
+                })}
+            </ScrollView>
         </View>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
     section: {
         marginBottom: 24,
-        marginTop: 24,
     },
     sectionTitle: {
         fontSize: 20,
@@ -52,14 +65,40 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         letterSpacing: 0.5,
     },
-    calendar: {
-        borderRadius: 12,
-        elevation: 3,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        backgroundColor: '#fff',
-        padding: 8,
+    datesContainer: {
+        flexDirection: 'row',
     },
-})
+    dateButton: {
+        width: 56,
+        height: 72,
+        backgroundColor: '#F8FAFC',
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 8,
+    },
+    selectedDate: {
+        backgroundColor: '#E11D48',
+    },
+    excludedDate: {
+        backgroundColor: '#E5E7EB',
+        opacity: 0.5,
+    },
+    dayName: {
+        fontSize: 13,
+        color: '#64748B',
+        marginBottom: 4,
+        fontWeight: '500',
+    },
+    dayNumber: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#1F2937',
+    },
+    selectedText: {
+        color: '#fff',
+    },
+    excludedText: {
+        color: '#9CA3AF',
+    },
+});

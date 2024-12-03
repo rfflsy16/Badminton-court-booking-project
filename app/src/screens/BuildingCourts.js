@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
-const CourtCard = ({ court }) => {
+const CourtCard = ({ court, index }) => {
     const navigation = useNavigation();
     return (
         <TouchableOpacity 
@@ -14,7 +14,7 @@ const CourtCard = ({ court }) => {
         >
             <View style={styles.cardContent}>
                 <View style={styles.cardHeader}>
-                    <Text style={styles.courtName}>{`Court A`}</Text>
+                    <Text style={styles.courtName}>{`Court ${String.fromCharCode(65 + index)}`}</Text>
                     <View style={styles.ratingContainer}>
                         <Ionicons name="star" size={16} color="#EA580C" />
                         <Text style={styles.rating}>4.7</Text>
@@ -69,7 +69,14 @@ const CourtCard = ({ court }) => {
                     ))}
                 </View>
 
-                <Text style={styles.price}>Rp. {court.price}</Text>
+                <Text style={styles.price}>
+                    {new Intl.NumberFormat('id-ID', { 
+                        style: 'currency', 
+                        currency: 'IDR',
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    }).format(court.price)}
+                </Text>
             </View>
         </TouchableOpacity>
     );
@@ -79,6 +86,7 @@ export default function BuildingCourts() {
     const route = useRoute();
     const navigation = useNavigation();
     const { venue } = route.params;
+    console.log(venue, "<<<< venue")
     const [userToken, setUserToken] = useState("");
     const [courtsData, setCourtsData] = useState([]);
 
@@ -136,8 +144,8 @@ export default function BuildingCourts() {
             {/* Courts List */}
             <FlatList
                 data={courtsData}
-                renderItem={({ item }) => <CourtCard court={item} />}
-                keyExtractor={item => item.id}
+                renderItem={({ item, index }) => <CourtCard court={item} index={index} />}
+                keyExtractor={item => item._id.toString()}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.listContainer}
             />

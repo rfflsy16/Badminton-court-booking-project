@@ -35,7 +35,13 @@ export default class RoomModel {
     // Mendapatkan room berdasarkan ID
     static async getRoomById(roomId) {
         const collection = this.getCollection();
-        return await collection.findOne({ _id: new ObjectId(roomId) });
+
+        const findRoom = await collection.findOne({ _id: new ObjectId(roomId) });
+        if (!findRoom) {
+            throw { name: 'NotFound' }
+        }
+
+        return findRoom
     }
 
     // Mendapatkan semua room

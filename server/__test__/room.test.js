@@ -2,7 +2,6 @@ import request from 'supertest'
 import { app } from '../app.js'
 import BuildingModel from '../models/building.js'
 import { signToken } from '../helpers/jwt.js';
-import { User } from '../models/user.js';
 import { hashPassword } from '../helpers/bcrypt.js';
 import { User } from '../models/user.js';
 import CourtModel from '../models/court.js';
@@ -14,7 +13,7 @@ const courtCollection = CourtModel.getCollection()
 const roomcollection = RoomModel.getCollection()
 
 
-let dataOfCourt, dataOfBuilding, access_token_admin, access_token_user
+let dataOfCourt, dataOfBuilding, dataOfRoom, access_token_admin, access_token_user
 beforeAll(async () => {
     await userCollection.insertMany([
         {
@@ -147,6 +146,9 @@ beforeAll(async () => {
         }
     },])
 
+    const room = await RoomModel.getRoom()
+    dataOfRoom = room[0]
+
     const users = await userCollection.find().toArray()
     const admin = {
         id: users[0]._id,
@@ -171,8 +173,195 @@ afterAll(async () => {
     await roomcollection.deleteMany()
 })
 
+// GET /room
 describe('GET /room', () => {
     describe('GET /room - succeed', () => {
+        it('should be return all of data rooms', async () => {
+            const response = await request(app)
+                .get('/room')
+                .set('Authorization', `Bearer ${access_token_admin}`)
 
+            expect(response.status).toBe(200)
+            expect(response.body).toBeInstanceOf(Object)
+        })
+    })
+    describe('GET /room - failed', () => {
+        it('should be return an error message because user doesnt login', async () => {
+            const response = await request(app)
+                .get('/room')
+
+            expect(response.status).toBe(401)
+            expect(response.body.message).toBe('Please login first')
+        })
+    })
+    describe('GET /room - failed', () => {
+        it('should be return an error message because invalid token', async () => {
+            const response = await request(app)
+                .get('/room')
+                .set('Authorization', `Bearer kwnoen`)
+            expect(response.status).toBe(401)
+            expect(response.body.message).toBe('Please login first')
+        })
+    })
+})
+
+// POST /room
+describe('POST /room', () => {
+    describe('POST /room - succeed', () => {
+        it('should be return an message Succeess create new Room', async () => {
+            const response = await request(app)
+                .post('/room')
+                .send({
+                    'courtId': dataOfCourt._id
+                })
+                .set('Authorization', `Bearer ${access_token_admin}`)
+
+            expect(response.status).toBe(201)
+            expect(response.body.message).toBe('Room created successfully')
+            expect(response.body.room).toBeInstanceOf(Object)
+        })
+    })
+    describe('POST /room - failed', () => {
+        it('should be return an error message because the room already exist', async () => {
+            const response = await request(app)
+                .post('/room')
+                .send({
+                    'courtId': dataOfCourt._id
+                })
+                .set('Authorization', `Bearer ${access_token_admin}`)
+
+            expect(response.status).toBe(400)
+            expect(response.body.message).toBe('Room already exists for this court with the same participants')
+        })
+    })
+    describe('POST /room - failed', () => {
+        it('should be return an error message because user doesnt login', async () => {
+            const response = await request(app)
+                .post('/room')
+                .send({
+                    'courtId': dataOfCourt._id
+                })
+
+            expect(response.status).toBe(401)
+            expect(response.body.message).toBe('Please login first')
+        })
+    })
+    describe('POST /room - failed', () => {
+        it('should be return an error message because Invalid token', async () => {
+            const response = await request(app)
+                .post('/room')
+                .send({
+                    'courtId': dataOfCourt._id
+                })
+                .set('Authorization', `Bearer klweferln`)
+
+            expect(response.status).toBe(401)
+            expect(response.body.message).toBe('Please login first')
+        })
+    })
+    describe('POST /room - failed', () => {
+        it('should be return an error message because Invalid token', async () => {
+            const response = await request(app)
+                .post('/room')
+                .send({
+                    'courtId': 'kjewnfkjebfkjeb'
+                })
+                .set('Authorization', `Bearer ${access_token_admin}`)
+
+            expect(response.status).toBe(400)
+            expect(response.body.message).toBe('input must be a 24 character hex string')
+        })
+    })
+})
+
+describe('GET /room/:roomId', () => {
+    describe('GET /room/:roomId - succeed', () => {
+        it('should be return data of the detail room', async () => {
+            const response = await request(app)
+                .get(`/room/${dataOfRoom._id}`)
+                .set('Authorization', `Bearer ${access_token_admin}`)
+
+            expect(response.status).toBe(200)
+            expect(response.body).toBeInstanceOf(Object)
+        })
+    })
+    describe('GET /room/:roomId - failed', () => {
+        it('should be return an error message because user doesnt login', async () => {
+            const response = await request(app)
+                .get(`/room/${dataOfRoom._id}`)
+
+            expect(response.status).toBe(401)
+            expect(response.body.message).toBe('Please login first')
+        })
+    })
+    describe('GET /room/:roomId - failed', () => {
+        it('should be return an error message because invalid token', async () => {
+            const response = await request(app)
+                .get(`/room/${dataOfRoom._id}`)
+                .set('Authorization', `Bearer dknckenkl`)
+            expect(response.status).toBe(401)
+            expect(response.body.message).toBe('Please login first')
+        })
+    })
+    describe('GET /room/:roomId - failed', () => {
+        it('should be return an error message because data is not found', async () => {
+            const response = await request(app)
+                .get(`/room/aaaaaad97649a501d3123456`)
+                .set('Authorization', `Bearer ${access_token_user}`)
+
+            expect(response.status).toBe(404)
+            expect(response.body.message).toBe('Data not found')
+        })
+    })
+    describe('GET /room/:roomId - failed', () => {
+        it('should be return an error message because invalid input id', async () => {
+            const response = await request(app)
+                .get(`/room/aaaaaad91`)
+                .set('Authorization', `Bearer ${access_token_admin}`)
+
+            expect(response.status).toBe(400)
+            expect(response.body.message).toBe('input must be a 24 character hex string')
+        })
+    })
+})
+
+describe('DELETE /room/:roomId', () => {
+    describe('DELETE /room/:roomId - succeed', () => {
+        it('should be return an succeess delete message', async () => {
+            const response = await request(app)
+                .delete(`/room/${dataOfRoom._id}`)
+                .set('Authorization', `Bearer ${access_token_admin}`)
+
+            expect(response.status).toBe(200)
+            expect(response.body.message).toBe('Room deleted successfully')
+        })
+    })
+    describe('DELETE /room/:roomId - failed', () => {
+        it('should be return an error message because the room has been deleted or data is not found', async () => {
+            const response = await request(app)
+                .delete(`/room/${dataOfRoom._id}`)
+                .set('Authorization', `Bearer ${access_token_admin}`)
+
+            expect(response.status).toBe(404)
+            expect(response.body.message).toBe('Data not found')
+        })
+    })
+    describe('DELETE /room/:roomId - failed', () => {
+        it('should be return an error message because the role of user is not admin', async () => {
+            const response = await request(app)
+                .delete(`/room/${dataOfRoom._id}`)
+                .set('Authorization', `Bearer ${access_token_user}`)
+            expect(response.status).toBe(403)
+            expect(response.body.message).toBe('You are not admin')
+        })
+    })
+    describe('DELETE /room/:roomId - failed', () => {
+        it('should be return an error message because invalid token', async () => {
+            const response = await request(app)
+                .delete(`/room/${dataOfRoom._id}`)
+                .set('Authorization', `Bearer nclenckle`)
+            expect(response.status).toBe(401)
+            expect(response.body.message).toBe('Please login first')
+        })
     })
 })

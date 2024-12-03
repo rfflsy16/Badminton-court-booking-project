@@ -6,10 +6,14 @@ import { User } from '../models/user'
 import { hashPassword } from '../helpers/bcrypt'
 import { signToken } from '../helpers/jwt'
 
+const userCollection = User.getCollection()
+const buildingCollection = BuildingModel.getCollection()
+const courtCollection = CourtModel.getCollection()
+
+let dataOfBuilding
 beforeAll(async () => {
-    const userCollection = User.getCollection()
-    const buildingCollection = BuildingModel.getCollection()
-    const courtCollection = CourtModel.getCollection()
+    const building = await BuildingModel.readBuilding()
+    dataOfBuilding = building[0]
 
     userCollection.insertMany([
         {
@@ -70,6 +74,7 @@ beforeAll(async () => {
         }
     }])
 
+
     courtCollection.insertMany([{
         "BuildingId": {
             "$oid": "674dff4dc2efa8461625f222"
@@ -96,4 +101,8 @@ beforeAll(async () => {
             "$date": "2024-12-02T22:05:47.984Z"
         }
     }])
+})
+
+afterAll(async () => {
+
 })

@@ -107,25 +107,25 @@ export default class BuildingModel {
             throw new Error("Invalid coordinates");
         }
 
-        const building = await collection.findOne({
+        const buildings = await collection.find({
             location: {
                 $nearSphere: {
                     $geometry: {
                         type: "Point",
                         coordinates: [longitude, latitude],
                     },
-                    $maxDistance: 1000,
+                    $maxDistance: 5000,
                 },
             },
-        });
+        }).toArray();
 
-        console.log(building, '<<<<<<')
+        console.log('Found nearby courts:', buildings.length);
 
-        if (!building) {
-            return []
+        if (!buildings || buildings.length === 0) {
+            return [];
         }
  
-        return building;
+        return buildings;
     }
 
 }

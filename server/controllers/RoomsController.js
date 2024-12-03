@@ -11,6 +11,7 @@ export class RoomController {
             const building = await CourtModel.findBuildingWithCourt(courtId);
             const id = building.BuildingId
             const adminId = await BuildingModel.readByIdBuilding(id)
+            console.log(adminId, "ini admin Id nya")
 
             const existingRoom = await RoomModel.getRoomByCourtAndParticipants(courtId, userId);
 
@@ -18,7 +19,7 @@ export class RoomController {
                 return res.status(400).json({ message: "Room already exists for this court with the same participants" });
             }
 
-            const newRoom = await RoomModel.addRoom(courtId, userId, adminId.UserId);
+            const newRoom = await RoomModel.addRoom(courtId, userId, adminId.userId);
 
             res.status(201).json({
                 message: "Room created successfully",
@@ -42,9 +43,57 @@ export class RoomController {
 
     static async getAllRooms(req, res, next) {
         try {
+            const { userId } = req.loginInfo;
+            console.log('Current user ID:', userId);
+            
             const rooms = await RoomModel.getRoom();
-            res.status(200).json(rooms);
+            console.log('All rooms from DB:', JSON.stringify(rooms, null, 2));
+            
+            // Get court details for each room
+            const roomsWithDetails = await Promise.all(rooms.map(async (room) => {
+                try {
+                    console.log(`Processing room ${room._id}:`);
+                    console.log('- Room participants:', room.participants);
+                    console.log('- Looking for user:', userId);
+                    
+                    // Convert all participant IDs to strings for comparison
+                    const participantIds = room.participants.map(id => id.toString());
+                    const isUserParticipant = participantIds.includes(userId.toString());
+                    console.log('- Is user a participant?', isUserParticipant);
+
+                    const court = await CourtModel.readCourtById(room.courtId);
+                    console.log('- Court details:', court);
+                    
+                    return {
+                        ...room,
+                        name: court?.name || `Court ${room.courtId}`,
+                        courtDetails: court,
+                        isParticipant: isUserParticipant
+                    };
+                } catch (error) {
+                    console.error(`Error processing room ${room._id}:`, error);
+                    return {
+                        ...room,
+                        name: `Court ${room.courtId}`,
+                        courtDetails: null,
+                        isParticipant: false
+                    };
+                }
+            }));
+
+            // Filter rooms where the current user is a participant
+            const userRooms = roomsWithDetails.filter(room => {
+                const isParticipant = room.participants.some(participantId => 
+                    participantId.toString() === userId.toString()
+                );
+                console.log(`Room ${room._id} - User ${userId} is participant: ${isParticipant}`);
+                return isParticipant;
+            });
+
+            console.log('Final rooms being sent:', JSON.stringify(userRooms, null, 2));
+            res.status(200).json(userRooms);
         } catch (err) {
+            console.error('Error in getAllRooms:', err);
             next(err);
         }
     }

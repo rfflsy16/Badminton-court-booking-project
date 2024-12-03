@@ -28,6 +28,13 @@ export default class PaymentModel {
         return payment
     }
 
+    static async readPaymentByBookingId(BookingId) {     
+        const collection = this.getCollection()
+        const payments = await collection.find({ BookingId }).toArray()
+
+        return payments
+    }
+
     static async createNewPayment(body, username) {
         const { BookingId, type, amount, status = "pending" } = body
 
@@ -46,7 +53,20 @@ export default class PaymentModel {
             updatedAt: new Date()
         }
 
-        await collection.insertOne(newPayment)
-        return { message: 'Succeess Payment' }
+       const payment = await collection.insertOne(newPayment)
+        return { message: 'Succeess Payment', _id: payment.insertedId }
+    }
+
+    static async updatePaymentStatus(id, status) {
+        const _id = new ObjectId(id)
+        const collection = this.getCollection()
+        const updateData = {
+            status,
+            updatedAt: new Date()
+        }
+
+        const payment = await collection.updateOne({ _id }, { $set: updateData })
+
+        return { message: 'Success update payment status', payment }
     }
 }

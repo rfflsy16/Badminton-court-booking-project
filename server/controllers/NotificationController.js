@@ -1,5 +1,5 @@
 
-export class NotificationController {
+export default class NotificationController {
     static async getNotification(req, res, next) {
         try {
 

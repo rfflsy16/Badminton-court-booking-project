@@ -31,7 +31,7 @@ export default class BuildingModel {
             throw { name: "BADREQUEST" }
         }
 
-        console.log(body, "<<<<<<")
+        // console.log(body, "<<<<<<")
 
         const collection = this.getCollection();
         const newBuilding = {
@@ -112,20 +112,21 @@ export default class BuildingModel {
             throw new Error("Invalid coordinates");
         }
 
-        const building = await collection.findOne({
+
+        const building = await collection.find({
             location: {
                 $nearSphere: {
                     $geometry: {
                         type: "Point",
                         coordinates: [longitude, latitude],
                     },
-                    $maxDistance: 1000,
+                    $maxDistance: 5000,
                 },
             },
-        });
-        // console.log(building, "<<<<<<<<< ini di controller")
-        if (!building) {
-            throw { name: 'BuildingNotFound' }
+        }).toArray();
+
+        if (!building || building.length === 0) {
+            return []
         }
 
         return building;

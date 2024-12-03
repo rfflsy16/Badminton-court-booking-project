@@ -6,7 +6,7 @@ export class BuildingController {
         // console.log('masukkkkkk')
         try {
             const { userId } = req.loginInfo
-            console.log(userId)
+            // console.log(userId)
             const newBuilding = await BuildingModel.createNewBuilding(req.body, userId);
             res.status(201).json({
                 message: "Building created successfully",
@@ -82,7 +82,6 @@ export class BuildingController {
     }
 
     static async findBuildingByCoordinates(req, res, next) {
-        // console.log('masullll')
         try {
             const { longitude, latitude } = req.body;
 

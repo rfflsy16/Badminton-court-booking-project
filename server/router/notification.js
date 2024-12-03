@@ -5,5 +5,6 @@ export default function notificationRouter() {
     const router = express.Router()
 
     router.get("/", NotificationController.getNotification);
+    router.post('/', NotificationController.generateAndSaveNotifications)
     return router
 }

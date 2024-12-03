@@ -11,7 +11,7 @@ export default class NotificationController {
         }
     }
 
-    static async generateAndSaveNotifications() {
+    static async generateAndSaveNotifications(req, res, next) {
         try {
             const recommendations = await AIController.generateRecommendations();
 
@@ -24,6 +24,8 @@ export default class NotificationController {
 
             const collection = NotificationModel.getCollection();
             await collection.insertMany(notificationData);
+
+            res.status(200).json({ message: "Notifikasi berhasil dibuat" });
         } catch (error) {
             console.error("Error pas generate notifikasi:", error);
         }

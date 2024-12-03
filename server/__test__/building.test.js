@@ -1,10 +1,8 @@
 import request from 'supertest'
 import { app } from '../app'
 import BuildingModel from '../models/building'
-import { ObjectId } from 'mongodb'
-import { signToken, verifyToken } from '../helpers/jwt';
+import { signToken } from '../helpers/jwt';
 import { User } from '../models/user';
-import CourtModel from '../models/court';
 import { hashPassword } from '../helpers/bcrypt';
 
 let access_token_admin, access_token_user;

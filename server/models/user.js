@@ -110,7 +110,7 @@ export class User {
     const updateData = {
       location: {
         type: "Point",
-        coordinates: location.coordinates, // [longitude, latitude]
+        coordinates: location.coordinates,
       },
       updatedAt: new Date(),
     };

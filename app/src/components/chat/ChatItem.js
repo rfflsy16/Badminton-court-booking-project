@@ -1,17 +1,52 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { useState, useEffect } from "react";
+import axios from 'axios';
+import * as SecureStore from 'expo-secure-store';
 
 export default function ChatItem({ chat, onPress }) {
+    const [lastMessage, setLastMessage] = useState("");
+    const [userToken, setUserToken] = useState("");
+
+    useEffect(() => {
+        async function getToken() {
+            const token = await SecureStore.getItemAsync('userToken');
+            setUserToken(token);
+        }
+        getToken();
+    },[])
+
+    useEffect(() => {
+        fetchLastMessage();
+    }, [userToken]);
+
+    const fetchLastMessage = async () => {
+        try {
+            const response = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/message/${chat._id}`,{
+                headers: {              
+                    Authorization: `Bearer ${userToken}` 
+                }
+            });
+            // const messages = response.data.messages;
+            // const lastMessage = messages[messages.length - 1];
+            setLastMessage(response.data.messages[0]?.text);
+            // console.log(response.data.messages[0]?.text, "<<<<< response last message")
+        } catch (error) {
+            console.error("Error fetching last message:", error);
+        }
+    };
+
+    // console.log(JSON.stringify(chat, null, 2), "<<<<< chat dari chat item")
     return (
         <TouchableOpacity style={styles.chatItem} onPress={onPress}>
-            <Image source={{ uri: chat.avatar }} style={styles.avatar} />
+            <Image source={{ uri: "https://lh4.googleusercontent.com/proxy/ElNJBofC5Bx_BPHcyLtNKL6tb90TKY0O1RzSW4i8UB7ZzuVGqitPVR43wJbwCxCPwaNPCTmNhsp3PTEXaza1NivZS2LdfGHBqqDfmInrTtO_K1g8" }} style={styles.avatar} />
             <View style={styles.chatContent}>
                 <View style={styles.chatHeader}>
-                    <Text style={styles.chatName}>{chat.name}</Text>
-                    <Text style={styles.chatTime}>{chat.time}</Text>
+                    <Text style={styles.chatName}>{chat.courtDetails.buildingDetails.name}</Text>
+                    <Text style={styles.chatTime}>{new Date(chat.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit' })} {new Date(chat.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</Text>
                 </View>
                 <View style={styles.chatFooter}>
                     <Text style={styles.lastMessage} numberOfLines={1}>
-                        {chat.lastMessage}
+                        {lastMessage || "No messages yet"}
                     </Text>
                     {chat.unread > 0 && (
                         <View style={styles.unreadBadge}>

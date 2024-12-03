@@ -4,7 +4,6 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { router } from "./router/index.js"
 
-import TestLocation from "./models/testLocation.js";
 const app = express();
 dotenv.config();
 const port = process.env.PORT || 3000;

@@ -289,6 +289,7 @@ export class BookingController {
             };
     
             const transaction = await snap.createTransaction(parameter);
+            console.log(transaction, "ini transaction");
     
             res.status(200).json({
                 message: "Pelunasan berhasil diinisiasi",

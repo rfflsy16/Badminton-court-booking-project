@@ -28,30 +28,31 @@ io.on('connection', (socket) => {
     console.log('a user connected');
 
     socket.on('JOIN_ROOM', async (room) => {
+        console.log(room, "<<<< mauk joinroom server")
         let findRoom = await RoomModel.checkRoom(room.courtId, room.userId, room.adminId)
         if(!findRoom){
             findRoom = await RoomModel.addRoom(room.courtId, room.userId, room.adminId)
         }
+        console.log(findRoom._id.toString(), "<<<")
         socket.join(findRoom._id.toString());
         io.to(findRoom._id.toString()).emit('JOIN_ROOM', findRoom); //kirim ke client
       });
 
     socket.on('SEND_MESSAGE', async (payload) => {
-        console.log(payload, "<< ini pyaoad")
-
-        const body = {
-            userId: payload.userId,
-            roomId:payload.roomId, 
-            text:payload.text,
-            x: "x"
+        if(payload.roomId && payload.text && payload.userId) {
+            console.log(payload,"<<<<< payload")
+            const message = await MessageModel.addMessage({
+                userId: payload.userId,
+                roomId:payload.roomId, 
+                text:payload.text
+            })
+            io.to(payload.roomId).emit("SEND_MESSAGE",{"_id": message._id,"roomId": payload.roomId, "text": payload.text, "userId": payload.userId});
         }
-        console.log(body, "<< ini body")
-        const message = await MessageModel.addMessage({
-            userId: payload.userId,
-            roomId:payload.roomId, 
-            text:payload.text
-        })
-        io.to(payload.roomId).emit("SEND_MESSAGE",{"_id": message._id,"roomId": payload.roomId, "text": payload.text, "userId": payload.userId});
+      });
+
+      socket.on('LEAVE_ROOM', async (room) => {
+        console.log(room, "<<<< maSuk leaveroom server")
+        socket.leave(room.roomId);
       });
   });
 

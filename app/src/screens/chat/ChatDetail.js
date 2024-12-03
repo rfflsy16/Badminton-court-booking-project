@@ -1,53 +1,126 @@
 import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import axios from 'axios';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import socket from '../../config/socket';
 import * as SecureStore from 'expo-secure-store';
-
-
+import axios from 'axios';
 
 const MessageBubble = ({ message, isUser }) => (
     <View style={[styles.messageBubble, isUser ? styles.userBubble : styles.otherBubble]}>
         <Text style={[styles.messageText, isUser ? styles.userText : styles.otherText]}>
             {message.text}
         </Text>
-        <Text style={[styles.timeText, isUser ? styles.userTime : styles.otherTime]}>
-            {message.time}
-        </Text>
+        {message.createdAt && (
+            <Text style={[styles.timeText, isUser ? styles.userTime : styles.otherTime]}>
+                {new Date(message.createdAt).toLocaleTimeString()}
+            </Text>
+        )}
     </View>
 );
 
 export default function ChatDetail({ route }) {
     const navigation = useNavigation();
     const [message, setMessage] = useState('');
-    const { chatId, name } = route.params;
+    const { courtId, name, adminId } = route.params;
     const [messages, setMessages] = useState([]);
     const [userToken, setUserToken] = useState("");
     const [myProfile, setMyProfile] = useState({});
+    const [roomId, setRoomId] = useState('');
 
-    console.log("masuk chat detail")
-    
+    useFocusEffect(
+        useCallback(() => {
+            getToken();
+            getUserInfo();
+            
+            return () => {
+                if (roomId && myProfile.userId) {
+                    socket.emit("LEAVE_ROOM", { roomId, userId: myProfile.userId });
+                }
+            };
+        }, [roomId, myProfile.userId])
+    );
+
     useEffect(() => {
-        async function getToken() {
-            const profile = await SecureStore.getItemAsync('userInfo');
+        if (myProfile.userId && courtId && adminId) {
+            socket.connect();
+            socket.emit("JOIN_ROOM", { userId: myProfile.userId, courtId, adminId });
+        }
+        
+        socket.on("JOIN_ROOM", (data) => {
+            setRoomId(data._id);
+        });
+
+        socket.on("SEND_MESSAGE", (data) => {
+            setMessages((prevMessages) => [...prevMessages, data]);
+        });
+
+        return () => {
+            socket.off("JOIN_ROOM");
+            socket.off("SEND_MESSAGE");
+        };
+    }, [myProfile.userId, courtId, adminId]);
+
+    async function getToken() {
+        const token = await SecureStore.getItemAsync('userToken');
+        setUserToken(token);
+    }
+    
+    async function getUserInfo() {
+        const profile = await SecureStore.getItemAsync('userInfo');
+        if (profile) {
             setMyProfile(JSON.parse(profile));
         }
-        getToken();
-    
-    },[])
-
-    
+    }
 
     useEffect(() => {
-        const userId = myProfile._id;
-    }, [myProfile])
+        async function getMessage(){
+            if(roomId && userToken){
+                try {
+                    const response = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/message/${roomId}`, {
+                        headers: {
+                            'Authorization': `Bearer ${userToken}`
+                        }
+                    });
+                    setMessages(response.data.messages);
+                } catch (error) {
+                    console.log("Error fetching messages:", error);
+                }
+            }
+        }
+        getMessage();
+    }, [roomId, userToken]);
 
-
+    useEffect(() => {
+        async function getRoomId(){
+            if (myProfile.userId && adminId && courtId && userToken) {
+                try {
+                    const response = await axios.get(
+                        `${process.env.EXPO_PUBLIC_BASE_URL}/room/find-room?userId=${myProfile.userId}&adminId=${adminId}&courtId=${courtId}`,
+                        {
+                            headers: {
+                                'Authorization': `Bearer ${userToken}`
+                            }
+                        }
+                    );
+                    if (response.data) {
+                        setRoomId(response.data._id);
+                    }
+                } catch (error) {
+                    console.log("Error finding room:", error);
+                }
+            }
+        }
+        getRoomId();
+    }, [myProfile.userId, adminId, courtId, userToken]);
 
     const sendMessage = () => {
-        if (message.trim().length > 0) {
-            // Add message sending logic here
+        if (message.trim().length > 0 && roomId && myProfile.userId) {
+            socket.emit("SEND_MESSAGE", { 
+                roomId, 
+                text: message, 
+                userId: myProfile.userId 
+            });
             setMessage('');
         }
     };
@@ -84,10 +157,10 @@ export default function ChatDetail({ route }) {
             <View style={styles.contentContainer}>
                 <FlatList
                     data={messages}
-                    renderItem={({ item }) => <MessageBubble message={item} isUser={item.isUser} />}
-                    keyExtractor={item => item.id}
+                    renderItem={({ item }) => <MessageBubble message={item} isUser={item.userId === myProfile.userId} />}
+                    keyExtractor={item => item._id}
                     contentContainerStyle={styles.messageList}
-                    inverted
+                    
                 />
 
                 <View style={styles.inputContainer}>

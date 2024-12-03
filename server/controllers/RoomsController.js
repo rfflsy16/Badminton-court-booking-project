@@ -34,6 +34,7 @@ export class RoomController {
         try {
             const { roomId } = req.params;
             console.log(roomId, "ini room id nya")
+        
             const room = await RoomModel.getRoomById(roomId);
             res.status(200).json(room);
         } catch (err) {
@@ -116,6 +117,17 @@ export class RoomController {
             }
 
             res.status(200).json({ message: "Room deleted successfully" });
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    static async findRoom(req, res, next) {
+        try {
+            const { userId, adminId, courtId } = req.query;
+            // console.log(userId, adminId, courtId)
+            const room = await RoomModel.findRoom(userId, adminId, courtId);
+            res.status(200).json(room)
         } catch (err) {
             next(err);
         }

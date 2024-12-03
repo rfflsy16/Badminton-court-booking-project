@@ -14,7 +14,6 @@ export default function CourtDetail() {
     const route = useRoute();
     const navigation = useNavigation();
     const { court } = route.params;
-    console.log(court._id, "<<<<<<< ini di court detail")
     const [selectedTimes, setSelectedTimes] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
     const [selectedDate, setSelectedDate] = useState('');
@@ -204,7 +203,7 @@ export default function CourtDetail() {
                                 onPress={() => navigation.navigate('ChatDetail', { 
                                     chatId: `court_${court.id}`,
                                     name: `Admin ${court.name}`,
-                                    userId: courtDetails?.buildingDetails.userId,
+                                    adminId: courtDetails?.buildingDetails.userId,
                                     courtId: courtDetails?._id,
                                     buildingId: courtDetails?.buildingDetails._id
                                 })}

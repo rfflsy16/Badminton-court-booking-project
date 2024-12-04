@@ -270,7 +270,7 @@ describe('POST /booking', () => {
                 })
 
             expect(response.status).toBe(201)
-            expect(response.body).toBeInstanceOf(Object)
+            expect(response.body).toBeHaveProperty('booking')
         })
     })
     describe('POST /booking - failed', () => {

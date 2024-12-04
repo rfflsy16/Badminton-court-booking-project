@@ -1,15 +1,28 @@
-import { useRoute } from "@react-navigation/native";
+import { useRoute, useNavigation } from "@react-navigation/native";
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { WebView } from 'react-native-webview';
-import Constants from 'expo-constants';
 import { useState } from 'react';
+import * as Animatable from 'react-native-animatable';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function Midtrans() {
     const route = useRoute();
+    const navigation = useNavigation();
     const { midtransUrl, midtransToken } = route.params;
     const [isLoading, setIsLoading] = useState(true);
+    const [showSuccess, setShowSuccess] = useState(false);
     
     console.log('Attempting to load Midtrans URL:', midtransUrl);
+
+    const handleNavigationStateChange = (navState) => {
+        // Check if the URL contains success indicators from Midtrans
+        if (navState.url.includes('status_code=200') || navState.url.includes('transaction_status=settlement')) {
+            setShowSuccess(true);
+            setTimeout(() => {
+                navigation.replace('MainApp');
+            }, 2000);
+        }
+    };
 
     if (!midtransUrl) {
         return (
@@ -20,9 +33,10 @@ export default function Midtrans() {
     }
 
     return (
-        <View style={styles.container}>
+        <>
             <WebView
                 source={{ uri: midtransUrl }}
+                onNavigationStateChange={handleNavigationStateChange}
                 style={styles.webview}
                 onError={(syntheticEvent) => {
                     const { nativeEvent } = syntheticEvent;
@@ -57,7 +71,30 @@ export default function Midtrans() {
                     <Text style={styles.loadingText}>Loading payment page...</Text>
                 </View>
             )}
-        </View>
+            {showSuccess && (
+                <Animatable.View 
+                    style={[styles.successContainer, styles.centerContent]}
+                    animation="zoomIn"
+                    duration={500}
+                >
+                    <Animatable.View 
+                        animation="bounceIn" 
+                        delay={500}
+                        style={styles.successIconContainer}
+                    >
+                        <Ionicons name="checkmark-circle" size={80} color="#22c55e" />
+                    </Animatable.View>
+                    <Animatable.Text 
+                        animation="fadeInUp" 
+                        delay={1000}
+                        style={styles.successText}
+                    >
+                        Payment Successful!
+                    </Animatable.Text>
+                </Animatable.View>
+            )}
+        </>
+        
     );
 }
 
@@ -76,6 +113,25 @@ const styles = StyleSheet.create({
         bottom: 0,
         backgroundColor: 'rgba(255, 255, 255, 0.9)',
     },
+    successContainer: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        zIndex: 999,
+    },
+    successIconContainer: {
+        backgroundColor: 'white',
+        borderRadius: 50,
+        padding: 10,
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+    },
     centerContent: {
         justifyContent: 'center',
         alignItems: 'center',
@@ -85,5 +141,11 @@ const styles = StyleSheet.create({
         color: '#EA580C',
         fontSize: 16,
         fontWeight: '500'
+    },
+    successText: {
+        marginTop: 20,
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#22c55e'
     }
 });

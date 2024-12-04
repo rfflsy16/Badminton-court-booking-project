@@ -82,6 +82,17 @@ export const errorHandler = (err, req, res, next) => {
         status = 404
         message = 'Cannot find Court'
     }
+
+    if (err.name === 'CastError') {
+        status = 400;
+        message = 'Invalid ID format';
+    }
+
+    if (err.name === 'MongoServerError') {
+        status = 400;
+        message = 'Database error';
+    }
+
     res.status(status).json({
         message
     })

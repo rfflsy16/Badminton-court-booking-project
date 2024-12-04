@@ -11,7 +11,6 @@ import * as SecureStore from 'expo-secure-store';
 const { width } = Dimensions.get("window");
 
 export default function Booking({ route }) {
-    // console.log('masuk screen =======================')
     const [activeTab, setActiveTab] = useState("bookings");
     const scrollViewRef = useRef(null);
     const scrollX = useRef(new Animated.Value(0)).current;
@@ -47,7 +46,7 @@ export default function Booking({ route }) {
 
     const fetchData = async () => {
         try {
-            // setLoading(true);
+            setLoading(true);
             console.log(`${process.env.EXPO_PUBLIC_BASE_URL}/booking/user`, "masuk sini<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
             const response = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/booking/user`,{

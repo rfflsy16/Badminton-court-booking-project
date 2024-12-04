@@ -241,4 +241,11 @@ afterAll(async () => {
     await bookingCollection.deleteMany()
 })
 
-// describe('')
+// describe('PATCH /booking/:id/payment', () => {
+//     describe('PATCH /booking/:id/payment - succeed', () => {
+//         it('should be return result of payment', async () => {
+//             const response = await request(app)
+//             .patch(`/booking/${}`)
+//         })
+//     }) 
+// })

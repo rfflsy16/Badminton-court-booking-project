@@ -1,11 +1,12 @@
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { courtsData } from '../data/courtsData';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import * as SecureStore from 'expo-secure-store';
 
-const CourtCard = ({ court }) => {
+const CourtCard = ({ court, index }) => {
     const navigation = useNavigation();
-
     return (
         <TouchableOpacity 
             style={styles.card}
@@ -13,10 +14,10 @@ const CourtCard = ({ court }) => {
         >
             <View style={styles.cardContent}>
                 <View style={styles.cardHeader}>
-                    <Text style={styles.courtName}>{court.name}</Text>
+                    <Text style={styles.courtName}>{`Court ${String.fromCharCode(65 + index)}`}</Text>
                     <View style={styles.ratingContainer}>
                         <Ionicons name="star" size={16} color="#EA580C" />
-                        <Text style={styles.rating}>{court.rating}</Text>
+                        <Text style={styles.rating}>4.7</Text>
                     </View>
                 </View>
 
@@ -43,11 +44,11 @@ const CourtCard = ({ court }) => {
                         borderRadius: 6,
                     }]}>
                         <MaterialCommunityIcons 
-                            name={court.courtType === 'Indoor' ? 'home-variant' : 'tree'} 
+                            name={court.category === 'Indoor' ? 'home-variant' : 'tree'} 
                             size={16} 
                             color="#64748B" 
                         />
-                        <Text style={styles.courtTypeText}>{court.courtType}</Text>
+                        <Text style={styles.courtTypeText}>{court.category}</Text>
                     </View>
                 </View>
 
@@ -68,7 +69,14 @@ const CourtCard = ({ court }) => {
                     ))}
                 </View>
 
-                <Text style={styles.price}>{court.price}</Text>
+                <Text style={styles.price}>
+                    {new Intl.NumberFormat('id-ID', { 
+                        style: 'currency', 
+                        currency: 'IDR',
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    }).format(court.price)}
+                </Text>
             </View>
         </TouchableOpacity>
     );
@@ -78,11 +86,34 @@ export default function BuildingCourts() {
     const route = useRoute();
     const navigation = useNavigation();
     const { venue } = route.params;
-    
-    // Hitung jumlah courts berdasarkan venueId
-    const venueCourts = courtsData.filter(court => court.venueId === venue.id);
-    const courtsCount = venueCourts.length;
+    const [userToken, setUserToken] = useState("");
+    const [courtsData, setCourtsData] = useState([]);
 
+    useEffect(() => {
+        async function getToken() {
+            const token = await SecureStore.getItemAsync('userToken');
+            setUserToken(token);
+        }
+        getToken();
+    },[])
+
+    useEffect(() => {
+        getBuildingById()
+    },[userToken])
+
+    const getBuildingById = async () => {          
+        try {
+            const response = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/buildings/${venue._id}`,{
+                headers: {              
+                    Authorization: `Bearer ${userToken}` 
+                }
+            })
+            setCourtsData(response.data.courts)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    console.log(venue, "<<<<<<< venue")
     return (
         <View style={styles.container}>
             {/* Header */}
@@ -101,19 +132,19 @@ export default function BuildingCourts() {
             <View style={styles.buildingInfo}>
                 <View style={styles.infoItem}>
                     <Ionicons name="location-outline" size={20} color="#64748B" />
-                    <Text style={styles.infoText}>{venue.location}</Text>
+                    <Text style={styles.infoText}>{venue.city}</Text>
                 </View>
                 <View style={styles.infoItem}>
                     <MaterialCommunityIcons name="badminton" size={20} color="#64748B" />
-                    <Text style={styles.infoText}>{courtsCount} Courts</Text>
+                    <Text style={styles.infoText}>{venue?.courts?.length} Courts</Text>
                 </View>
             </View>
 
             {/* Courts List */}
             <FlatList
-                data={venueCourts}
-                renderItem={({ item }) => <CourtCard court={item} />}
-                keyExtractor={item => item.id}
+                data={courtsData}
+                renderItem={({ item, index }) => <CourtCard court={item} index={index} />}
+                keyExtractor={item => item._id.toString()}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.listContainer}
             />

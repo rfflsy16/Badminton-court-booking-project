@@ -1,56 +1,85 @@
-import { View, StyleSheet, ActivityIndicator, Text } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { useState, useEffect } from "react";
 import { useChat } from '../context/ChatContext';
 import Header from "../components/chat/Header";
 import SearchBar from "../components/chat/SearchBar";
 import ChatList from "../components/chat/ChatList";
+import axios from 'axios';
+import * as SecureStore from 'expo-secure-store';
+
 
 export default function Chat({ navigation }) {
     const [searchQuery, setSearchQuery] = useState('');
-    const { chats, loadRooms, loading } = useChat();
+    const { chatData: chats, markAsRead, updateUnreadCount } = useChat();
+    const [roomChatList, setRoomChatList] = useState([]);
+    const [userToken, setUserToken] = useState("");
 
     useEffect(() => {
-        loadRooms();
+        const getToken = async () => {
+            const token = await SecureStore.getItemAsync('userToken');
+            setUserToken(token);
+        };
+        getToken();
     }, []);
 
-    const handleChatPress = (chatId) => {
-        navigation.navigate('ChatDetail', { roomId: chatId });
+    useEffect(() => {
+        getRoomChatList()
+    },[userToken])
+
+    const getRoomChatList = async () => {
+        try {
+            const response = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/room`,{
+                headers: {
+                    Authorization: `Bearer ${userToken}`
+                }
+            })
+            console.log("Room Chat List Response:", response.data)
+            setRoomChatList(response.data);
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    useEffect(() => {
+        updateUnreadCount();
+    }, []);
+
+   
+    const handleChatPress = (roomId) => {
+        console.log("Room ID received:", roomId);
+        console.log("Current roomChatList:", roomChatList);
+        const selectedChat = roomChatList.find(chat => {
+            console.log("Comparing:", chat._id, roomId);
+            return chat._id === roomId;
+        });
+        console.log("Selected Chat:", selectedChat);
+        console.log(selectedChat, "<<<<< selected chat")
+        // navigation.navigate('ChatDetail', {
+        //     courtId: selectedChat.courtId,
+        //     name: selectedChat.courtDetails.buildingDetails.name,
+        //     adminId: selectedChat.courtDetails.buildingDetails.userId 
+        // });
     };
 
-    const filteredChats = chats.filter(chat =>
-        chat.name?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    // console.log(roomChatList, "<<<<< room chat list")
+    
 
-    if (loading) {
-        return (
-            <View style={[styles.container, styles.centerContent]}>
-                <ActivityIndicator size="large" color="#115E59" />
-            </View>
-        );
-    }
+    const filteredChats = chats.filter(chat =>
+        chat.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     return (
         <View style={styles.container}>
             <Header />
-            {chats.length > 0 ? (
-                <>
-                    <SearchBar
-                        searchQuery={searchQuery}
-                        setSearchQuery={setSearchQuery}
-                    />
-                    <ChatList
-                        chats={filteredChats}
-                        onChatPress={handleChatPress}
-                    />
-                </>
-            ) : (
-                <View style={styles.emptyContainer}>
-                    <Text style={styles.emptyTitle}>No Chats Yet</Text>
-                    <Text style={styles.emptyText}>
-                        Your chat conversations with court owners will appear here
-                    </Text>
-                </View>
-            )}
+            <SearchBar 
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+            />
+            <ChatList 
+                chats={roomChatList}
+                key={roomChatList._id}
+                onChatPress={handleChatPress}
+            />
         </View>
     );
 }
@@ -60,26 +89,4 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
     },
-    centerContent: {
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    emptyContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: 40,
-    },
-    emptyTitle: {
-        fontSize: 20,
-        fontWeight: '600',
-        color: '#1F2937',
-        marginBottom: 8,
-    },
-    emptyText: {
-        fontSize: 16,
-        color: '#64748B',
-        textAlign: 'center',
-        lineHeight: 24,
-    }
 });

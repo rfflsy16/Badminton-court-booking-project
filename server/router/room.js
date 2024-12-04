@@ -8,6 +8,7 @@ export default function roomRouter() {
 
     router.get("/", RoomController.getAllRooms)
     router.post("/", RoomController.createRoom)
+    router.get("/find-room", RoomController.findRoom)
     router.get("/:roomId", checkRoomAndMessage, RoomController.getRoomById)
     router.delete("/:roomId", authorization, RoomController.deleteRoom)
 

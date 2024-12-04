@@ -7,6 +7,10 @@ export default function CourtMap({
     onNavigate,
     onShare
 }) {
+    const coordinates = court?.buildingDetails?.location?.coordinates || [-6.2088, 106.8456];
+    const longitude = coordinates[0];
+    const latitude = coordinates[1];
+
     return (
         <View style={styles.section}>
             <Text style={styles.sectionTitle}>Location</Text>
@@ -14,19 +18,19 @@ export default function CourtMap({
                 <MapView
                     style={styles.map}
                     initialRegion={{
-                        latitude: -6.2088,  // Jakarta coordinates
-                        longitude: 106.8456,
+                        latitude,
+                        longitude,
                         latitudeDelta: 0.01,
                         longitudeDelta: 0.01,
                     }}
                 >
                     <Marker
                         coordinate={{
-                            latitude: -6.2088,
-                            longitude: 106.8456,
+                            latitude,
+                            longitude,
                         }}
-                        title={court.name}
-                        description="Premium Badminton Court"
+                        title={court?.buildingDetails?.name || ''}
+                        description={court?.buildingDetails?.address || ''}
                     >
                         <View style={styles.customMarker}>
                             <View style={styles.markerContent}>

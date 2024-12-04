@@ -83,6 +83,61 @@ export default function PaymentModal({
 
     const selectedPaymentMethod = getSelectedPaymentMethod();
 
+    const renderPaymentDetails = () => {
+        if (!court?.buildingDetails) return null;
+
+        const selectedPaymentOption = selectedPayment && 
+            paymentMethods
+                .find(m => m.id === selectedPayment.methodId)
+                ?.options.find(o => o.id === selectedPayment.optionId);
+
+        return (
+            <View style={styles.detailsContainer}>
+                <Text style={styles.courtName}>{court.buildingDetails.name}</Text>
+                <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>Date</Text>
+                    <Text style={styles.detailValue}>{selectedDate}</Text>
+                </View>
+                <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>Time</Text>
+                    <Text style={styles.detailValue}>
+                        {selectedTimes
+                            .map(id => timeSlots.find(slot => slot.id === id)?.time)
+                            .filter(Boolean)
+                            .join(', ')}
+                    </Text>
+                </View>
+                <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>Payment Method</Text>
+                    <Text style={styles.detailValue}>{selectedPaymentOption?.name || ''}</Text>
+                </View>
+                {promoDiscount > 0 && (
+                    <View style={styles.detailRow}>
+                        <Text style={styles.detailLabel}>Discount</Text>
+                        <Text style={styles.detailValue}>-{promoDiscount}%</Text>
+                    </View>
+                )}
+                <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>Payment Type</Text>
+                    <Text style={styles.detailValue}>
+                        {paymentType === 'dp' ? 'Down Payment (50%)' : 'Full Payment'}
+                    </Text>
+                </View>
+                <View style={[styles.detailRow, styles.totalRow]}>
+                    <Text style={styles.totalLabel}>Total Amount</Text>
+                    <Text style={styles.totalAmount}>
+                        {new Intl.NumberFormat('id-ID', { 
+                            style: 'currency', 
+                            currency: 'IDR',
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0
+                        }).format(amount)}
+                    </Text>
+                </View>
+            </View>
+        );
+    };
+
     return (
         <Modal
             animationType="slide"
@@ -107,71 +162,7 @@ export default function PaymentModal({
                     </View>
 
                     {/* Payment Details */}
-                    <View style={styles.detailsContainer}>
-                        {/* Court Info */}
-                        <View style={styles.detailSection}>
-                            <Text style={styles.detailTitle}>Booking Details</Text>
-                            <View style={styles.courtInfo}>
-                                <Text style={styles.courtName}>{court.name}</Text>
-                                <View style={styles.detailRow}>
-                                    <Text style={styles.detailLabel}>Date</Text>
-                                    <Text style={styles.detailValue}>{selectedDate}</Text>
-                                </View>
-                                <View style={styles.detailRow}>
-                                    <Text style={styles.detailLabel}>Time</Text>
-                                    <Text style={styles.detailValue}>{formatTimeSlot(selectedTimes)}</Text>
-                                </View>
-                                <View style={styles.detailRow}>
-                                    <Text style={styles.detailLabel}>Duration</Text>
-                                    <Text style={styles.detailValue}>{selectedTimes.length} hours</Text>
-                                </View>
-                            </View>
-                        </View>
-
-                        {/* Payment Method */}
-                        <View style={styles.detailSection}>
-                            <Text style={styles.detailTitle}>Payment Method</Text>
-                            <View style={styles.paymentMethod}>
-                                <Image 
-                                    source={{ uri: selectedPaymentMethod?.image }}
-                                    style={styles.paymentLogo}
-                                    resizeMode="contain"
-                                />
-                                <Text style={styles.paymentName}>
-                                    {selectedPaymentMethod?.name}
-                                </Text>
-                            </View>
-                        </View>
-
-                        {/* Payment Summary */}
-                        <View style={styles.detailSection}>
-                            <Text style={styles.detailTitle}>Payment Summary</Text>
-                            <View style={styles.summaryContainer}>
-                                <View style={styles.detailRow}>
-                                    <Text style={styles.detailLabel}>Subtotal</Text>
-                                    <Text style={styles.detailValue}>
-                                        Rp {(amount / (1 - promoDiscount/100)).toLocaleString()}
-                                    </Text>
-                                </View>
-                                {promoDiscount > 0 && (
-                                    <View style={styles.detailRow}>
-                                        <Text style={styles.detailLabel}>Discount ({promoDiscount}%)</Text>
-                                        <Text style={[styles.detailValue, styles.discountText]}>
-                                            -Rp {((amount / (1 - promoDiscount/100)) * (promoDiscount/100)).toLocaleString()}
-                                        </Text>
-                                    </View>
-                                )}
-                                <View style={[styles.detailRow, styles.totalRow]}>
-                                    <Text style={styles.totalLabel}>
-                                        {paymentType === 'dp' ? 'Down Payment (50%)' : 'Total Payment'}
-                                    </Text>
-                                    <Text style={styles.totalAmount}>
-                                        Rp {amount.toLocaleString()}
-                                    </Text>
-                                </View>
-                            </View>
-                        </View>
-                    </View>
+                    {renderPaymentDetails()}
 
                     {/* Swipe Button */}
                     <View style={styles.swipeContainer}>

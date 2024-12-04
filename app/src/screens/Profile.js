@@ -40,15 +40,12 @@ export default function Profile() {
                     'Authorization': `Bearer ${userToken}`
                 }
             })
-            console.log(response.data, "<<<<<<<<<<<<<<<<<<< ini response data");
             setMyProfile(response.data);
         } catch (error) {
             console.log(error);
         }
     
     }
-
-    console.log(myProfile, "<<<<<<<<<<<<<<<<<<< ini my profile");
 
     const userInfo = {
         name: myProfile.fullName,

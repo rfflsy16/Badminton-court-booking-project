@@ -8,7 +8,16 @@ export default class BuildingModel {
 
     static async readBuilding() {
         const collection = this.getCollection();
-        const buildings = await collection.find().toArray();
+        const buildings = await collection.aggregate([
+            {
+                $lookup: {
+                    from: "Courts",
+                    localField: "_id",
+                    foreignField: "BuildingId",
+                    as: "courts",
+                },
+            },
+        ]).toArray();
         return buildings;
     }
 
@@ -16,12 +25,21 @@ export default class BuildingModel {
         const _id = new ObjectId(id);
         const collection = this.getCollection();
 
-        const building = await collection.findOne({ _id });
+        const building = await collection.aggregate([ 
+        { $match: { _id } },
+        {
+            $lookup: {
+                from: "Courts",
+                localField: "_id",
+                foreignField: "BuildingId",
+                as: "courts",
+            },
+        }]).toArray();
         if (!building) {
             throw { name: "BuildingNotFound" };
         }
 
-        return building;
+        return building[0];
     }
 
     static async createNewBuilding(body, userId) {

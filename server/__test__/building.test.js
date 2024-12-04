@@ -330,7 +330,7 @@ describe('GET /buildings/:id', () => {
     describe('GET /buildings/:id - failed', () => {
         it('should be return an error message because users doesnt input id in the right things', async () => {
             const response = await request(app)
-                .get(`/buildings/67496558cf13ad22e00d3324`)
+                .get(`/buildings/674aaa58cf13ad22aaad3324`)
                 .set('Authorization', `Bearer ${access_token_admin}`)
 
             expect(response.status).toBe(404)

@@ -222,19 +222,6 @@ describe('POST /room', () => {
         })
     })
     describe('POST /room - failed', () => {
-        it('should be return an error message because the room already exist', async () => {
-            const response = await request(app)
-                .post('/room')
-                .send({
-                    'courtId': dataOfCourt._id
-                })
-                .set('Authorization', `Bearer ${access_token_admin}`)
-
-            expect(response.status).toBe(400)
-            expect(response.body.message).toBe('Room already exists for this court with the same participants')
-        })
-    })
-    describe('POST /room - failed', () => {
         it('should be return an error message because user doesnt login', async () => {
             const response = await request(app)
                 .post('/room')

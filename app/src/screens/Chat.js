@@ -1,6 +1,6 @@
 import { View, StyleSheet } from "react-native";
-import { useState, useEffect } from "react";
-import { useNavigation } from '@react-navigation/native';
+import { useState, useEffect, useCallback } from "react";
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useChat } from '../context/ChatContext';
 import Header from "../components/chat/Header";
 import SearchBar from "../components/chat/SearchBar";
@@ -17,6 +17,12 @@ export default function Chat() {
     const [myProfile, setMyProfile] = useState({});
     const navigation = useNavigation();
 
+    useFocusEffect(
+        useCallback(() => {
+            getRoomChatList()
+            getUserInfo()            
+        }, [userToken])
+    );
 
     useEffect(() => {
         const getToken = async () => {
@@ -32,11 +38,6 @@ export default function Chat() {
             setMyProfile(JSON.parse(profile));
         }
     }
-
-    useEffect(() => {
-        getRoomChatList()
-        getUserInfo()
-    },[userToken])
 
     const getRoomChatList = async () => {
         try {

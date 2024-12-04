@@ -13,9 +13,9 @@ export class RoomController {
             const building = await CourtModel.findBuildingWithCourt(courtId);
             const id = building.BuildingId
             const adminId = await BuildingModel.readByIdBuilding(id)
-            console.log(adminId, "ini admin Id nya")
 
             const existingRoom = await RoomModel.getRoomByCourtAndParticipants(courtId, userId);
+
 
             if (existingRoom) {
                 return res.status(400).json({ message: "Room already exists for this court with the same participants" });

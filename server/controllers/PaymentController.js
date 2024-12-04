@@ -2,7 +2,7 @@ import PaymentModel from "../models/payment";
 
 
 export class PaymentController {
-    static async getPayment(req, res, next) {
+    static async getPaymentByUserId(req, res, next) {
         try {
             const payments = await PaymentModel.readPayment()
 

@@ -39,6 +39,8 @@ export default function Booking({ route }) {
     useFocusEffect(
         useCallback(() => {
             fetchData();
+            fetchDataTransaction(); 
+
         }, [userToken])
 
     )
@@ -57,12 +59,18 @@ export default function Booking({ route }) {
             const bookings = response.data;
             
 
+            const formatTimeRange = (timeArray) => {
+                return timeArray
+                    .map(hour => `${hour < 10 ? `0${hour}` : hour}:00`)
+                    .join("-");
+            };
+            
             const formattedBookings = bookings.map(booking => ({
                 id: booking._id,
                 venueName: booking.building.name || "Unknown Venue",
                 courtNumber: booking.court.type || "Unknown Court",
                 date: booking.date,
-                time: booking.selectedTime.join(" - "),
+                time: formatTimeRange(booking.selectedTime),
                 status: booking.statusBooking || "Pending",
                 price: `Rp ${booking.totalPrice}`,
                 image: booking.building.imgUrl || "https://via.placeholder.com/150", // Placeholder image jika tidak ada gambar
@@ -70,7 +78,8 @@ export default function Booking({ route }) {
             }));
 
             setBookingsData(formattedBookings);
-            setTransactionsData(formattedBookings.filter(booking => booking.statusBooking === "paid")); // Contoh filtering untuk transaksi
+
+            // setTransactionsData(formattedBookings.filter(booking => booking.statusBooking === "paid")); // Contoh filtering untuk transaksi
         } catch (error) {
             console.error("Failed to fetch bookings:", error.message);
         } finally {
@@ -91,6 +100,48 @@ export default function Booking({ route }) {
             setActiveTab(tab);
         }
     };
+
+    const fetchDataTransaction = async () => {
+        try {
+            // setLoading(true);
+            console.log(`${process.env.EXPO_PUBLIC_BASE_URL}/booking/transaction/user`, "masuk sini<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+
+            const response = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/booking/transaction/user`,{
+                headers: {              
+                    Authorization: `Bearer ${userToken}` 
+                }
+            })
+            // console.log(response.data, '<<<<<<<<<<<<<<<<');
+            const transactions = response.data;
+            
+            const formatTimeRange = (timeArray) => {
+                return timeArray
+                    .map(hour => `${hour < 10 ? `0${hour}` : hour}:00`)
+                    .join("-");
+            };
+            const formattedTransaction = transactions.map(transaction => ({
+                id: transaction._id,
+                venueName: transaction.building.name || "Unknown Venue",
+                courtNumber: transaction.court.type || "Unknown Court",
+                date: transaction.date,
+       
+                time: formatTimeRange(transaction.selectedTime),
+                status: transaction.statusBooking || "Pending",
+                price: `Rp ${transaction.totalPrice}`,
+                image: transaction.building.imgUrl || "https://via.placeholder.com/150", // Placeholder image jika tidak ada gambar
+                courtId: transaction.courtId,
+            }));
+
+            setTransactionsData(formattedTransaction);
+            // setTransactionsData(formattedTransaction.filter(transaction => transaction.statusBooking === "paid")); // Contoh filtering untuk transaksi
+        } catch (error) {
+            console.error("Failed to fetch bookings:", error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    
 
     if (loading) {
         return (

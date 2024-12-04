@@ -11,6 +11,13 @@ export default class BookingModel {
         return await collection.find().toArray();
     }
 
+    static async readById(id) {
+        const _id = new ObjectId(id);
+        const collection = this.getCollection();
+        return await collection.findOne({ _id });
+    }
+    
+
     static async readByUserId(userId) {
         const id = new ObjectId(userId);
         const collection = this.getCollection();

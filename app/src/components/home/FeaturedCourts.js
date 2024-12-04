@@ -1,11 +1,9 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { courtsData } from "../../data/courtsData.js";
 import * as Location from 'expo-location';
 import { useState, useEffect } from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { venuesData } from '../../data/venuesData';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
@@ -19,24 +17,31 @@ export default function FeaturedCourts() {
 
 
     useEffect(() => {
-        
         async function getToken() {
             const token = await SecureStore.getItemAsync('userToken');
             setUserToken(token);
-
         }
         getToken();
-    
     },[])
     
     useEffect(() => {
         async function getCurrentLocation() {
-          let location = await Location.getCurrentPositionAsync({});
-          setLatitude(location.coords.latitude);
-          setLongitude(location.coords.longitude)
+            try {
+                let { status } = await Location.requestForegroundPermissionsAsync();
+                if (status !== 'granted') {
+                    console.log('Permission to access location was denied');
+                    return;
+                }
+
+                let location = await Location.getCurrentPositionAsync({});
+                setLatitude(location.coords.latitude);
+                setLongitude(location.coords.longitude);
+            } catch (error) {
+                console.error('Error getting location:', error);
+            }
         }
         getCurrentLocation();
-      }, []);
+    }, []);
 
       useEffect(() => {
         getNearestCourts();
@@ -62,10 +67,7 @@ export default function FeaturedCourts() {
                     Authorization: `Bearer ${userToken}` 
                 }
             });
-           
-            // console.log('API Response:', response.data);
-            
-            // Convert single object to array if it's not already an array
+        
             const courtsData = Array.isArray(response.data) ? response.data : [response.data];
             setNearestCourts(courtsData);
 
@@ -77,8 +79,10 @@ export default function FeaturedCourts() {
     return (
         <View style={styles.section}>
             <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Nearby Gor</Text>
-                <TouchableOpacity>
+                <Text style={styles.sectionTitle}>Nearby Courts</Text>
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('Venues')}
+                >
                     <Text style={styles.seeAll}>See All</Text>
                 </TouchableOpacity>
             </View>

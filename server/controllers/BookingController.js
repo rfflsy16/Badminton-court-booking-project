@@ -44,7 +44,6 @@ export class BookingController {
     static async addBooking(req, res, next) {
 
         try {
-
             const { userId } = req.loginInfo;
             const { courtId, date, selectedTime, paymentType } = req.body;
             const court = await CourtModel.readCourtById(courtId);
@@ -99,13 +98,8 @@ export class BookingController {
 
             let snap = new midtransClient.Snap({
                 // Set to true if you want Production Environment (accept real transaction).
-<<<<<<< HEAD
                 isProduction : false,
                 serverKey : process.env.MIDTRANS_SERVER_KEY
-=======
-                isProduction: false,
-                serverKey: 'SB-Mid-server-oAaRKJgPgm-N4NnVCMyViSkx'
->>>>>>> raffles
             });
 
             //panggil model user
@@ -135,7 +129,8 @@ export class BookingController {
                 booking: newBooking,
                 paymentUrl: "",
                 newPayment,
-                midtransUrl: transaction.redirect_url
+                midtransUrl: transaction.redirect_url,
+                midtransToken: transaction.token
             });
         } catch (error) {
             next(error);
@@ -320,7 +315,6 @@ export class BookingController {
             };
 
             const transaction = await snap.createTransaction(parameter);
-            console.log(transaction, "ini transaction");
 
             res.status(200).json({
                 message: "Pelunasan berhasil diinisiasi",
@@ -328,7 +322,6 @@ export class BookingController {
                 paymentUrl: transaction.redirect_url, // URL untuk melanjutkan pelunasan di Midtrans
             });
         } catch (error) {
-            console.log(error, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<ini error");
             next(error);
         }
     }

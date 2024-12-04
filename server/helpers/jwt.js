@@ -1,4 +1,3 @@
-
 import jwt from "jsonwebtoken";
 const secretKey = process.env.JWT_SECRET || "amanaza";
 
@@ -7,5 +6,8 @@ export const signToken = (payload) => {
 };
 
 export const verifyToken = (token) => {
+  if(!token){
+    throw { name: "Unauthorized" } 
+  }
   return jwt.verify(token, secretKey);
 };

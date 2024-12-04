@@ -13,6 +13,7 @@ export const authentication = async (req, res, next) => {
         const access_token = authorization.split(' ')[1]
 
         const payload = verifyToken(access_token)
+        
 
         const user = await User.findByEmail(payload.email)
 

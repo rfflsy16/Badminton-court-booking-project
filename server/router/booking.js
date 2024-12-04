@@ -10,6 +10,7 @@ export default function bookingRouter() {
     router.get("/user", BookingController.getBookingByUserID);
     router.get("/transaction/user", BookingController.getTransactionByUserID);
     router.post('/:bookingId/complete-payment', BookingController.completePayment);
+    router.get("/:id", BookingController.getBookingById);
 
     router.delete("/:id", BookingController.deleteBooking);
     router.patch("/:id/payment", BookingController.updatePayment);

@@ -1,9 +1,10 @@
 import { useRoute, useNavigation } from "@react-navigation/native";
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Button } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { useState } from 'react';
 import * as Animatable from 'react-native-animatable';
 import { Ionicons } from '@expo/vector-icons';
+import { min } from "date-fns";
 
 export default function Midtrans() {
     const route = useRoute();
@@ -11,6 +12,8 @@ export default function Midtrans() {
     const { midtransUrl, midtransToken } = route.params;
     const [isLoading, setIsLoading] = useState(true);
     const [showSuccess, setShowSuccess] = useState(false);
+    const [test, setTest] = useState(false);
+    
     
     console.log('Attempting to load Midtrans URL:', midtransUrl);
 
@@ -32,10 +35,20 @@ export default function Midtrans() {
         );
     }
 
+    
+
     return (
         <>
+        <Button
+            title="Refresh Payment"
+            onPress={() => {
+                navigation.replace('Midtrans', { midtransUrl, midtransToken });
+            }}
+        />
             <WebView
                 source={{ uri: midtransUrl }}
+                   
+
                 onNavigationStateChange={handleNavigationStateChange}
                 style={styles.webview}
                 onError={(syntheticEvent) => {

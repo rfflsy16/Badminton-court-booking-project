@@ -11,7 +11,6 @@ import * as SecureStore from 'expo-secure-store';
 const { width } = Dimensions.get("window");
 
 export default function Booking({ route }) {
-    // console.log('masuk screen =======================')
     const [activeTab, setActiveTab] = useState("bookings");
     const scrollViewRef = useRef(null);
     const scrollX = useRef(new Animated.Value(0)).current;
@@ -28,9 +27,11 @@ export default function Booking({ route }) {
             scrollViewRef.current?.scrollTo({ x: index * width, animated: true });
         }
     }, [route.params]);
+
     useEffect(() => {
         async function getToken() {
             const token = await SecureStore.getItemAsync('userToken');
+            console.log(token, "tokennn")
             setUserToken(token);
         }
         getToken();
@@ -38,16 +39,17 @@ export default function Booking({ route }) {
 
     useFocusEffect(
         useCallback(() => {
-            fetchData();
-            fetchDataTransaction(); 
-
+            if (userToken !== "") {
+                fetchData();
+                fetchDataTransaction(); 
+            }
         }, [userToken])
 
     )
 
     const fetchData = async () => {
         try {
-            // setLoading(true);
+            setLoading(true);
             console.log(`${process.env.EXPO_PUBLIC_BASE_URL}/booking/user`, "masuk sini<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
             const response = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/booking/user`,{
@@ -55,7 +57,7 @@ export default function Booking({ route }) {
                     Authorization: `Bearer ${userToken}` 
                 }
             })
-            // console.log(response.data, '<<<<<<<<<<<<<<<<');
+            console.log(response.data, '<<<<<<<<<<<<<<<<');
             const bookings = response.data;
             
 

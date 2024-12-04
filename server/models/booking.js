@@ -16,7 +16,7 @@ export default class BookingModel {
         const collection = this.getCollection();
         return await collection.findOne({ _id });
     }
-    
+
     static async readByUserId(userId) {
 
         const id = new ObjectId(userId);
@@ -28,69 +28,68 @@ export default class BookingModel {
                 $match: { userId: id }
             },
 
-            {   
+            {
                 $lookup: {
                     from: "Courts",
                     localField: "courtId",
                     foreignField: "_id",
                     as: "court"
                 }
-              },
+            },
 
-              {
+            {
                 $unwind: {
                     path: "$court",
                     preserveNullAndEmptyArrays: false
                 }
-              },
+            },
 
-              {
+            {
                 $lookup: {
-                from: "Buildings",
-                localField: "court.BuildingId",
-                foreignField: "_id",
-                as: "building"
+                    from: "Buildings",
+                    localField: "court.BuildingId",
+                    foreignField: "_id",
+                    as: "building"
                 }
-              },
+            },
 
-              {
+            {
                 $unwind: {
-                path: "$building",
-                preserveNullAndEmptyArrays: false
+                    path: "$building",
+                    preserveNullAndEmptyArrays: false
                 }
-              }
+            }
         ]).toArray();
 
     }
 
     static async bookingById(bookingId) {
         const _id = new ObjectId(bookingId);
-        console.log(_id, "id================")
         const collection = this.getCollection();
         const booking = await collection.aggregate([
             {
                 $match: { _id }
             },
-            {   
+            {
                 $lookup: {
                     from: "Payments",
                     localField: "_id",
                     foreignField: "BookingId",
                     as: "payment"
-                  }
-              },
-              {
+                }
+            },
+            {
                 $lookup: {
                     from: "Courts",
                     localField: "courtId",
                     foreignField: "_id",
                     as: "court"
-                  }
-              },
-              {
+                }
+            },
+            {
                 $unwind: {
-                path: "$court",
-                preserveNullAndEmptyArrays: true
+                    path: "$court",
+                    preserveNullAndEmptyArrays: true
                 },
             },
             {
@@ -99,23 +98,23 @@ export default class BookingModel {
                     localField: "court.BuildingId",
                     foreignField: "_id",
                     as: "building"
-                  }
-              },
+                }
+            },
 
-              {
+            {
                 $unwind: {
                     path: "$building",
                     preserveNullAndEmptyArrays: true
-                  }
+                }
             }
         ]).toArray();
-        if (booking.length>0){
+        if (booking.length > 0) {
 
             return booking[0]
-        }else{
+        } else {
             return null
         }
-        
+
     }
 
     static async create(data) {

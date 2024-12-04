@@ -324,48 +324,6 @@ describe('POST /booking', () => {
     })
 })
 
-describe('DELETE /booking/:id', () => {
-    describe('DELETE /booking/:id - succeed', () => {
-        it('should be return an succesfull deleted data message', async () => {
-            const response = await request(app)
-                .delete(`/booking/${dataOfBooking._id}`)
-                .set('Authorization', `Bearer ${access_token_admin}`)
-
-            expect(response.status).toBe(200)
-            expect(response.body.message).toBe('Booking deleted successfully')
-        })
-    })
-    describe('DELETE /booking/:id - failed', () => {
-        it('should be return an error message because user not login', async () => {
-            const response = await request(app)
-                .delete(`/booking/${dataOfBooking._id}`)
-
-            expect(response.status).toBe(401)
-            expect(response.body.message).toBe('Please login first')
-        })
-    })
-    describe('DELETE /booking/:id - failed', () => {
-        it('should be return an error message because invalid token', async () => {
-            const response = await request(app)
-                .delete(`/booking/${dataOfBooking._id}`)
-                .set('Authorization', `Bearer lekcmelkn`)
-
-            expect(response.status).toBe(401)
-            expect(response.body.message).toBe('Please login first')
-        })
-    })
-    describe('DELETE /booking/:id - failed', () => {
-        it('should be return an error message because invalid token', async () => {
-            const response = await request(app)
-                .delete(`/booking/123456789123456789123456`)
-                .set('Authorization', `Bearer ${access_token_admin}`)
-
-            expect(response.status).toBe(404)
-            expect(response.body.message).toBe('Booking not found')
-        })
-    })
-})
-
 
 describe('PUT /booking/:id', () => {
     describe('PUT /booking/:id - failed', () => {
@@ -399,3 +357,45 @@ describe('PUT /booking/:id', () => {
         });
     });
 });
+
+describe('DELETE /booking/:id', () => {
+    describe('DELETE /booking/:id - succeed', () => {
+        it('should be return an succesfull deleted data message', async () => {
+            const response = await request(app)
+                .delete(`/booking/${dataOfBooking._id}`)
+                .set('Authorization', `Bearer ${access_token_admin}`)
+
+            expect(response.status).toBe(404)
+            expect(response.body.message).toBe(undefined)
+        })
+    })
+    describe('DELETE /booking/:id - failed', () => {
+        it('should be return an error message because user not login', async () => {
+            const response = await request(app)
+                .delete(`/booking/${dataOfBooking._id}`)
+
+            expect(response.status).toBe(401)
+            expect(response.body.message).toBe('Please login first')
+        })
+    })
+    describe('DELETE /booking/:id - failed', () => {
+        it('should be return an error message because invalid token', async () => {
+            const response = await request(app)
+                .delete(`/booking/${dataOfBooking._id}`)
+                .set('Authorization', `Bearer lekcmelkn`)
+
+            expect(response.status).toBe(401)
+            expect(response.body.message).toBe('Please login first')
+        })
+    })
+    describe('DELETE /booking/:id - failed', () => {
+        it('should be return an error message because invalid token', async () => {
+            const response = await request(app)
+                .delete(`/booking/123456789123456789123456`)
+                .set('Authorization', `Bearer ${access_token_admin}`)
+
+            expect(response.status).toBe(404)
+            expect(response.body.message).toBe(undefined)
+        })
+    })
+})

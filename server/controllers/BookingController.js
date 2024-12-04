@@ -28,16 +28,16 @@ export class BookingController {
         }
     }
 
-    static async getBookingById(req, res, next) { 
+    static async getBookingById(req, res, next) {
         try {
             const { id } = req.params;
             console.log(id, "ini id booking")
             const booking = await BookingModel.bookingById(id);
-            
+
             // console.log(booking, "<<<<<<<<<<<<<<<<<<<<<< ini booking");
-            
+
             res.status(200).json(booking);
-       
+
         } catch (error) {
             next(error);
         }
@@ -150,55 +150,6 @@ export class BookingController {
             next(error);
         }
     }
-
-    static async deleteBooking(req, res, next) {
-        try {
-            const { id } = req.params;
-            const result = await BookingModel.deleteById(id);
-            if (result.deletedCount === 0) {
-                return res.status(404).json({ message: "Booking not found" });
-            }
-
-            res.status(200).json({ message: "Booking deleted successfully" });
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    // Update booking payment status for DP
-    static async updatePayment(req, res, next) {
-        try {
-            const { id } = req.params;
-            const { paymentAmount } = req.body;
-
-            const booking = await BookingModel.readById(id);
-
-            if (!booking) {
-                return res.status(404).json({ message: "Booking not found" });
-            }
-
-            const paidAmount = booking.paidAmount || 0;
-            const newPaidAmount = paidAmount + paymentAmount;
-
-            if (newPaidAmount >= booking.totalPrice) {
-                // Payment complete
-                booking.statusBooking = "paid";
-                booking.paidAmount = booking.totalPrice;
-            } else {
-                // Partial payment
-                booking.paidAmount = newPaidAmount;
-            }
-
-            booking.updatedAt = new Date();
-
-            await BookingModel.updateById(id, booking);
-
-            res.status(200).json({ message: "Payment updated successfully", booking });
-        } catch (error) {
-            next(error);
-        }
-    }
-
     static async handleNotification(req, res, next) {
         try {
             const notificationBody = req.body;
@@ -255,7 +206,7 @@ export class BookingController {
             // Cari booking berdasarkan ID
             if (bookingId.length < 24) throw { name: 'InvalidInputID' }
             const booking = await BookingModel.readById(bookingId);
-            
+
             if (!booking) {
                 return res.status(404).json({ message: "Booking not found" });
             }

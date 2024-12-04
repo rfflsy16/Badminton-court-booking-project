@@ -472,6 +472,15 @@ describe('DELETE /buildings', () => {
         })
     })
     describe('DELETE /buildings - failed', () => {
+        it('should be return an error message because invalid token', async () => {
+            const response = await request(app)
+                .delete(`/buildings/${dataOfBuilding._id}`)
+                .set('Authorization', `Bearer edklrle`)
+            expect(response.status).toBe(401)
+            expect(response.body.message).toBe('Please login first')
+        })
+    })
+    describe('DELETE /buildings - failed', () => {
         it('should be return an error message because user is not admin', async () => {
             const response = await request(app)
                 .delete(`/buildings/${dataOfBuilding._id}`)

@@ -8,7 +8,7 @@ export default function ChatList({ chats, onChatPress }) {
             renderItem={({ item }) => (
                 <ChatItem 
                     chat={item} 
-                    onPress={() => onChatPress(item._id)}
+                    onPress={() => onChatPress(item._id, item.courtId, item.participants)}
                 />
             )}
             keyExtractor={item => item._id}

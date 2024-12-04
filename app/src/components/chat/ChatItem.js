@@ -16,7 +16,9 @@ export default function ChatItem({ chat, onPress }) {
     },[])
 
     useEffect(() => {
-        fetchLastMessage();
+        if(userToken !== ""){
+            fetchLastMessage();
+        }
     }, [userToken]);
 
     const fetchLastMessage = async () => {

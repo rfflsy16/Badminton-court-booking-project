@@ -231,7 +231,6 @@ export default function CourtDetail() {
                             <TouchableOpacity 
                                 style={styles.chatButton}
                                 onPress={() => navigation.navigate('ChatDetail', { 
-                                    chatId: `court_${court.id}`,
                                     name: `Admin ${courtDetails?.buildingDetails.name}`,
                                     adminId: courtDetails?.buildingDetails.userId,
                                     courtId: courtDetails?._id,

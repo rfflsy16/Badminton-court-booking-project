@@ -41,7 +41,7 @@ export default class AIController {
                 ${recommendations
                     .map(
                         (rec) =>
-                            `Lapangan: ${rec.GOR}, Waktu kosong: ${rec.availableTimes.join(", ")}`
+                            `GOR: ${rec.GOR}, Waktu kosong: ${rec.availableTimes.join(", ")}`
                     )
                     .join("\n")} jangan ada enter  dan tanpa enter`;
 

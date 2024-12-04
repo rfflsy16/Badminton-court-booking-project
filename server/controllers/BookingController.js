@@ -1,7 +1,9 @@
 import BookingModel from "../models/booking.js";
+import {ObjectId} from "mongodb";
 import PaymentModel from "../models/payment.js";
 import midtransClient from 'midtrans-client';
 import { User } from "../models/user.js";
+import CourtModel from "../models/court.js";
 import 'dotenv/config'
 
 export class BookingController {
@@ -15,19 +17,43 @@ export class BookingController {
         }
     }
 
+    static async getBookingByUserID(req, res, next) {
+        try {
+            const {userId} = req.loginInfo;
+            const bookings = await BookingModel.readByUserId(userId)
+           
+            res.status(200).json(bookings);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async getTransactionByUserID(req, res, next) {
+        try {
+            const {userId} = req.loginInfo;
+            const bookings = await BookingModel.readByUserId(userId)
+           
+            res.status(200).json(bookings);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+
     // Add a new booking
     static async addBooking(req, res, next) {
 
         try {
 
-            const { userId, username } = req.loginInfo;
-            const { courtId, date, selectedTime, paymentType, price } = req.body;
+            const { userId } = req.loginInfo;
+            const { courtId, date, selectedTime, paymentType } = req.body;
+            const court = await CourtModel.readCourtById(courtId);
+            const price = court.price;
 
             // Validate input
             if (!courtId || !date || !selectedTime || !paymentType || !price) {
                 return res.status(400).json({ message: "Missing required fields" });
             }
-
 
             // Validasi apakah waktu sudah di-booking
             const existingBookings = await BookingModel.findByCourtAndDate(courtId, date);
@@ -49,7 +75,7 @@ export class BookingController {
 
             const bookingData = {
                 userId,
-                courtId,
+                courtId: new ObjectId(courtId), // Gunakan ObjectId untuk konversi
                 date,
                 selectedTime,
                 paymentType,
@@ -63,12 +89,13 @@ export class BookingController {
             const newBooking = await BookingModel.create(bookingData, userId);
 
             const bodyPayment = {
+                userId,
                 BookingId: newBooking.insertedId,
                 type: paymentType,
                 amount: paymentAmount,
                 status: "pending"
             };
-            const newPayment = await PaymentModel.createNewPayment(bodyPayment, username);
+            const newPayment = await PaymentModel.createNewPayment(bodyPayment, userId);
 
             let snap = new midtransClient.Snap({
                 // Set to true if you want Production Environment (accept real transaction).
@@ -259,6 +286,7 @@ export class BookingController {
 
             // Opsional: Simpan transaksi pelunasan sementara ke database untuk pelacakan
             const paymentData = {
+                userId: booking.userId,
                 BookingId: booking._id,
                 type: "dp",
                 amount: remainingPayment,

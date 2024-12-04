@@ -3,33 +3,49 @@ import BookingModel from "../models/booking.js";
 import CourtModel from "../models/court.js";
 
 export default class AIController {
-    static async recommendation(req, res, next) {
+    static async generateRecommendations(req, res, next) {
         try {
-            const checkAvailableOrNot = await BookingModel.read()
-            if (checkAvailableOrNot) {
-                return res.status(200).json({
-                    message: 'Lapangan ini sudah di booking',
-                    status: 'Booked'
-                })
-            }
+            const bookings = await BookingModel.read();
+            const courts = await CourtModel.readCourts();
+            const recommendations = courts.map((court) => {
+                const bookedTimes = bookings
+                    .filter((booking) => booking.CourtId.toString() === court._id.toString())
+                    .flatMap((booking) => booking.selectedTime || []);
 
-            const availableCourt = await CourtModel.readCourts()
-            console.log(availableCourt, "<<<<<<")
+                const allTimes = Array.from(
+                    { length: court.endTime - court.startTime },
+                    (_, i) => court.startTime + i
+                );
+                const availableTimes = allTimes.filter((time) => !bookedTimes.includes(time));
 
-            const genAi = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
-            const model = genAi.getGenerativeModel({ model: 'gemini-1.5-flash' })
-            const prompt = ``
-            const generate = await model.generateContent(prompt)
+                return { courtName: court.name, availableTimes };
+            });
 
+            console.log(recommendations, "<<<<<<")
+
+            const genAi = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+            const model = genAi.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+            const prompt = `
+                Tampilkan daftar lapangan kosong dan jam tersedia:
+                ${recommendations
+                    .map(
+                        (rec) =>
+                            `Lapangan: ${rec.courtName}, Waktu kosong: ${rec.availableTimes.join(", ")}`
+                    )
+                    .join("\n")}
+            `;
+            const aiResponse = (await model.generateContent(prompt));
+
+            console.log("AI Jawab:", aiResponse.text);
+
+            // return recommendations;
             res.status(200).json({
-                availableCourt
+                aiResponse
             })
-
-
-
         } catch (error) {
-            console.log(error)
-            // next(error)
+            console.error("Error di AI:", error);
+            throw error;
         }
     }
 }

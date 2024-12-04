@@ -36,6 +36,7 @@ const courts = [
 const availableTimes = ['09:00 AM', '11:00 AM', '01:00 PM', '03:00 PM', '05:00 PM'];
 
 export default function AvailableCourts() {
+    console.log("masuk sini")
     const [selectedCourt, setSelectedCourt] = useState(null);
     const [isModalVisible, setModalVisible] = useState(false);
     const [selectedDate, setSelectedDate] = useState('');

@@ -29,7 +29,7 @@ export default function Header() {
     
     const getMyProfile = async () => {
         try {
-            const response = await axios.get('https://674a-2a09-bac5-3a24-137d-00-1f1-209.ngrok-free.app/profile',{
+            const response = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/profile`,{
                 headers: {
                     'Authorization': `Bearer ${userToken}`
                 }

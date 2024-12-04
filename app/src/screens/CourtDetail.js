@@ -1,8 +1,9 @@
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Share } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Share, ActivityIndicator } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import { useRoute, useNavigation } from '@react-navigation/native';
-import { useState, useEffect } from 'react';
-import CourtCalendar from '../components/CourtDetail/CourtCalendar';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import * as SecureStore from 'expo-secure-store';import CourtCalendar from '../components/CourtDetail/CourtCalendar';
 import CourtTimeSlots from '../components/CourtDetail/CourtTimeSlots';
 import BookingModal from '../components/CourtDetail/BookingModal';
 import CourtMap from '../components/CourtDetail/CourtMap';
@@ -22,6 +23,37 @@ export default function CourtDetail() {
     const [promoCode, setPromoCode] = useState('');
     const [promoDiscount, setPromoDiscount] = useState(0);
     const [showFullDesc, setShowFullDesc] = useState(false);
+    const [courtDetails, setCourtDetails] = useState(null)
+    const [userToken, setUserToken] = useState("");
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        async function getToken() {
+            const token = await SecureStore.getItemAsync('userToken');
+            setUserToken(token);
+        }
+        getToken();
+    },[])
+
+    useEffect(() => {
+        getCourtById()
+    },[userToken])
+
+    const getCourtById = async () => {          
+        try {
+            setIsLoading(true);
+            const response = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/courts/${court._id}`,{
+                headers: {              
+                    Authorization: `Bearer ${userToken}` 
+                }
+            })
+            setCourtDetails(response.data)
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setIsLoading(false);
+        }
+    }
 
     const handleTimeSelection = (slotId) => {
         setSelectedTimes(prev => {
@@ -33,17 +65,17 @@ export default function CourtDetail() {
         });
     };
 
-    // Calculate total price whenever selected times change
     useEffect(() => {
-        const pricePerHour = parseInt(court.price.replace(/[^0-9]/g, ''));
-        const totalAmount = pricePerHour * selectedTimes.length;
-        setTotalPrice(totalAmount);
-    }, [selectedTimes, court.price]);
+        if (courtDetails?.price) {
+            const totalAmount = courtDetails.price * selectedTimes.length;
+            setTotalPrice(totalAmount);
+        }
+    }, [selectedTimes, courtDetails?.price]);
 
     const reviews = [
-        { id: 1, user: 'John Doe', rating: 5, comment: 'Excellent court condition!', date: '2023-10-15' },
-        { id: 2, user: 'Jane Smith', rating: 4, comment: 'Great facilities, but parking can be difficult', date: '2023-10-10' },
-        { id: 3, user: 'Mike Johnson', rating: 5, comment: 'Professional setup, will come again', date: '2023-10-05' },
+        { id: 1, user: 'Udin Baruddin', rating: 5, comment: 'Suka banget sama kondisi lapangannya!', date: '2023-10-15' },
+        { id: 2, user: 'Bambang Sudirman', rating: 4, comment: 'Fasilitasnya oke banget, parkirannya ga susah', date: '2023-10-10' },
+        { id: 3, user: 'Oka Salmon', rating: 5, comment: 'Tempatnya cozy dan keliatan profesional bgt, bakal dateng lagi sih', date: '2023-10-05' },
     ];
 
     const paymentMethods = [
@@ -78,22 +110,38 @@ export default function CourtDetail() {
         setSelectedPayment({ methodId, optionId });
     };
 
-    const timeSlots = [
-        { id: 1, time: '08:00', available: true },
-        { id: 2, time: '09:00', available: false },
-        { id: 3, time: '10:00', available: true },
-        { id: 4, time: '11:00', available: true },
-        { id: 5, time: '13:00', available: true },
-        { id: 6, time: '14:00', available: false },
-        { id: 7, time: '15:00', available: true },
-        { id: 8, time: '16:00', available: true },
-    ];
+    const generateTimeSlots = () => {
+        if (!courtDetails) return [];
+        
+        const slots = [];
+        const { startTime, endTime, excludedTime } = courtDetails;
+        
+        for (let hour = startTime; hour < endTime; hour++) {
+            const timeString = `${hour.toString().padStart(2, '0')}:00`;
+            const isExcluded = excludedTime.includes(hour.toString());
+            
+            slots.push({
+                id: hour,
+                time: timeString,
+                available: !isExcluded
+            });
+        }
+        
+        return slots;
+    };
+
+    const timeSlots = generateTimeSlots();
+
+    const isDateExcluded = (date) => {
+        if (!courtDetails?.excludedDate || !date) return false;
+        return courtDetails.excludedDate.includes(date);
+    };
 
     const handleNavigateToMaps = () => {
         navigation.navigate('Maps', {
             location: {
-                latitude: -6.2088,  // Sesuaikan dgn koordinat court
-                longitude: 106.8456
+                latitude: courtDetails?.buildingDetails.location.coordinates.latitude,  // Sesuaikan dgn koordinat court
+                longitude: courtDetails?.buildingDetails.location.coordinates.longitude
             },
             courtName: court.name
         });
@@ -129,11 +177,19 @@ export default function CourtDetail() {
         navigation.replace('MainApp');
     };
 
+    if (isLoading || !courtDetails) {
+        return (
+            <View style={[styles.container, styles.loadingContainer]}>
+                <ActivityIndicator size="large" color="#E11D48" />
+            </View>
+        );
+    }
+
     return (
         <View style={styles.container}>
             <ScrollView showsVerticalScrollIndicator={false}>
                 {/* Court Image */}
-                <Image source={{ uri: court.image }} style={styles.courtImage} />
+                <Image source={{ uri: courtDetails?.buildingDetails.imgUrl }} style={styles.courtImage} />
                 
                 {/* Back Button */}
                 <TouchableOpacity 
@@ -147,7 +203,7 @@ export default function CourtDetail() {
                 <View style={styles.content}>
                     <View style={styles.headerInfo}>
                         <View style={styles.mainInfo}>
-                            <Text style={styles.courtName}>{court.name}</Text>
+                            <Text style={styles.courtName}>{courtDetails?.buildingDetails.name}</Text>
                             <View style={styles.ratingContainer}>
                                 <Ionicons name="star" size={16} color="#F59E0B" />
                                 <Text style={styles.rating}>4.8</Text>
@@ -155,11 +211,18 @@ export default function CourtDetail() {
                             </View>
                             <View style={styles.locationInfo}>
                                 <Ionicons name="location-outline" size={16} color="#64748B" />
-                                <Text style={styles.locationText}>Jl. Raya Serpong No. 8D</Text>
+                                <Text style={styles.locationText}>{courtDetails?.buildingDetails.address}</Text>
                             </View>
                         </View>
                         <View style={styles.priceInfo}>
-                            <Text style={styles.price}>{court.price}</Text>
+                            <Text style={styles.price}>
+                                {new Intl.NumberFormat('id-ID', { 
+                                    style: 'currency', 
+                                    currency: 'IDR',
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0
+                                }).format(courtDetails?.price)}
+                            </Text>
                             <Text style={styles.priceUnit}>/hour</Text>
                             <View style={styles.statusContainer}>
                                 <View style={styles.statusDot} />
@@ -169,7 +232,10 @@ export default function CourtDetail() {
                                 style={styles.chatButton}
                                 onPress={() => navigation.navigate('ChatDetail', { 
                                     chatId: `court_${court.id}`,
-                                    name: `Admin ${court.name}`,
+                                    name: `Admin ${courtDetails?.buildingDetails.name}`,
+                                    adminId: courtDetails?.buildingDetails.userId,
+                                    courtId: courtDetails?._id,
+                                    buildingId: courtDetails?.buildingDetails._id
                                 })}
                             >
                                 <Ionicons name="chatbubble-outline" size={20} color="#fff" />
@@ -184,10 +250,10 @@ export default function CourtDetail() {
                         <View>
                             <Text style={styles.description}>
                                 {showFullDesc 
-                                    ? court.description 
-                                    : court.description?.slice(0, 150) + (court.description?.length > 150 ? '...' : '')}
+                                    ? courtDetails?.description 
+                                    : courtDetails?.description?.slice(0, 150) + (courtDetails?.buildingDetails.description?.length > 150 ? '...' : '')}
                             </Text>
-                            {court.description?.length > 150 && (
+                            {courtDetails?.description?.length > 150 && (
                                 <TouchableOpacity onPress={() => setShowFullDesc(!showFullDesc)}>
                                     <Text style={styles.readMore}>
                                         {showFullDesc ? 'Show Less' : 'Read More'}
@@ -199,7 +265,7 @@ export default function CourtDetail() {
 
                     {/* Location Map */}
                     <CourtMap 
-                        court={court}
+                        court={courtDetails}
                         onNavigate={handleNavigateToMaps}
                         onShare={handleShare}
                     />
@@ -207,7 +273,12 @@ export default function CourtDetail() {
                     {/* Calendar */}
                     <CourtCalendar 
                         selectedDate={selectedDate}
-                        onDateSelect={setSelectedDate}
+                        onDateSelect={(date) => {
+                            if (!isDateExcluded(date)) {
+                                setSelectedDate(date);
+                            }
+                        }}
+                        excludedDates={courtDetails?.excludedDate || []}
                     />
 
                     {/* Time Slots */}
@@ -216,6 +287,7 @@ export default function CourtDetail() {
                         selectedTimes={selectedTimes}
                         onTimeSelect={handleTimeSelection}
                         timeSlots={timeSlots}
+                        isDateExcluded={isDateExcluded(selectedDate)}
                     />
 
                     {/* Facilities */}
@@ -250,7 +322,7 @@ export default function CourtDetail() {
             <BookingModal
                 visible={showPaymentModal}
                 onClose={() => setShowPaymentModal(false)}
-                court={court}
+                court={courtDetails}
                 selectedDate={selectedDate}
                 selectedTimes={selectedTimes}
                 totalPrice={totalPrice}
@@ -457,5 +529,10 @@ const styles = StyleSheet.create({
         color: '#E11D48',
         fontWeight: '600',
         marginTop: 8,
+    },
+    loadingContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        flex: 1,
     },
 });

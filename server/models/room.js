@@ -11,7 +11,7 @@ export default class RoomModel {
         const collection = this.getCollection();
         return await collection.findOne({
             courtId,
-            participants: { $in: [userId] },
+            participants: { $in: [new ObjectId(userId)] },
         });
     }
 
@@ -19,11 +19,13 @@ export default class RoomModel {
     static async addRoom(courtId, userId, adminId) {
         const collection = this.getCollection();
 
-        const participants = [userId, adminId]; // User dan Admin masuk sebagai participants
+        const participants = [new ObjectId(userId), new ObjectId(adminId)]; // User dan Admin masuk sebagai participants
 
         const newRoom = {
-            courtId,
-            participants,
+            courtId: new ObjectId(courtId),
+            participants: [
+                new ObjectId(userId),
+                new ObjectId(adminId)],
             createdAt: new Date(),
             updatedAt: new Date(),
         };
@@ -35,7 +37,24 @@ export default class RoomModel {
     // Mendapatkan room berdasarkan ID
     static async getRoomById(roomId) {
         const collection = this.getCollection();
-        return await collection.findOne({ _id: new ObjectId(roomId) });
+
+        const findRoom = await collection.findOne({ _id: new ObjectId(roomId) });
+        if (!findRoom) {
+            throw { name: 'NotFound' }
+        }
+
+        return findRoom
+    }
+
+    static async checkRoom(courtId, userId, adminId){
+        const collection = this.getCollection();
+
+        const room = await collection.findOne({
+            courtId: new ObjectId(courtId),
+            participants: { $all: [new ObjectId(userId), new ObjectId(adminId)] },
+        });
+
+        return room
     }
 
     // Mendapatkan semua room
@@ -49,5 +68,18 @@ export default class RoomModel {
         const collection = this.getCollection();
         const result = await collection.deleteOne({ _id: new ObjectId(roomId) });
         return result.deletedCount > 0;
+    }
+
+    static async findRoom(userId, adminId, courtId) {
+        const collection = this.getCollection();
+        const room = await collection.findOne({
+            courtId: new ObjectId(courtId),
+            participants: { 
+                $all: [new ObjectId(userId), new ObjectId(adminId)],
+                $size: 2
+            }
+        });
+        
+        return room
     }
 }

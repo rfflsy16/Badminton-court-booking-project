@@ -5,7 +5,6 @@ import { BookingController } from '../controllers/BookingController.js';
 export default function bookingRouter() {
     const router = express.Router();
 
-    // Routes
     router.get("/", BookingController.getBooking);
     router.post("/", BookingController.addBooking);
     router.post('/:bookingId/complete-payment', BookingController.completePayment);

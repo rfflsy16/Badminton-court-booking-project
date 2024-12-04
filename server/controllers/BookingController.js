@@ -115,10 +115,10 @@ export class BookingController {
     }
 
 
-    // Delete a booking
     static async deleteBooking(req, res, next) {
         try {
             const { id } = req.params;
+
 
             const result = await BookingModel.deleteById(id);
             if (result.deletedCount === 0) {
@@ -290,6 +290,7 @@ export class BookingController {
             };
     
             const transaction = await snap.createTransaction(parameter);
+            console.log(transaction, "ini transaction");
     
             res.status(200).json({
                 message: "Pelunasan berhasil diinisiasi",

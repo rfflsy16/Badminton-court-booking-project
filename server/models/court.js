@@ -83,6 +83,12 @@ export default class CourtModel {
                         as: "buildingDetails",
                     },
                 },
+                {
+                    $unwind: {
+                        path: "$buildingDetails",
+                        preserveNullAndEmptyArrays: true,
+                    },
+                }
             ])
             .toArray();
 

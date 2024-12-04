@@ -26,7 +26,7 @@ export default class CourtController {
         try {
             const court = await CourtModel.createCourt(req.body);
             res.status(201).json(court);
-            console.log(court, "<<<<<<< ini di controller")
+
         } catch (error) {
             next(error);
         }
@@ -54,8 +54,8 @@ export default class CourtController {
 
     static async getCourtsByBuilding(req, res, next) {
         try {
-            const { courtId } = req.params;
-            const courts = await CourtModel.findBuildingWithCourt(courtId);
+            const { BuildingId } = req.params;
+            const courts = await CourtModel.findBuildingWithCourt(BuildingId);
             res.status(200).json(courts);
         } catch (error) {
             next(error);

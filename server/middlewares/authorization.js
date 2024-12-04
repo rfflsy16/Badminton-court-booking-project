@@ -1,4 +1,3 @@
-import { RoomController } from "../controllers/RoomsController.js";
 import RoomModel from "../models/room.js";
 import { User } from "../models/user.js";
 

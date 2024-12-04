@@ -51,8 +51,8 @@ export default function FeaturedCourts() {
                 latitude,
                 userToken: userToken ? 'Present' : 'Missing'
             });
-
-            const response = await axios.post(`https://ed9b-27-50-29-117.ngrok-free.app/buildings/coordinates`,
+            console.log(process.env.EXPO_PUBLIC_BASE_URL, "<<<<ENV")
+            const response = await axios.post(`${process.env.EXPO_PUBLIC_BASE_URL}/buildings/coordinates`,
                 {
                     longitude,
                     latitude              
@@ -63,7 +63,7 @@ export default function FeaturedCourts() {
                 }
             });
            
-            console.log('API Response:', response.data);
+            // console.log('API Response:', response.data);
             
             // Convert single object to array if it's not already an array
             const courtsData = Array.isArray(response.data) ? response.data : [response.data];
@@ -77,7 +77,7 @@ export default function FeaturedCourts() {
     return (
         <View style={styles.section}>
             <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Nearby Courts</Text>
+                <Text style={styles.sectionTitle}>Nearby Gor</Text>
                 <TouchableOpacity>
                     <Text style={styles.seeAll}>See All</Text>
                 </TouchableOpacity>
@@ -92,7 +92,7 @@ export default function FeaturedCourts() {
                         <TouchableOpacity 
                             key={court._id || court.id} 
                             style={styles.featuredCard}
-                            onPress={() => navigation.navigate('CourtDetail', { court })}
+                            onPress={() => navigation.navigate('BuildingCourts', { venue: court })}
                         >
                             <Image
                                 source={{ uri: court.imgUrl || court.image }}

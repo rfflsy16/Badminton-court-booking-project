@@ -8,6 +8,7 @@ import PaymentStatus from "../components/invoice/PaymentStatus";
 export default function Invoice({ route }) {
     const navigation = useNavigation();
     const { item } = route.params;
+    console.log(item);
 
     return (
         <View style={styles.container}>
@@ -30,7 +31,7 @@ export default function Invoice({ route }) {
 
                 <InvoiceSection title="Payment Details">
                     <InfoItem label="Court Price" value={item.price} />
-                    <InfoItem label="Service Fee" value="Rp 5.000" />
+                    <InfoItem label="Service Fee" value="Rp 0" />
                     <Divider />
                     <InfoItem label="Total" value={item.price} isTotal />
                 </InvoiceSection>

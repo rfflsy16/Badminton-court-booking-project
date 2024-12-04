@@ -36,7 +36,14 @@ export default function BookingCard({ item }) {
                 <View style={styles.cardHeader}>
                     <View>
                         <Text style={styles.venueName}>{item.venueName}</Text>
-                        <Text style={styles.courtNumber}>{item.courtNumber}</Text>
+                        <View style={styles.courtIdContainer}>
+                            <Ionicons name="card-outline" size={14} color="#94A3B8" />
+                            <Text style={styles.courtId}>ID: {item._id}</Text>
+                        </View>
+                        <View style={styles.courtTypeContainer}>
+                            <Ionicons name="basketball-outline" size={14} color="#94A3B8" />
+                            <Text style={styles.courtNumber}>{item.courtNumber}</Text>
+                        </View>
                     </View>
                     <View style={[styles.statusBadge, 
                         { backgroundColor: statusStyle.backgroundColor }
@@ -47,6 +54,10 @@ export default function BookingCard({ item }) {
                     </View>
                 </View>
                 <View style={styles.bookingDetails}>
+                    <View style={styles.detailItem}>
+                        <Ionicons name="location-outline" size={16} color="#94A3B8" />
+                        <Text style={styles.detailText}>{item.location}</Text>
+                    </View>
                     <View style={styles.detailItem}>
                         <Ionicons name="calendar-outline" size={16} color="#94A3B8" />
                         <Text style={styles.detailText}>{item.date}</Text>
@@ -96,9 +107,25 @@ const styles = StyleSheet.create({
         color: '#1F2937',
         marginBottom: 4,
     },
+    courtIdContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 4,
+    },
+    courtTypeContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    courtId: {
+        fontSize: 12,
+        color: '#94A3B8',
+        marginLeft: 4,
+        fontFamily: 'monospace',
+    },
     courtNumber: {
         fontSize: 14,
         color: '#64748B',
+        marginLeft: 4,
     },
     statusBadge: {
         paddingHorizontal: 8,
@@ -110,13 +137,12 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
     bookingDetails: {
-        flexDirection: 'row',
         marginBottom: 12,
     },
     detailItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginRight: 16,
+        marginBottom: 8,
     },
     detailText: {
         marginLeft: 4,

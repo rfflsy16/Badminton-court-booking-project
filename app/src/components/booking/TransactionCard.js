@@ -9,7 +9,7 @@ export default function TransactionCard({ item }) {
         switch (status.toLowerCase()) {
             case 'paid':
                 return '#4ADE80';  
-            case 'ongoing':
+            case 'pending':
                 return '#FBBF24';  
             case 'cancelled':
                 return '#EF4444';  
@@ -28,7 +28,14 @@ export default function TransactionCard({ item }) {
                 <View style={styles.cardHeader}>
                     <View style={styles.headerLeft}>
                         <Text style={styles.venueName}>{item.venueName}</Text>
-                        <Text style={styles.courtNumber}>{item.courtNumber}</Text>
+                        <View style={styles.transactionIdContainer}>
+                            <Ionicons name="receipt-outline" size={14} color="#94A3B8" />
+                            <Text style={styles.transactionId}>ID: {item.id}</Text>
+                        </View>
+                        <View style={styles.courtTypeContainer}>
+                            <Ionicons name="basketball-outline" size={14} color="#94A3B8" />
+                            <Text style={styles.courtNumber}>{item.courtNumber}</Text>
+                        </View>
                     </View>
                     <View style={[styles.statusContainer, { backgroundColor: getStatusColor(item.status) + '20' }]}>
                         <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>
@@ -93,6 +100,21 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         color: '#1F2937',
         marginBottom: 4,
+    },
+    transactionIdContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 4,
+    },
+    courtTypeContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    transactionId: {
+        fontSize: 12,
+        color: '#94A3B8',
+        marginLeft: 4,
+        fontFamily: 'monospace',
     },
     courtNumber: {
         fontSize: 14,

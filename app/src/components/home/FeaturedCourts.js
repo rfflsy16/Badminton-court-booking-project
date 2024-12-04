@@ -12,7 +12,6 @@ export default function FeaturedCourts() {
     const [nearestCourts, setNearestCourts] = useState([]);
     const [latitude, setLatitude] = useState("");
     const [longitude, setLongitude] = useState("");
-    const base_url = process.env.EXPO_PUBLIC_BASE_URL;
     const [userToken, setUserToken] = useState("");
 
 
@@ -51,12 +50,6 @@ export default function FeaturedCourts() {
           if (!latitude || !longitude || !userToken) return;
           
           try {
-            console.log('Fetching courts with:', {
-                longitude,
-                latitude,
-                userToken: userToken ? 'Present' : 'Missing'
-            });
-            console.log(process.env.EXPO_PUBLIC_BASE_URL, "<<<<ENV")
             const response = await axios.post(`${process.env.EXPO_PUBLIC_BASE_URL}/buildings/coordinates`,
                 {
                     longitude,

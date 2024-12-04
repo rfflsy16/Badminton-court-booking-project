@@ -40,9 +40,14 @@ export class BuildingController {
         try {
             const { longitude, latitude } = req.body;
 
+            if (!longitude || !latitude) {
+                return res.status(400).json({ message: 'Coordinates are required' })
+            }
+
             if (typeof longitude !== 'number' || typeof latitude !== 'number') {
                 return res.status(400).json({ message: "Invalid coordinates" });
             }
+
 
             const building = await BuildingModel.findBuildingByCoordinates(longitude, latitude);
 
@@ -52,18 +57,6 @@ export class BuildingController {
         }
     }
 
-    static async updateBuilding(req, res, next) {
-        try {
-            const { id } = req.params;
-            const updatedBuilding = await BuildingModel.updateBuilding(id, req.body);
-            res.status(200).json({
-                message: "Building updated successfully",
-                building: updatedBuilding,
-            });
-        } catch (err) {
-            next(err);
-        }
-    }
 
     static async deleteBuilding(req, res, next) {
         try {
@@ -77,17 +70,6 @@ export class BuildingController {
             next(err);
         }
     }
-
-    // static async findBuildingByUserLocation(req, res, next) {
-    //     try {
-    //         const { longitude, latitude } = req.query;
-    //         const buildings = await BuildingModel.findBuildingByUserLocation(longitude, latitude);
-    //         res.status(200).json(buildings);
-    //     } catch (err) {
-    //         console.error('Error finding buildings:', err);
-    //         next(err);
-    //     }
-    // }
 }
 
 

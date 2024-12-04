@@ -7,8 +7,8 @@ import { router } from "./router/index.js"
 import { Server } from 'socket.io';
 import RoomModel from "./models/room.js";
 import MessageModel from "./models/message.js";
+import schedule from "./cronJob.js";
 
-import cron from "./cronJob.js";
 const app = express();
 dotenv.config();
 app.use(cors());
@@ -16,6 +16,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(router)
+schedule()
+
 const server = createServer(app);
 const io = new Server(server);
 io.on('connection', (socket) => {
@@ -47,5 +49,4 @@ io.on('connection', (socket) => {
 
 
 
-cron;
 export { app, server } 

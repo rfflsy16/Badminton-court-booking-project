@@ -4,9 +4,12 @@ import BuildingModel from '../models/building'
 import { signToken } from '../helpers/jwt';
 import { User } from '../models/user';
 import { hashPassword } from '../helpers/bcrypt';
+import CourtModel from '../models/court';
+const courtCollection = CourtModel.getCollection()
+
 
 let access_token_admin, access_token_user;
-let dataOfBuilding
+let dataOfBuilding, dataOfCourt
 beforeAll(async () => {
     const collectionBuilding = BuildingModel.getCollection()
     await collectionBuilding.insertMany([{
@@ -56,6 +59,57 @@ beforeAll(async () => {
     const building = await BuildingModel.readBuilding()
     dataOfBuilding = building[0]
 
+    await courtCollection.insertMany([{
+        "BuildingId": dataOfBuilding._id,
+        "category": "Indoor",
+        "type": "Premium",
+        "description": "Lapangan bulutangkis indoor premium dengan pencahayaan dan ventilasi yang baik.",
+        "startTime": 8,
+        "endTime": 22,
+        "excludedTime": [
+            "11",
+            "14"
+        ],
+        "excludedDate": [
+            "2024-12-07"
+        ],
+        "price": 200000,
+        "dp": 100000,
+        "location": "Jl. HR. Rasuna Said, Kuningan, Jakarta Selatan",
+        "createdAt": {
+            "$date": "2024-12-02T22:05:47.984Z"
+        },
+        "updatedAt": {
+            "$date": "2024-12-02T22:05:47.984Z"
+        }
+    }, {
+        "BuildingId": dataOfBuilding._id,
+        "category": "Outdoor",
+        "type": "Basic",
+        "description": "Lapangan bulutangkis outdoor dengan lapangan rumput yang nyaman untuk permainan kasual.",
+        "startTime": 7,
+        "endTime": 18,
+        "excludedTime": [
+            "12",
+            "16"
+        ],
+        "excludedDate": [
+            "2024-12-08"
+        ],
+        "price": 100000,
+        "dp": 50000,
+        "location": "Jl. HR. Rasuna Said, Kuningan, Jakarta Selatan",
+        "createdAt": {
+            "$date": "2024-12-02T22:06:48.645Z"
+        },
+        "updatedAt": {
+            "$date": "2024-12-02T22:06:48.645Z"
+        }
+    }])
+
+    const court = await CourtModel.readCourts()
+    dataOfCourt = court[0]
+
     const userCollection = User.getCollection()
     await userCollection.insertMany([
         {
@@ -97,6 +151,9 @@ afterAll(async () => {
 
     const collectionUser = User.getCollection()
     await collectionUser.deleteMany()
+
+
+    await courtCollection.deleteMany()
 })
 
 describe('POST /buildings', () => {
@@ -281,6 +338,61 @@ describe('POST /buildings/coordinates', () => {
 
             expect(response.status).toBe(200)
             expect(response.body).toBeInstanceOf(Object)
+        })
+    })
+    describe('POST /buildings/coordinates - failed', () => {
+        it('should be return an error message because user not login', async () => {
+            const response = await request(app)
+                .post('/buildings/coordinates')
+                .send({
+                    "longitude": 106.7827962,
+                    "latitude": -6.2615624
+                }
+                )
+
+            expect(response.status).toBe(401)
+            expect(response.body.message).toBe('Please login first')
+        })
+    })
+    describe('POST /buildings/coordinates - failed', () => {
+        it('should be return an error message because invalid token', async () => {
+            const response = await request(app)
+                .post('/buildings/coordinates')
+                .set('Authorization', `Bearer kndoewn`)
+                .send({
+                    "longitude": 106.7827962,
+                    "latitude": -6.2615624
+                }
+                )
+
+            expect(response.status).toBe(401)
+            expect(response.body.message).toBe('Please login first')
+        })
+    })
+    describe('POST /buildings/coordinates - failed', () => {
+        it('should be return an error message because invalid coordinates', async () => {
+            const response = await request(app)
+                .post('/buildings/coordinates')
+                .set('Authorization', `Bearer ${access_token_admin}`)
+                .send({
+                    "longitude": 'ahjebjbf',
+                    "latitude": 'wjefeb'
+                }
+                )
+
+            expect(response.status).toBe(400)
+            expect(response.body.message).toBe('Invalid coordinates')
+        })
+    })
+    describe('POST /buildings/coordinates - failed', () => {
+        it('should be return an error message because longitude and latitude is empty', async () => {
+            const response = await request(app)
+                .post('/buildings/coordinates')
+                .set('Authorization', `Bearer ${access_token_admin}`)
+                .send()
+
+            expect(response.status).toBe(400)
+            expect(response.body.message).toBe('Coordinates are required')
         })
     })
 })

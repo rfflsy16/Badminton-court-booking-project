@@ -28,9 +28,21 @@ export default class BookingModel {
         return await collection.deleteOne({ _id });
     }
 
-    static async updateById(id, updateData) {
-        const _id = new ObjectId(id);
-        const collection = this.getCollection();
-        return await collection.updateOne({ _id }, { $set: updateData });
+    static async updateBookingStatus(id, status) {
+        const _id = new ObjectId(id)
+        const collection = this.getCollection()
+        const updateData = {
+            statusBooking: status,
+            updatedAt: new Date()
+        }
+
+        const booking = await collection.updateOne({ _id }, { $set: updateData })
+
+        return { message: 'Success update booking status', booking }
     }
+    static async findByCourtAndDate(courtId, date) {
+        const collection = this.getCollection();
+        return await collection.find({ courtId, date }).toArray();
+    }
+
 }

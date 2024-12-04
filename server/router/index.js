@@ -8,10 +8,17 @@ import buildingRouter from './buildings.js'
 import messageRouter from "./message.js"
 import courtRouter from './courts.js'
 import bookingRouter from './booking.js'
+import notificationRouter from './notification.js'
+import { BookingController } from '../controllers/BookingController.js';
+
 export const router = express.Router()
 
 router.post("/register", UserController.register)
 router.post("/login", UserController.login)
+router.post('/midtrans-notification', BookingController.handleNotification);
+router.post('/complete-payment', BookingController.completePayment);
+
+
 
 router.use(authentication)
 router.get("/profile", UserController.getProfile)
@@ -20,6 +27,6 @@ router.use('/courts', courtRouter())
 router.use("/room", roomRouter())
 router.use("/message", messageRouter())
 router.use("/booking", bookingRouter())
-
+router.use('/notifications', notificationRouter())
 
 router.use(errorHandler)

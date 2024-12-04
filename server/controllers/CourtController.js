@@ -13,6 +13,8 @@ export default class CourtController {
     static async getById(req, res, next) {
         try {
             const { id } = req.params;
+            if (id.length < 24) throw { name: 'InvalidInputID' }
+
             const court = await CourtModel.readCourtById(id);
             res.status(200).json(court);
         } catch (error) {

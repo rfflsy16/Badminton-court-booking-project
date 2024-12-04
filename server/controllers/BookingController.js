@@ -39,13 +39,11 @@ export class BookingController {
                 });
             }
 
-            // Calculate total price
             const totalPrice = selectedTime.length * price;
 
-            //validasi untuk booking dp
-            let paymentAmount = totalPrice; // Default to full price
+            let paymentAmount = totalPrice;
             if (paymentType === "dp") {
-                paymentAmount = totalPrice * 0.5; // Set DP to 50%
+                paymentAmount = totalPrice * 0.5;
             }
 
             const bookingData = {
@@ -61,10 +59,8 @@ export class BookingController {
                 updatedAt: new Date(),
             };
 
-            // Simpan booking
             const newBooking = await BookingModel.create(bookingData, userId);
 
-            // Simpan ke data payment
             const bodyPayment = {
                 BookingId: newBooking.insertedId,
                 type: paymentType,

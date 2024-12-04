@@ -85,9 +85,24 @@ export default class BookingModel {
 
         return { message: 'Success update booking status', booking }
     }
+
     static async findByCourtAndDate(courtId, date) {
         const collection = this.getCollection();
-        return await collection.find({ courtId, date }).toArray();
-    }
+        
+        // Convert courtId to ObjectId if it's a string
+        const courtObjectId = typeof courtId === 'string' ? new ObjectId(courtId) : courtId;
+        
+        // Create start and end of the day for the given date
+        const searchDate = new Date(date);
+        const startOfDay = new Date(searchDate.getFullYear(), searchDate.getMonth(), searchDate.getDate());
+        const endOfDay = new Date(searchDate.getFullYear(), searchDate.getMonth(), searchDate.getDate() + 1);
 
+        return await collection.find({ 
+            courtId: courtObjectId,
+            date: {
+                $gte: startOfDay.toISOString(),
+                $lt: endOfDay.toISOString()
+            }
+        }).toArray();
+    }
 }

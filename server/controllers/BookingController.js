@@ -56,13 +56,18 @@ export class BookingController {
 
             // Validasi apakah waktu sudah di-booking
             const existingBookings = await BookingModel.findByCourtAndDate(courtId, date);
-            const conflictingTimes = existingBookings.flatMap(booking => booking.selectedTime)
-                .filter(time => selectedTime.includes(time));
+            
+            if (existingBookings && existingBookings.length > 0) {
+                const conflictingTimes = existingBookings
+                    .filter(booking => booking.statusBooking !== 'cancelled') // Only check non-cancelled bookings
+                    .flatMap(booking => booking.selectedTime)
+                    .filter(time => selectedTime.includes(time));
 
-            if (conflictingTimes.length > 0) {
-                return res.status(400).json({
-                    message: `Lapangan penuh pada waktu ${conflictingTimes.join(', ')}`
-                });
+                if (conflictingTimes.length > 0) {
+                    return res.status(400).json({
+                        message: `Lapangan sudah di-booking pada jam ${conflictingTimes.join(', ')}:00`
+                    });
+                }
             }
 
             const totalPrice = selectedTime.length * price;
@@ -190,7 +195,6 @@ export class BookingController {
     static async handleNotification(req, res, next) {
         try {
             const notificationBody = req.body;
-            console.log(notificationBody, "ini notification body");
 
             //ini khusus payment status
             if (notificationBody.transaction_status === 'capture') {
@@ -204,7 +208,6 @@ export class BookingController {
 
                     //ini booking
                     const booking = await BookingModel.readById(payment.BookingId);
-                    console.log(booking, "ini data booking");
 
                     if (booking) {
                         if (booking.paymentType === 'fullpayment') {

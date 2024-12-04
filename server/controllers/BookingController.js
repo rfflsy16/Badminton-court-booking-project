@@ -76,7 +76,6 @@ export class BookingController {
                 serverKey: process.env.MIDTRANS_SERVER_KEY
             });
 
-            //panggil model user
             const userData = await User.getById(userId);
 
             let parameter = {

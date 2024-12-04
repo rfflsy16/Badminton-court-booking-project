@@ -242,11 +242,38 @@ afterAll(async () => {
     await paymentCollection.deleteMany()
 })
 
-// describe('PATCH /booking/:id/payment', () => {
-//     describe('PATCH /booking/:id/payment - succeed', () => {
-//         it('should be return result of payment', async () => {
-//             const response = await request(app)
-//             .patch(`/booking/${}`)
-//         })
-//     }) 
-// })
+describe('POST /complete-payment', () => {
+    // describe('POST /complete-payment - succeed', () => {
+    //     it('should be return result of payment', async () => {
+    //         const response = await request(app)
+    //             .post(`/complete-payment`)
+    //             .send({
+    //                 bookingId: `${dataOfBooking._id}`
+    //             })
+    //         expect(response.status).toBe(201)
+    //         expect(response.body.message).toBe('')
+    //     })
+    // })
+    describe('POST /complete-payment - failed', () => {
+        it('should be return result of payment', async () => {
+            const response = await request(app)
+                .post(`/complete-payment`)
+                .send({
+                    bookingId: `nkjwencnelkc`
+                })
+            expect(response.status).toBe(400)
+            expect(response.body.message).toBe('input must be a 24 character hex string')
+        })
+    })
+    describe('POST /complete-payment - failed', () => {
+        it('should be return result of payment', async () => {
+            const response = await request(app)
+                .post(`/complete-payment`)
+                .send({
+                    bookingId: `123456789123456789123456`
+                })
+            expect(response.status).toBe(404)
+            expect(response.body.message).toBe('Booking not found')
+        })
+    })
+})

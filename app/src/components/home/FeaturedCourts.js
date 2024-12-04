@@ -51,7 +51,7 @@ export default function FeaturedCourts() {
                 latitude,
                 userToken: userToken ? 'Present' : 'Missing'
             });
-            console.log(process.env.EXPO_PUBLIC_BASE_URL, "<<<<ENV")
+            // console.log(process.env.EXPO_PUBLIC_BASE_URL, "<<<<ENV")
             const response = await axios.post(`${process.env.EXPO_PUBLIC_BASE_URL}/buildings/coordinates`,
                 {
                     longitude,

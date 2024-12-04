@@ -28,9 +28,11 @@ export default function Booking({ route }) {
             scrollViewRef.current?.scrollTo({ x: index * width, animated: true });
         }
     }, [route.params]);
+
     useEffect(() => {
         async function getToken() {
             const token = await SecureStore.getItemAsync('userToken');
+            console.log(token, "tokennn")
             setUserToken(token);
         }
         getToken();
@@ -38,9 +40,10 @@ export default function Booking({ route }) {
 
     useFocusEffect(
         useCallback(() => {
-            fetchData();
-            fetchDataTransaction(); 
-
+            if (userToken !== "") {
+                fetchData();
+                fetchDataTransaction(); 
+            }
         }, [userToken])
 
     )
@@ -55,7 +58,7 @@ export default function Booking({ route }) {
                     Authorization: `Bearer ${userToken}` 
                 }
             })
-            // console.log(response.data, '<<<<<<<<<<<<<<<<');
+            console.log(response.data, '<<<<<<<<<<<<<<<<');
             const bookings = response.data;
             
 

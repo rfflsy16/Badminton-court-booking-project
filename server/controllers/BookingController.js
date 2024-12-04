@@ -20,9 +20,25 @@ export class BookingController {
     static async getBookingByUserID(req, res, next) {
         try {
             const {userId} = req.loginInfo;
+            console.log(userId, "ini user id")
             const bookings = await BookingModel.readByUserId(userId)
            
             res.status(200).json(bookings);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async getBookingById(req, res, next) { 
+        try {
+            const { id } = req.params;
+            console.log(id, "ini id booking")
+            const booking = await BookingModel.bookingById(id);
+            
+            // console.log(booking, "<<<<<<<<<<<<<<<<<<<<<< ini booking");
+            
+            res.status(200).json(booking);
+       
         } catch (error) {
             next(error);
         }
@@ -39,12 +55,10 @@ export class BookingController {
         }
     }
 
-
     // Add a new booking
     static async addBooking(req, res, next) {
 
         try {
-
             const { userId } = req.loginInfo;
             const { courtId, date, selectedTime, paymentType } = req.body;
             const court = await CourtModel.readCourtById(courtId);
@@ -99,13 +113,9 @@ export class BookingController {
 
             let snap = new midtransClient.Snap({
                 // Set to true if you want Production Environment (accept real transaction).
-<<<<<<< HEAD
                 isProduction : false,
                 serverKey : process.env.MIDTRANS_SERVER_KEY
-=======
-                isProduction: false,
-                serverKey: 'SB-Mid-server-oAaRKJgPgm-N4NnVCMyViSkx'
->>>>>>> raffles
+                
             });
 
             //panggil model user
@@ -137,17 +147,15 @@ export class BookingController {
                 newPayment,
                 midtransUrl: transaction.redirect_url
             });
+
         } catch (error) {
             next(error);
         }
     }
 
-
     static async deleteBooking(req, res, next) {
         try {
             const { id } = req.params;
-
-
             const result = await BookingModel.deleteById(id);
             if (result.deletedCount === 0) {
                 return res.status(404).json({ message: "Booking not found" });
@@ -166,6 +174,7 @@ export class BookingController {
             const { paymentAmount } = req.body;
 
             const booking = await BookingModel.readById(id);
+
             if (!booking) {
                 return res.status(404).json({ message: "Booking not found" });
             }
@@ -185,18 +194,16 @@ export class BookingController {
             booking.updatedAt = new Date();
 
             await BookingModel.updateById(id, booking);
+
             res.status(200).json({ message: "Payment updated successfully", booking });
         } catch (error) {
             next(error);
         }
     }
 
-
-
     static async handleNotification(req, res, next) {
         try {
             const notificationBody = req.body;
-            console.log(notificationBody, "ini notification body");
 
             //ini khusus payment status
             if (notificationBody.transaction_status === 'capture') {
@@ -205,12 +212,10 @@ export class BookingController {
                 if (payment) {
                     payment.status = 'paid';
                     payment.updatedAt = new Date();
+
                     await PaymentModel.updatePaymentStatus(notificationBody.order_id, payment.status);
 
-
-                    //ini booking
                     const booking = await BookingModel.readById(payment.BookingId);
-                    console.log(booking, "ini data booking");
 
                     if (booking) {
                         if (booking.paymentType === 'fullpayment') {
@@ -228,15 +233,11 @@ export class BookingController {
                                 totalPayment += element.amount
                             });
 
-                            console.log(totalPayment, "ini total payment");
-                            console.log(booking.totalPrice, "ini total price");
-
                             if (totalPayment === booking.totalPrice) {
                                 booking.statusBooking = 'paid';
                                 booking.updatedAt = new Date();
                                 await BookingModel.updateBookingStatus(booking._id, booking.statusBooking);
                             }
-
 
                         }
                     }
@@ -256,6 +257,7 @@ export class BookingController {
             // Cari booking berdasarkan ID
             if (bookingId.length < 24) throw { name: 'InvalidInputID' }
             const booking = await BookingModel.readById(bookingId);
+            
             if (!booking) {
                 return res.status(404).json({ message: "Booking not found" });
             }
@@ -273,9 +275,6 @@ export class BookingController {
             payments.forEach((element) => {
                 totalPayment += element.amount;
             });
-
-            console.log(totalPayment, "ini total payment");
-            console.log(booking.totalPrice, "ini total price");
 
             // Hitung sisa pembayaran
             const remainingPayment = booking.totalPrice - totalPayment;
@@ -320,7 +319,6 @@ export class BookingController {
             };
 
             const transaction = await snap.createTransaction(parameter);
-            console.log(transaction, "ini transaction");
 
             res.status(200).json({
                 message: "Pelunasan berhasil diinisiasi",
@@ -328,7 +326,6 @@ export class BookingController {
                 paymentUrl: transaction.redirect_url, // URL untuk melanjutkan pelunasan di Midtrans
             });
         } catch (error) {
-            console.log(error, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<ini error");
             next(error);
         }
     }

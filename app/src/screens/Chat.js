@@ -52,8 +52,8 @@ export default function Chat({ navigation }) {
             console.log("Comparing:", chat._id, roomId);
             return chat._id === roomId;
         });
-        console.log("Selected Chat:", selectedChat);
-        console.log(selectedChat, "<<<<< selected chat")
+        // console.log("Selected Chat:", selectedChat);
+        // console.log(selectedChat, "<<<<< selected chat")
         // navigation.navigate('ChatDetail', {
         //     courtId: selectedChat.courtId,
         //     name: selectedChat.courtDetails.buildingDetails.name,

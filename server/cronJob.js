@@ -1,10 +1,11 @@
 import cron from 'node-cron'
-import AIController from './controllers/AiController.js';
+import NotificationModel from './models/notification.js';
 
-cron.schedule("1 0 * * *", async () => {
-    console.log("Cron job jalan: Bikin notifikasi otomatis...");
-    await AIController.generateRecommendations();
-    console.log("Notifikasi sukses dibuat!");
-});
+export default function schedule() {
 
-export default cron;
+    cron.schedule("0 15 * * *", async () => {
+        console.log("Cron job jalan: Bikin notifikasi otomatis...");
+        await NotificationModel.getNotification();
+        console.log("Notifikasi sukses dibuat!");
+    });
+}

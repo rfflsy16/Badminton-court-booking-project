@@ -2,7 +2,7 @@ export const errorHandler = (err, req, res, next) => {
     let status = 500
     let message = 'Internal Server Error'
 
-    console.log(err, "<<<<,")
+    // console.log(err, "<<<<,")
 
     if (err.name == 'SequelizeValidationError') {
         status = 400
@@ -12,6 +12,11 @@ export const errorHandler = (err, req, res, next) => {
     if (err.name == 'SequelizeUniqueConstraintError') {
         status = 400
         message = err.errors[0].message
+    }
+
+    if (err.name === 'InvalidCoordinates') {
+        status = 400
+        message = 'Invalid Coordinates'
     }
 
     if (err.name == 'SequelizeDatabaseError' || err.name == 'SequelizeForeignKeyConstraintError') {

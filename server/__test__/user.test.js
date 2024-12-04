@@ -101,6 +101,20 @@ describe('POST /register', () => {
             expect(response.body.message).toBe('Please input all of the field')
         })
     })
+    describe('POST /register -failed', () => {
+        it('should be return an error message because fullName is empty', async () => {
+            const response = await request(app)
+                .post('/register')
+                .send({
+                    fullName: '',
+                    email: 'mamang@mail.com',
+                    password: '123456'
+                })
+
+            expect(response.status).toBe(400)
+            expect(response.body.message).toBe('Please input all of the field')
+        })
+    })
 })
 
 describe('POST /login', () => {

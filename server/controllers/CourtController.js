@@ -32,25 +32,6 @@ export default class CourtController {
         }
     }
 
-    static async update(req, res, next) {
-        try {
-            const { id } = req.params;
-            const court = await CourtModel.updateCourt(id, req.body);
-            res.status(200).json(court);
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    static async delete(req, res, next) {
-        try {
-            const { id } = req.params;
-            const result = await CourtModel.deleteCourt(id);
-            res.status(200).json(result);
-        } catch (error) {
-            next(error);
-        }
-    }
 
     static async getCourtsByBuilding(req, res, next) {
         try {

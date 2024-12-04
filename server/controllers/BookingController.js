@@ -75,7 +75,7 @@ export class BookingController {
 
             if (conflictingTimes.length > 0) {
                 return res.status(400).json({
-                    message: `Lapangan penuh pada waktu ${conflictingTimes.join(', ')}`
+                    message: `Lapangan penuh pada pukul ${conflictingTimes.join(', ')}:00`
                 });
             }
 

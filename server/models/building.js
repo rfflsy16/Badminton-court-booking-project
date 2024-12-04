@@ -69,30 +69,6 @@ export default class BuildingModel {
         return result.ops;
     }
 
-    static async updateBuilding(id, body) {
-        const _id = new ObjectId(id);
-        const { name, address, location } = body;
-
-        const updateData = {
-            ...(name && { name }),
-            ...(address && { address }),
-            ...(location && { location }),
-            updatedAt: new Date(),
-        };
-
-        const collection = this.getCollection();
-        const result = await collection.findOneAndUpdate(
-            { _id },
-            { $set: updateData },
-            { returnDocument: "after" }
-        );
-
-        if (!result.value) {
-            throw new Error("Building not found or no changes made");
-        }
-
-        return result.value;
-    }
 
     static async deleteBuilding(id) {
         const _id = new ObjectId(id);
@@ -128,7 +104,7 @@ export default class BuildingModel {
         const collection = this.getCollection();
 
         if (typeof longitude !== 'number' || typeof latitude !== 'number') {
-            throw new Error("Invalid coordinates");
+            throw { name: 'InvalidCoordinates' }
         }
 
         const buildings = await collection.find({

@@ -13,7 +13,7 @@ export default class NotificationController {
 
     static async generateAndSaveNotifications(req, res, next) {
         try {
-            const recommendations = await AIController.generateRecommendations();
+            const { recommendations } = await AIController.generateRecommendations();
 
             const notificationData = recommendations.map((rec) => ({
                 message: `Lapangan "${rec.courtName}" kosong di waktu: ${rec.availableTimes.join(

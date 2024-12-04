@@ -28,7 +28,6 @@ router.use('/courts', courtRouter())
 router.use("/room", roomRouter())
 router.use("/message", messageRouter())
 router.use("/booking", bookingRouter())
-router.use('/notifications', notificationRouter())
-router.use('/gemini', geminiRouter())
+router.use('/send-notification', geminiRouter())
 
 router.use(errorHandler)

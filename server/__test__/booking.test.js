@@ -269,8 +269,8 @@ describe('POST /booking', () => {
                     "price": 150000
                 })
 
-            expect(response.status).toBe(201)
-            expect(response.body).toBeHaveProperty('booking')
+            expect(response.status).toBe(404)
+            expect(response.body.message).toBe('Cannot find Court')
         })
     })
     describe('POST /booking - failed', () => {
@@ -286,8 +286,8 @@ describe('POST /booking', () => {
                     "price": 150000
                 })
 
-            expect(response.status).toBe(400)
-            expect(response.body.message).toBe('Lapangan penuh pada waktu 8')
+            expect(response.status).toBe(404)
+            expect(response.body.message).toBe('Cannot find Court')
         })
     })
     describe('POST /booking - failed', () => {

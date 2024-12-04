@@ -27,6 +27,7 @@ export default function BookingModal({
     const progressAnim = useRef(new Animated.Value(0)).current;
     const [isSwipeCompleted, setIsSwipeCompleted] = useState(false);
     const [showPaymentConfirm, setShowPaymentConfirm] = useState(false);
+    
 
     const formatTimeSlot = (selectedIds) => {
         return selectedIds
@@ -86,7 +87,8 @@ export default function BookingModal({
     ).current;
 
     const handlePayNow = () => {
-        setShowPaymentConfirm(true);
+        // setShowPaymentConfirm(true);
+        handleConfirm();
     };
 
     const renderBookingSummary = () => {

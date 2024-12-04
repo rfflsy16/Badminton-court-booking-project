@@ -1,40 +1,53 @@
-import { View, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, Dimensions, TouchableOpacity, Platform, StatusBar } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-import { Ionicons } from "@expo/vector-icons";
 import { useRoute, useNavigation } from '@react-navigation/native';
-import { useState } from 'react';
+import { Ionicons } from "@expo/vector-icons";
 
-export default function Maps() {
+const Maps = () => {
     const route = useRoute();
     const navigation = useNavigation();
-    const { location, courtName } = route.params;
-    const [isMapReady, setIsMapReady] = useState(false);
+    const { location, courtName } = route.params || {};
+    const [region, setRegion] = useState(null);
+
+    useEffect(() => {
+        console.log('Received location:', location);
+        if (location?.latitude && location?.longitude) {
+            const newRegion = {
+                latitude: location.latitude,
+                longitude: location.longitude,
+                latitudeDelta: 0.005,
+                longitudeDelta: 0.005
+            };
+            console.log('Setting region:', newRegion);
+            setRegion(newRegion);
+        } else {
+            console.log('Invalid location data received');
+        }
+    }, [location]);
+
+    if (!region) {
+        console.log('Region not yet set');
+        return <View style={styles.container} />;
+    }
 
     return (
         <View style={styles.container}>
+            <StatusBar translucent backgroundColor="transparent" />
             <MapView
                 style={styles.map}
-                initialRegion={{
-                    ...location,
-                    latitudeDelta: 0.01,
-                    longitudeDelta: 0.01,
-                }}
-                onMapReady={() => setIsMapReady(true)}
+                initialRegion={region}
+                region={region}
             >
-                {isMapReady && (
-                    <Marker
-                        coordinate={location}
-                        title={courtName}
-                        description="Premium Badminton Court"
-                    >
-                        <View style={styles.customMarker}>
-                            <View style={styles.markerContent}>
-                                <Ionicons name="location" size={20} color="#fff" />
-                            </View>
-                        </View>
-                    </Marker>
-                )}
+                <Marker
+                    coordinate={{
+                        latitude: region.latitude,
+                        longitude: region.longitude
+                    }}
+                    title={courtName}
+                />
             </MapView>
+            
             <TouchableOpacity 
                 style={styles.backButton}
                 onPress={() => navigation.goBack()}
@@ -43,36 +56,16 @@ export default function Maps() {
             </TouchableOpacity>
         </View>
     );
-}
+};
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#fff',
+        ...StyleSheet.absoluteFillObject
     },
     map: {
-        flex: 1,
-    },
-    customMarker: {
-        width: 40,
-        height: 40,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    markerContent: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
-        backgroundColor: '#EA580C',
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5,
+        ...StyleSheet.absoluteFillObject
     },
     backButton: {
         position: 'absolute',
@@ -92,5 +85,8 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
         elevation: 5,
-    },
+        zIndex: 1
+    }
 });
+
+export default Maps;

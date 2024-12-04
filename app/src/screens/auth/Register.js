@@ -19,7 +19,7 @@ export default function Register() {
   const handleRegister = async () => {
     try {
 
-      const response= await fetch('https://ed9b-27-50-29-117.ngrok-free.app/register', {
+      const response= await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -33,11 +33,8 @@ export default function Register() {
       });
 
       const responseText = await response.text();
-
-      // Attempt to parse the response as JSON
       const data = JSON.parse(responseText);
-      console.log(data, '<<<<<<<<<<<< parsed data');
-
+      
       if (response.ok) {
         Alert.alert('Success', 'User registered successfully');
         navigation.navigate('Login');

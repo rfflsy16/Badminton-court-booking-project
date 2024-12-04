@@ -18,14 +18,11 @@ export default function Profile() {
     const [myProfile, setMyProfile] = useState({});
     
     useEffect(() => {
-        
         async function getToken() {
             const token = await SecureStore.getItemAsync('userToken');
             setUserToken(token);
-
         }
         getToken();
-    
     },[])
 
     useEffect(() => {
@@ -35,7 +32,7 @@ export default function Profile() {
     
     const getMyProfile = async () => {
         try {
-            const response = await axios.get('https://ed9b-27-50-29-117.ngrok-free.app/profile',{
+            const response = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/profile`,{
                 headers: {
                     'Authorization': `Bearer ${userToken}`
                 }

@@ -33,7 +33,7 @@ export default function CourtDetail() {
             setUserToken(token);
         }
         getToken();
-    },[])
+    },[userToken])
 
     useEffect(() => {
         getCourtById()
@@ -187,20 +187,48 @@ export default function CourtDetail() {
     };
 
     const handlePaymentSuccess = async () => {
-        const payload = {
-            date: selectedDate,
-            selectedTime: selectedTimes,
-            paymentType: paymentType,
-            courtId: courtDetails._id,
-            price: getFinalAmount(),
-        }
-
-        const response = await axios.post(`${process.env.EXPO_PUBLIC_BASE_URL}/booking`, payload, {
-            headers: {
-                Authorization: `Bearer ${userToken}`
+        try {
+            if(!userToken || userToken === "") {   
+                alert('Please login first');
+                return;
             }
-        });
 
+            const payload = {
+                date: selectedDate,
+                selectedTime: selectedTimes,
+                paymentType: paymentType,
+                courtId: courtDetails._id,
+                price: getFinalAmount(),
+            };
+
+            console.log('Sending booking request with payload:', payload);
+            
+            const response = await axios.post(
+                `${process.env.EXPO_PUBLIC_BASE_URL}/booking`, 
+                payload, 
+                {
+                    headers: {
+                        Authorization: `Bearer ${userToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            console.log('Server response:', response.data);
+
+            if (!response.data.midtransUrl) {
+                throw new Error('No payment URL received from server');
+            }
+
+            setShowPaymentModal(false);
+            navigation.navigate('Midtrans', {
+                midtransUrl: response.data.midtransUrl,
+                midtransToken: response.data.midtransToken
+            });
+        } catch (error) {
+            console.error('Booking error:', error.response?.data || error.message);
+            alert(error.response?.data?.message || 'Failed to process booking. Please try again.');
+        }
     };
 
     if (isLoading || !courtDetails) {

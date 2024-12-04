@@ -18,7 +18,6 @@ export class BookingController {
     static async addBooking(req, res, next) {
 
         try {
-
             const { userId, username } = req.loginInfo;
             const { courtId, date, selectedTime, paymentType, price } = req.body;
 
@@ -106,7 +105,8 @@ export class BookingController {
                 booking: newBooking,
                 paymentUrl: "",
                 newPayment,
-                midtransUrl: transaction.redirect_url
+                midtransUrl: transaction.redirect_url,
+                midtransToken: transaction.token
             });
         } catch (error) {
             next(error);

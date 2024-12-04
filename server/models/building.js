@@ -25,17 +25,18 @@ export default class BuildingModel {
         const _id = new ObjectId(id);
         const collection = this.getCollection();
 
-        const building = await collection.aggregate([ 
-        { $match: { _id } },
-        {
-            $lookup: {
-                from: "Courts",
-                localField: "_id",
-                foreignField: "BuildingId",
-                as: "courts",
-            },
-        }]).toArray();
-        if (!building) {
+        const building = await collection.aggregate([
+            { $match: { _id } },
+            {
+                $lookup: {
+                    from: "Courts",
+                    localField: "_id",
+                    foreignField: "BuildingId",
+                    as: "courts",
+                },
+            }]).toArray();
+
+        if (!building || building.length === 0) {
             throw { name: "BuildingNotFound" };
         }
 
@@ -147,7 +148,7 @@ export default class BuildingModel {
         if (!buildings || buildings.length === 0) {
             return [];
         }
- 
+
         return buildings;
     }
 

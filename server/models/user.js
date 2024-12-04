@@ -23,6 +23,7 @@ export class User {
     const collection = this.getCollection();
     const user = await collection.findOne({ _id });
     if (!user) throw { name: "NotFound" };
+    console.log(user, "<<<<< ini di model user")
     return user;
   }
 

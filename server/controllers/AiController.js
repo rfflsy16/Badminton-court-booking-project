@@ -3,14 +3,13 @@ import BookingModel from "../models/booking.js";
 import CourtModel from "../models/court.js";
 
 export default class AIController {
-    static async generateRecommendations() {
+    static async generateRecommendations(req, res, next) {
         try {
             const bookings = await BookingModel.read();
             const courts = await CourtModel.readCourts();
-
             const recommendations = courts.map((court) => {
                 const bookedTimes = bookings
-                    .filter((booking) => booking.courtId?.toString() === court._id.toString())
+                    .filter((booking) => booking.CourtId.toString() === court._id.toString())
                     .flatMap((booking) => booking.selectedTime || []);
 
                 const allTimes = Array.from(
@@ -21,6 +20,8 @@ export default class AIController {
 
                 return { courtName: court.name, availableTimes };
             });
+
+            console.log(recommendations, "<<<<<<")
 
             const genAi = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
             const model = genAi.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -34,11 +35,14 @@ export default class AIController {
                     )
                     .join("\n")}
             `;
-            const aiResponse = await model.generateContent(prompt);
+            const aiResponse = (await model.generateContent(prompt));
 
             console.log("AI Jawab:", aiResponse.text);
 
-            return recommendations;
+            // return recommendations;
+            res.status(200).json({
+                aiResponse
+            })
         } catch (error) {
             console.error("Error di AI:", error);
             throw error;

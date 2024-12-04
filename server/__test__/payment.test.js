@@ -239,6 +239,7 @@ afterAll(async () => {
     await roomcollection.deleteMany()
     await messageCollection.deleteMany()
     await bookingCollection.deleteMany()
+    await paymentCollection.deleteMany()
 })
 
 // describe('PATCH /booking/:id/payment', () => {

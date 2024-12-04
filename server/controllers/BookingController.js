@@ -80,7 +80,6 @@ export class BookingController {
     }
 
 
-    // Delete a booking
     static async deleteBooking(req, res, next) {
         try {
             const { id } = req.params;

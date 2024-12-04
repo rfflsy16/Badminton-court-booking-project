@@ -2,6 +2,7 @@ import BookingModel from "../models/booking.js";
 import PaymentModel from "../models/payment.js";
 import midtransClient from 'midtrans-client';
 import { User } from "../models/user.js";
+import 'dotenv/config'
 
 export class BookingController {
     // Get all bookings
@@ -76,7 +77,7 @@ export class BookingController {
             let snap = new midtransClient.Snap({
                 // Set to true if you want Production Environment (accept real transaction).
                 isProduction : false,
-                serverKey : 'SB-Mid-server-oAaRKJgPgm-N4NnVCMyViSkx'
+                serverKey : process.env.MIDTRANS_SERVER_KEY
             });
 
             //panggil model user
@@ -167,7 +168,7 @@ export class BookingController {
     static async handleNotification(req, res, next) {
         try {
             const notificationBody = req.body;
-            // console.log(notificationBody, "ini notification body");
+            console.log(notificationBody, "ini notification body");
 
             //ini khusus payment status
             if (notificationBody.transaction_status === 'capture') {
@@ -269,7 +270,7 @@ export class BookingController {
             // Buat transaksi ke Midtrans untuk pelunasan
             let snap = new midtransClient.Snap({
                 isProduction: false,
-                serverKey: 'SB-Mid-server-oAaRKJgPgm-N4NnVCMyViSkx',
+                serverKey: process.env.MIDTRANS_SERVER_KEY,
             });
     
             let parameter = {

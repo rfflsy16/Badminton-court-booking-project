@@ -1,20 +1,83 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import * as SecureStore from 'expo-secure-store';
+import axios from "axios";
+import { useState, useEffect } from "react";
 
 export default function TransactionCard({ item }) {
     const navigation = useNavigation();
+    const [userToken, setUserToken] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        console.log('Transaction item:', JSON.stringify(item, null, 2)); // Debug log
+        async function getToken() {
+            const token = await SecureStore.getItemAsync('userToken');
+            setUserToken(token);
+        }
+        getToken();
+    }, []);
 
     const getStatusColor = (status) => {
         switch (status.toLowerCase()) {
             case 'paid':
                 return '#4ADE80';  
-            case 'pending':
+            case 'ongoing':
                 return '#FBBF24';  
             case 'cancelled':
                 return '#EF4444';  
             default:
                 return '#94A3B8';
+        }
+    };
+
+    const handleCompletePayment = async () => {
+        try {
+            if (!userToken) {   
+                alert('Please login first');
+                return;
+            }
+
+            if (!item._id) {
+                alert('Invalid booking data');
+                return;
+            }
+
+            setIsLoading(true);
+
+            const payload = {
+                bookingId: item._id  // Use _id directly from the transaction
+            };
+
+            console.log('Sending completion payment request:', payload);
+            
+            const response = await axios.post(
+                `${process.env.EXPO_PUBLIC_BASE_URL}/complete-payment`, 
+                payload, 
+                {
+                    headers: {
+                        Authorization: `Bearer ${userToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            console.log('Server response:', response.data);
+
+            if (response.data.paymentUrl) {
+                navigation.navigate('Midtrans', {
+                    paymentUrl: response.data.paymentUrl
+                });
+            } else {
+                throw new Error('No payment URL received from server');
+            }
+        } catch (error) {
+            console.error('Payment error:', error);
+            const errorMessage = error.response?.data?.message || 'Failed to process payment. Please try again.';
+            alert(errorMessage);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -30,17 +93,25 @@ export default function TransactionCard({ item }) {
                         <Text style={styles.venueName}>{item.venueName}</Text>
                         <View style={styles.transactionIdContainer}>
                             <Ionicons name="receipt-outline" size={14} color="#94A3B8" />
-                            <Text style={styles.transactionId}>ID: {item.id}</Text>
+                            <Text style={styles.transactionId}>Booking ID: {item._id}</Text>
                         </View>
                         <View style={styles.courtTypeContainer}>
                             <Ionicons name="basketball-outline" size={14} color="#94A3B8" />
                             <Text style={styles.courtNumber}>{item.courtNumber}</Text>
                         </View>
                     </View>
-                    <View style={[styles.statusContainer, { backgroundColor: getStatusColor(item.status) + '20' }]}>
-                        <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>
-                            {item.status}
-                        </Text>
+                    <View style={styles.headerRight}>
+                        <View style={[styles.statusContainer, { backgroundColor: getStatusColor(item.status) + '20' }]}>
+                            <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>
+                                {item.status}
+                            </Text>
+                        </View>
+                        <View style={[styles.paymentTypeContainer, { backgroundColor: '#E2E8F0' }]}>
+                            <Ionicons name="card-outline" size={12} color="#64748B" />
+                            <Text style={styles.paymentTypeText}>
+                                {item.paymentType === 'dp' ? 'Down Payment' : 'Full Payment'}
+                            </Text>
+                        </View>
                     </View>
                 </View>
                 <View style={styles.locationContainer}>
@@ -59,6 +130,20 @@ export default function TransactionCard({ item }) {
                 </View>
                 <View style={styles.priceContainer}>
                     <Text style={[styles.price, { color: '#E11D48' }]}>{item.price}</Text>
+                    {item.status.toLowerCase() === 'ongoing' && item.paymentType === 'dp' && (
+                        <TouchableOpacity 
+                            style={[
+                                styles.completePaymentButton,
+                                isLoading && styles.completePaymentButtonDisabled
+                            ]}
+                            onPress={handleCompletePayment}
+                            disabled={isLoading}
+                        >
+                            <Text style={styles.completePaymentText}>
+                                {isLoading ? 'Processing...' : 'Complete Payment'}
+                            </Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
             </View>
         </TouchableOpacity>
@@ -95,6 +180,10 @@ const styles = StyleSheet.create({
         flex: 1,
         marginRight: 12,
     },
+    headerRight: {
+        alignItems: 'flex-end',
+        gap: 4,
+    },
     venueName: {
         fontSize: 16,
         fontWeight: '600',
@@ -130,6 +219,19 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         textTransform: 'capitalize',
     },
+    paymentTypeContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 6,
+        gap: 4,
+    },
+    paymentTypeText: {
+        fontSize: 10,
+        fontWeight: '500',
+        color: '#64748B',
+    },
     locationContainer: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -156,10 +258,27 @@ const styles = StyleSheet.create({
     },
     priceContainer: {
         marginTop: 4,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center'
     },
     price: {
         fontSize: 16,
         fontWeight: '600',
         color: '#E11D48',
+    },
+    completePaymentButton: {
+        backgroundColor: '#3B82F6',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 6,
+    },
+    completePaymentButtonDisabled: {
+        backgroundColor: '#94A3B8',
+    },
+    completePaymentText: {
+        color: '#FFFFFF',
+        fontSize: 12,
+        fontWeight: '600',
     },
 });

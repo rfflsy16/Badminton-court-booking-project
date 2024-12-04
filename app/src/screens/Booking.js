@@ -43,10 +43,8 @@ export default function Booking({ route }) {
                 const fetchAllData = async () => {
                     try {
                         setLoading(true);
-                        await Promise.all([
-                            fetchData(),
-                            fetchDataTransaction()
-                        ]);
+                        await fetchData(); // Fetch bookings first
+                        await fetchDataTransaction(); // Then fetch transactions
                     } catch (error) {
                         Alert.alert(
                             "Error",
@@ -101,7 +99,7 @@ export default function Booking({ route }) {
                     courtId: booking.court._id || "Unknown Court Id",
                     location: booking.court.location || "Unknown Location",
                     date: booking.date,
-                    rawDate: bookingDate,
+                    rawDate: new Date(booking.date).getTime(),
                     time: formatTimeRange(booking.selectedTime),
                     status: dynamicStatus,
                     price: booking.totalPrice.toLocaleString("id-ID", { style: "currency", currency: "IDR" }),
@@ -133,7 +131,7 @@ export default function Booking({ route }) {
                     .map(hour => `${hour < 10 ? `0${hour}` : hour}:00`)
                     .join("-");
             };
-            console.log(JSON.stringify(transactions, null, 2), "<<<< transactions, " )
+
             const formattedTransaction = transactions.map(transaction => {
                 let status = transaction.statusBooking;
                 if (transaction.paymentType === "full") {
@@ -145,18 +143,28 @@ export default function Booking({ route }) {
 
                 const transactionDate = parseISO(transaction.date);
 
+                // For debugging
+                console.log('Processing transaction:', {
+                    transactionId: transaction._id,
+                    date: transaction.date,
+                    courtId: transaction.courtId
+                });
+
                 return {
-                    id: transaction._id,
+                    _id: transaction._id, // Use _id consistently
                     venueName: transaction.building.name || "Unknown Venue",
                     courtNumber: transaction.court.type || "Unknown Court",
                     location: transaction.court.location || "Unknown Location",
+                    city: transaction.building.city || "Unknown City",
+                    courtId: transaction.courtId,
+                    paymentType: transaction.paymentType,
                     date: transaction.date,
-                    rawDate: transactionDate,
+                    rawDate: new Date(transaction.date).getTime(),
                     time: formatTimeRange(transaction.selectedTime),
                     status: status,
                     price: transaction.totalPrice.toLocaleString("id-ID", { style: "currency", currency: "IDR" }),
                     image: transaction.building.imgUrl || "https://via.placeholder.com/150",
-                    courtId: transaction.courtId,
+                    selectedTime: transaction.selectedTime
                 };
             })
             .sort((a, b) => b.rawDate - a.rawDate);
@@ -231,7 +239,7 @@ export default function Booking({ route }) {
                         <FlatList
                             data={transactionsData}
                             renderItem={({ item }) => <TransactionCard item={item} />}
-                            keyExtractor={(item) => item.id}
+                            keyExtractor={(item) => item._id}
                             contentContainerStyle={styles.listContainer}
                             showsVerticalScrollIndicator={false}
                         />

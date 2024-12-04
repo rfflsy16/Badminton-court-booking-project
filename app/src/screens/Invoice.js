@@ -8,7 +8,7 @@ import PaymentStatus from "../components/invoice/PaymentStatus";
 export default function Invoice({ route }) {
     const navigation = useNavigation();
     const { item } = route.params;
-    console.log(item);
+    console.log(item, "<<<< INVOICE");
 
     return (
         <View style={styles.container}>
@@ -20,7 +20,7 @@ export default function Invoice({ route }) {
                 <InvoiceSection title="Venue Info">
                     <InfoItem label="Venue Name" value={item.venueName} />
                     <InfoItem label="Court Number" value={item.courtNumber} />
-                    <InfoItem label="Location" value={item.location} />
+                    <InfoItem label="Location" value={item.city} />
                 </InvoiceSection>
 
                 <InvoiceSection title="Booking Details">

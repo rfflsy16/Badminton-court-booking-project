@@ -80,6 +80,15 @@ export default function CourtDetail() {
 
     const paymentMethods = [
         {
+            id: 'card',
+            title: 'Credit/Debit Card',
+            options: [
+                { id: 'visa', name: 'Visa', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png' },
+                { id: 'mastercard', name: 'Mastercard', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png' },
+                { id: 'jcb', name: 'JCB', image:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/JCB_logo.svg/2560px-JCB_logo.svg.png' },
+            ]
+        },
+        {
             id: 'ewallet',
             title: 'E-Wallet',
             options: [

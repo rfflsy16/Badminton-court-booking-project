@@ -20,7 +20,6 @@ export default function Home() {
     return (
         <View style={styles.container}>
             <Header />
-            <Button onPress={() => navigation.navigate('Midtrans', { midtransUrl: "https://app.sandbox.midtrans.com/snap/v4/redirection/b8f1ae0a-4619-4681-8732-a93ad31d032c", midtransToken: "12345" })} title="Midtrans"/>
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 refreshControl={

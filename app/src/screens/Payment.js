@@ -4,12 +4,22 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import { useState } from 'react';
 
 export default function Payment() {
+    console.log("masuk payment");
     const route = useRoute();
     const navigation = useNavigation();
     const { court, selectedDate, selectedTimes, totalPrice } = route.params;
     const [selectedPayment, setSelectedPayment] = useState(null);
 
     const paymentMethods = [
+        {
+            id: 'card',
+            title: 'Credit/Debit Card',
+            options: [
+                { id: 'visa', name: 'Visa', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png' },
+                { id: 'mastercard', name: 'Mastercard', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png' },
+                { id: 'jcb', name: 'JCB', image:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/JCB_logo.svg/2560px-JCB_logo.svg.png' },
+            ]
+        },
         {
             id: 'ewallet',
             title: 'E-Wallet',
@@ -103,12 +113,28 @@ export default function Payment() {
                                     ]}
                                     onPress={() => handlePaymentSelect(method.id, option.id)}
                                 >
-                                    <Image
-                                        source={{ uri: option.image }}
-                                        style={styles.paymentLogo}
-                                        resizeMode="contain"
-                                    />
+                                    {option.images ? (
+                                        <View style={{ flexDirection: 'row' }}>
+                                            {option.images.map((image, index) => (
+                                                <Image
+                                                    key={index}
+                                                    source={{ uri: image }}
+                                                    style={[styles.paymentLogo, { marginRight: index === option.images.length - 1 ? 12 : 8 }]}
+                                                    resizeMode="contain"
+                                                />
+                                            ))}
+                                        </View>
+                                    ) : (
+                                        <Image
+                                            source={{ uri: option.image }}
+                                            style={styles.paymentLogo}
+                                            resizeMode="contain"
+                                        />
+                                    )}
                                     <Text style={styles.paymentName}>{option.name}</Text>
+                                    {option.description && (
+                                        <Text style={{ fontSize: 12, color: '#64748B' }}>{option.description}</Text>
+                                    )}
                                     <View style={styles.radioButton}>
                                         {selectedPayment?.methodId === method.id && 
                                          selectedPayment?.optionId === option.id && 

@@ -72,16 +72,10 @@ export class BookingController {
 
             let snap = new midtransClient.Snap({
                 // Set to true if you want Production Environment (accept real transaction).
-<<<<<<< HEAD
-                isProduction : false,
-                serverKey : process.env.MIDTRANS_SERVER_KEY
-=======
                 isProduction: false,
-                serverKey: 'SB-Mid-server-oAaRKJgPgm-N4NnVCMyViSkx'
->>>>>>> raffles
+                serverKey: process.env.MIDTRANS_SERVER_KEY
             });
 
-            //panggil model user
             const userData = await User.getById(userId);
 
             let parameter = {

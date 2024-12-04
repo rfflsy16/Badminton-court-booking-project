@@ -36,7 +36,8 @@ export default class PaymentModel {
     }
 
     static async createNewPayment(body, username) {
-        const { BookingId, type, amount, status = "pending" } = body
+        const { BookingId, type, amount, status = "pending", userId } = body
+        
 
         if (!BookingId || !type || !amount) {
             throw { name: 'BADREQUEST' }
@@ -44,7 +45,7 @@ export default class PaymentModel {
 
         const collection = this.getCollection()
         const newPayment = {
-            username,
+            userId,
             BookingId,
             type,
             amount,

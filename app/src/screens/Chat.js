@@ -1,5 +1,6 @@
 import { View, StyleSheet } from "react-native";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useChat } from '../context/ChatContext';
 import Header from "../components/chat/Header";
 import SearchBar from "../components/chat/SearchBar";
@@ -8,11 +9,20 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
 
-export default function Chat({ navigation }) {
+export default function Chat() {
     const [searchQuery, setSearchQuery] = useState('');
     const { chatData: chats, markAsRead, updateUnreadCount } = useChat();
     const [roomChatList, setRoomChatList] = useState([]);
     const [userToken, setUserToken] = useState("");
+    const [myProfile, setMyProfile] = useState({});
+    const navigation = useNavigation();
+
+    useFocusEffect(
+        useCallback(() => {
+            getRoomChatList()
+            getUserInfo()            
+        }, [userToken])
+    );
 
     useEffect(() => {
         const getToken = async () => {
@@ -22,9 +32,12 @@ export default function Chat({ navigation }) {
         getToken();
     }, []);
 
-    useEffect(() => {
-        getRoomChatList()
-    },[userToken])
+    async function getUserInfo() {
+        const profile = await SecureStore.getItemAsync('userInfo');
+        if (profile) {
+            setMyProfile(JSON.parse(profile));
+        }
+    }
 
     const getRoomChatList = async () => {
         try {
@@ -33,7 +46,6 @@ export default function Chat({ navigation }) {
                     Authorization: `Bearer ${userToken}`
                 }
             })
-            console.log("Room Chat List Response:", response.data)
             setRoomChatList(response.data);
         } catch (error) {
             console.log(error)
@@ -45,27 +57,18 @@ export default function Chat({ navigation }) {
     }, []);
 
    
-    const handleChatPress = (roomId) => {
-        console.log("Room ID received:", roomId);
-        console.log("Current roomChatList:", roomChatList);
-        const selectedChat = roomChatList.find(chat => {
-            console.log("Comparing:", chat._id, roomId);
-            return chat._id === roomId;
-        });
-        console.log("Selected Chat:", selectedChat);
-        console.log(selectedChat, "<<<<< selected chat")
-        // navigation.navigate('ChatDetail', {
-        //     courtId: selectedChat.courtId,
-        //     name: selectedChat.courtDetails.buildingDetails.name,
-        //     adminId: selectedChat.courtDetails.buildingDetails.userId 
-        // });
-    };
+    const handleChatPress = (roomId, courtId, participants) => {
+        const adminId = participants.find(participant => participant !== myProfile.userId);
+        navigation.navigate('ChatDetail', {
+            roomId,
+            courtId,
+            name: "Chatroom",
+            adminId
+        });     
+    };    
 
-    // console.log(roomChatList, "<<<<< room chat list")
-    
-
-    const filteredChats = chats.filter(chat =>
-        chat.name.toLowerCase().includes(searchQuery.toLowerCase())
+    const filteredChats = roomChatList.filter(chat =>
+        chat.courtDetails.buildingDetails.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     return (
@@ -76,8 +79,7 @@ export default function Chat({ navigation }) {
                 setSearchQuery={setSearchQuery}
             />
             <ChatList 
-                chats={roomChatList}
-                key={roomChatList._id}
+                chats={filteredChats}
                 onChatPress={handleChatPress}
             />
         </View>

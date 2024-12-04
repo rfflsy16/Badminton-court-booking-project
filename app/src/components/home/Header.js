@@ -3,7 +3,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-
 import * as SecureStore from 'expo-secure-store';
 
 export default function Header() {

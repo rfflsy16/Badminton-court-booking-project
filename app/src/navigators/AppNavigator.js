@@ -17,8 +17,8 @@ import PrivacyPolicy from '../screens/profile/PrivacyPolicy';
 import Notifications from '../screens/Notifications';
 import Invoice from '../screens/Invoice';
 import useIsSignedOut from "../hooks/useIsSignedOut";
-import useIsSignedIn from "../hooks/useIsSignedIn";    
-import Test from '../screens/test'
+import useIsSignedIn from "../hooks/useIsSignedIn";  
+import Midtrans from "../screens/Midtrans";  
 
 const RootStack = createNativeStackNavigator({
     // initialRouteName: "MainApp",
@@ -48,6 +48,10 @@ const RootStack = createNativeStackNavigator({
         CourtDetail: {
             if: useIsSignedIn,
             screen: CourtDetail
+        },
+        Midtrans: {
+            if: useIsSignedIn,
+            screen: Midtrans
         },
         ChatDetail: {
             if: useIsSignedIn,

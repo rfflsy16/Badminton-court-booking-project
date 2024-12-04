@@ -113,7 +113,6 @@ export default function BuildingCourts() {
             console.log(error)
         }
     }
-    console.log(venue, "<<<<<<< venue")
     return (
         <View style={styles.container}>
             {/* Header */}

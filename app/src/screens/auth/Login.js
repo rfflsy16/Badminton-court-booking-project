@@ -28,12 +28,10 @@ export default function Login() {
     useEffect(() => {
         if (authContext.isLogin) {
             navigation.navigate('MainApp'); 
-            
         }
     }, [authContext.isLogin]);
 
     const handleLogin = async () => {
-
         if (!isFormValid) return alert('Please fill in all fields');
 
         try {

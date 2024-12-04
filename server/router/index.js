@@ -21,6 +21,7 @@ router.post('/complete-payment', BookingController.completePayment);
 
 
 router.use(authentication)
+
 router.get("/profile", UserController.getProfile)
 router.use("/buildings", buildingRouter())
 router.use('/courts', courtRouter())

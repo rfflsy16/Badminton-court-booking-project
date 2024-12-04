@@ -1,5 +1,5 @@
 import BookingModel from "../models/booking.js";
-import {ObjectId} from "mongodb";
+import { ObjectId } from "mongodb";
 import PaymentModel from "../models/payment.js";
 import midtransClient from 'midtrans-client';
 import { User } from "../models/user.js";
@@ -19,9 +19,9 @@ export class BookingController {
 
     static async getBookingByUserID(req, res, next) {
         try {
-            const {userId} = req.loginInfo;
+            const { userId } = req.loginInfo;
             const bookings = await BookingModel.readByUserId(userId)
-           
+
             res.status(200).json(bookings);
         } catch (error) {
             next(error);
@@ -30,9 +30,9 @@ export class BookingController {
 
     static async getTransactionByUserID(req, res, next) {
         try {
-            const {userId} = req.loginInfo;
+            const { userId } = req.loginInfo;
             const bookings = await BookingModel.readByUserId(userId)
-           
+
             res.status(200).json(bookings);
         } catch (error) {
             next(error);
@@ -98,11 +98,10 @@ export class BookingController {
 
             let snap = new midtransClient.Snap({
                 // Set to true if you want Production Environment (accept real transaction).
-                isProduction : false,
-                serverKey : process.env.MIDTRANS_SERVER_KEY
+                isProduction: false,
+                serverKey: process.env.MIDTRANS_SERVER_KEY
             });
 
-            //panggil model user
             const userData = await User.getById(userId);
 
             let parameter = {

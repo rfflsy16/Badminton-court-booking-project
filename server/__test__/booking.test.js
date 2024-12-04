@@ -1,19 +1,24 @@
 import request from 'supertest'
 import { app } from '../app.js'
 import BuildingModel from '../models/building.js'
-import { signToken } from '../helpers/jwt.js';
-import { hashPassword } from '../helpers/bcrypt.js';
-import { User } from '../models/user.js';
-import CourtModel from '../models/court.js';
-import RoomModel from '../models/room.js';
+import { User } from '../models/user.js'
+import CourtModel from '../models/court.js'
+import RoomModel from '../models/room.js'
+import MessageModel from '../models/message.js'
+import BookingModel from '../models/booking.js'
+
+import { hashPassword } from '../helpers/bcrypt.js'
+import { signToken } from '../helpers/jwt'
+
 
 const userCollection = User.getCollection()
 const buildingCollection = BuildingModel.getCollection()
 const courtCollection = CourtModel.getCollection()
 const roomcollection = RoomModel.getCollection()
+const messageCollection = MessageModel.getCollection()
+const bookingCollection = BookingModel.getCollection()
 
-
-let dataOfCourt, dataOfBuilding, dataOfRoom, access_token_admin, access_token_user
+let access_token_admin, access_token_user, dataOfBuilding, dataOfCourt, dataOfRoom, dataOfMessage, dataOfBooking
 beforeAll(async () => {
     await userCollection.insertMany([
         {
@@ -149,6 +154,49 @@ beforeAll(async () => {
     const room = await RoomModel.getRoom()
     dataOfRoom = room[0]
 
+    await messageCollection.insertMany([{
+        "userId": {
+            "$oid": "6749c89fb1e40e4b8b37de9d"
+        },
+        "roomId": dataOfRoom._id,
+        "text": "ini test dari della",
+        "createdAt": {
+            "$date": "2024-12-03T03:00:58.819Z"
+        },
+        "updatedAt": {
+            "$date": "2024-12-03T03:00:58.819Z"
+        }
+    }])
+
+    const message = await MessageModel.getMessagesByRoomId(dataOfRoom._id)
+    dataOfMessage = message[0]
+
+    await bookingCollection.insertMany([{
+        "userId": {
+            "$oid": "6749c89fb1e40e4b8b37de9d"
+        },
+        "courtId": dataOfCourt._id,
+        "date": "2024-12-11",
+        "selectedTime": [
+            10
+        ],
+        "paymentType": "fullpayment",
+        "price": 200000,
+        "totalPrice": 200000,
+        "statusBooking": "pending",
+        "createdAt": {
+            "$date": "2024-12-03T09:53:10.739Z"
+        },
+        "updatedAt": {
+            "$date": "2024-12-03T09:53:10.739Z"
+        }
+    }])
+
+
+    const booking = await BookingModel.read()
+    dataOfBooking = booking[0]
+    console.log(dataOfBooking, '<<<<<< ini id booking')
+
     const users = await userCollection.find().toArray()
     const admin = {
         id: users[0]._id,
@@ -171,184 +219,149 @@ afterAll(async () => {
     await buildingCollection.deleteMany()
     await courtCollection.deleteMany()
     await roomcollection.deleteMany()
+    await messageCollection.deleteMany()
+    await bookingCollection.deleteMany()
 })
 
-// GET /room
-describe('GET /room', () => {
-    describe('GET /room - succeed', () => {
-        it('should be return all of data rooms', async () => {
+
+describe('GET /booking', () => {
+    describe('GET /booking - succeed', () => {
+        it('should be return data of booking', async () => {
             const response = await request(app)
-                .get('/room')
+                .get('/booking')
                 .set('Authorization', `Bearer ${access_token_admin}`)
 
             expect(response.status).toBe(200)
             expect(response.body).toBeInstanceOf(Object)
         })
     })
-    describe('GET /room - failed', () => {
-        it('should be return an error message because user doesnt login', async () => {
+    describe('GET /booking - failed', () => {
+        it('should be return an error message because user does not login', async () => {
             const response = await request(app)
-                .get('/room')
+                .get('/booking')
 
             expect(response.status).toBe(401)
             expect(response.body.message).toBe('Please login first')
         })
     })
-    describe('GET /room - failed', () => {
+    describe('GET /booking - failed', () => {
         it('should be return an error message because invalid token', async () => {
             const response = await request(app)
-                .get('/room')
-                .set('Authorization', `Bearer kwnoen`)
+                .get('/booking')
+                .set('Authorization', `Bearer kdjnckelnr`)
             expect(response.status).toBe(401)
             expect(response.body.message).toBe('Please login first')
         })
     })
 })
 
-// POST /room
-describe('POST /room', () => {
-    describe('POST /room - succeed', () => {
-        it('should be return an message Succeess create new Room', async () => {
+describe('POST /booking', () => {
+    describe('POST /booking - succeed', () => {
+        it('should be return the detail of bookings', async () => {
             const response = await request(app)
-                .post('/room')
-                .send({
-                    'courtId': dataOfCourt._id
-                })
+                .post(`/booking`)
                 .set('Authorization', `Bearer ${access_token_admin}`)
+                .send({
+                    "courtId": "123456789abcdef123456789",
+                    "date": "2024-12-16",
+                    "selectedTime": [8],
+                    "paymentType": "Dp",
+                    "price": 150000
+                })
 
             expect(response.status).toBe(201)
-            expect(response.body.message).toBe('Room created successfully')
-            expect(response.body.room).toBeInstanceOf(Object)
-        })
-    })
-    describe('POST /room - failed', () => {
-        it('should be return an error message because user doesnt login', async () => {
-            const response = await request(app)
-                .post('/room')
-                .send({
-                    'courtId': dataOfCourt._id
-                })
-
-            expect(response.status).toBe(401)
-            expect(response.body.message).toBe('Please login first')
-        })
-    })
-    describe('POST /room - failed', () => {
-        it('should be return an error message because Invalid token', async () => {
-            const response = await request(app)
-                .post('/room')
-                .send({
-                    'courtId': dataOfCourt._id
-                })
-                .set('Authorization', `Bearer klweferln`)
-
-            expect(response.status).toBe(401)
-            expect(response.body.message).toBe('Please login first')
-        })
-    })
-    describe('POST /room - failed', () => {
-        it('should be return an error message because Invalid token', async () => {
-            const response = await request(app)
-                .post('/room')
-                .send({
-                    'courtId': 'kjewnfkjebfkjeb'
-                })
-                .set('Authorization', `Bearer ${access_token_admin}`)
-
-            expect(response.status).toBe(400)
-            expect(response.body.message).toBe('input must be a 24 character hex string')
-        })
-    })
-})
-
-describe('GET /room/:roomId', () => {
-    describe('GET /room/:roomId - succeed', () => {
-        it('should be return data of the detail room', async () => {
-            const response = await request(app)
-                .get(`/room/${dataOfRoom._id}`)
-                .set('Authorization', `Bearer ${access_token_admin}`)
-
-            expect(response.status).toBe(200)
             expect(response.body).toBeInstanceOf(Object)
         })
     })
-    describe('GET /room/:roomId - failed', () => {
-        it('should be return an error message because user doesnt login', async () => {
+    describe('POST /booking - failed', () => {
+        it('should be return an error message because has been booked by other user', async () => {
             const response = await request(app)
-                .get(`/room/${dataOfRoom._id}`)
-
-            expect(response.status).toBe(401)
-            expect(response.body.message).toBe('Please login first')
-        })
-    })
-    describe('GET /room/:roomId - failed', () => {
-        it('should be return an error message because invalid token', async () => {
-            const response = await request(app)
-                .get(`/room/${dataOfRoom._id}`)
-                .set('Authorization', `Bearer dknckenkl`)
-            expect(response.status).toBe(401)
-            expect(response.body.message).toBe('Please login first')
-        })
-    })
-    describe('GET /room/:roomId - failed', () => {
-        it('should be return an error message because data is not found', async () => {
-            const response = await request(app)
-                .get(`/room/aaaaaad97649a501d3123456`)
-                .set('Authorization', `Bearer ${access_token_user}`)
-
-            expect(response.status).toBe(404)
-            expect(response.body.message).toBe('Data not found')
-        })
-    })
-    describe('GET /room/:roomId - failed', () => {
-        it('should be return an error message because invalid input id', async () => {
-            const response = await request(app)
-                .get(`/room/aaaaaad91`)
+                .post(`/booking`)
                 .set('Authorization', `Bearer ${access_token_admin}`)
+                .send({
+                    "courtId": "123456789abcdef123456789",
+                    "date": "2024-12-16",
+                    "selectedTime": [8],
+                    "paymentType": "Dp",
+                    "price": 150000
+                })
 
             expect(response.status).toBe(400)
-            expect(response.body.message).toBe('input must be a 24 character hex string')
+            expect(response.body.message).toBe('Lapangan penuh pada waktu 8')
+        })
+    })
+    describe('POST /booking - failed', () => {
+        it('should be return an error message because user doesnt login', async () => {
+            const response = await request(app)
+                .post(`/booking`)
+                .send({
+                    "courtId": "123456789abcdef123456789",
+                    "date": "2024-12-16",
+                    "selectedTime": [8],
+                    "paymentType": "Dp",
+                    "price": 150000
+                })
+
+            expect(response.status).toBe(401)
+            expect(response.body.message).toBe('Please login first')
+        })
+    })
+    describe('POST /booking - failed', () => {
+        it('should be return an error message because invalid token', async () => {
+            const response = await request(app)
+                .post(`/booking`)
+                .send({
+                    "courtId": "123456789abcdef123456789",
+                    "date": "2024-12-16",
+                    "selectedTime": [8],
+                    "paymentType": "Dp",
+                    "price": 150000
+                })
+                .set('Authorization', `Bearer sdcnjkdnck`)
+            expect(response.status).toBe(401)
+            expect(response.body.message).toBe('Please login first')
         })
     })
 })
 
-describe('DELETE /room/:roomId', () => {
-    describe('DELETE /room/:roomId - succeed', () => {
-        it('should be return an succeess delete message', async () => {
+describe('DELETE /booking/:id', () => {
+    describe('DELETE /booking/:id - succeed', () => {
+        it('should be return an succesfull deleted data message', async () => {
             const response = await request(app)
-                .delete(`/room/${dataOfRoom._id}`)
+                .delete(`/booking/${dataOfBooking._id}`)
                 .set('Authorization', `Bearer ${access_token_admin}`)
 
             expect(response.status).toBe(200)
-            expect(response.body.message).toBe('Room deleted successfully')
+            expect(response.body.message).toBe('Booking deleted successfully')
         })
     })
-    describe('DELETE /room/:roomId - failed', () => {
-        it('should be return an error message because the room has been deleted or data is not found', async () => {
+    describe('DELETE /booking/:id - failed', () => {
+        it('should be return an error message because user not login', async () => {
             const response = await request(app)
-                .delete(`/room/${dataOfRoom._id}`)
+                .delete(`/booking/${dataOfBooking._id}`)
+
+            expect(response.status).toBe(401)
+            expect(response.body.message).toBe('Please login first')
+        })
+    })
+    describe('DELETE /booking/:id - failed', () => {
+        it('should be return an error message because invalid token', async () => {
+            const response = await request(app)
+                .delete(`/booking/${dataOfBooking._id}`)
+                .set('Authorization', `Bearer lekcmelkn`)
+
+            expect(response.status).toBe(401)
+            expect(response.body.message).toBe('Please login first')
+        })
+    })
+    describe('DELETE /booking/:id - failed', () => {
+        it('should be return an error message because invalid token', async () => {
+            const response = await request(app)
+                .delete(`/booking/123456789123456789123456`)
                 .set('Authorization', `Bearer ${access_token_admin}`)
 
             expect(response.status).toBe(404)
-            expect(response.body.message).toBe('Data not found')
-        })
-    })
-    describe('DELETE /room/:roomId - failed', () => {
-        it('should be return an error message because the role of user is not admin', async () => {
-            const response = await request(app)
-                .delete(`/room/${dataOfRoom._id}`)
-                .set('Authorization', `Bearer ${access_token_user}`)
-            expect(response.status).toBe(403)
-            expect(response.body.message).toBe('You are not admin')
-        })
-    })
-    describe('DELETE /room/:roomId - failed', () => {
-        it('should be return an error message because invalid token', async () => {
-            const response = await request(app)
-                .delete(`/room/${dataOfRoom._id}`)
-                .set('Authorization', `Bearer nclenckle`)
-            expect(response.status).toBe(401)
-            expect(response.body.message).toBe('Please login first')
+            expect(response.body.message).toBe('Booking not found')
         })
     })
 })

@@ -11,6 +11,5 @@ const uri =
 
 const client = new MongoClient(uri);
 const db = client.db(dbName);
-// const db = client.db('badmintonCourtsDB');
 
 export { db, client };

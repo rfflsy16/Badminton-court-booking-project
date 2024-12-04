@@ -186,12 +186,21 @@ export default function CourtDetail() {
         return paymentType === 'dp' ? discountedPrice * 0.5 : discountedPrice;
     };
 
-    const handlePaymentSuccess = () => {
-        setShowPaymentModal(false);
-        setSelectedPayment(null);
-        setPromoCode('');
-        setPromoDiscount(0);
-        navigation.replace('MainApp');
+    const handlePaymentSuccess = async () => {
+        const payload = {
+            date: selectedDate,
+            selectedTime: selectedTimes,
+            paymentType: paymentType,
+            courtId: courtDetails._id,
+            price: getFinalAmount(),
+        }
+
+        const response = await axios.post(`${process.env.EXPO_PUBLIC_BASE_URL}/booking`, payload, {
+            headers: {
+                Authorization: `Bearer ${userToken}`
+            }
+        });
+
     };
 
     if (isLoading || !courtDetails) {
@@ -327,14 +336,15 @@ export default function CourtDetail() {
                             (!selectedDate || selectedTimes.length === 0) && styles.bookButtonDisabled
                         ]}
                         disabled={!selectedDate || selectedTimes.length === 0}
-                        onPress={() => setShowPaymentModal(true)}
+                        onPress={() => {
+                            setShowPaymentModal(true)
+                        }}
                     >
                         <Text style={styles.bookButtonText}>Book Now</Text>
                     </TouchableOpacity>
                 </View>
             </View>
 
-            {/* Booking Modal tetap sama */}
             <BookingModal
                 visible={showPaymentModal}
                 onClose={() => setShowPaymentModal(false)}

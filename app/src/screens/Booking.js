@@ -1,21 +1,25 @@
 import { View, StyleSheet, FlatList, Animated, Dimensions, ActivityIndicator } from "react-native";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Header from "../components/booking/Header";
 import TabBar from "../components/booking/TabBar";
 import BookingCard from "../components/booking/BookingCard";
 import TransactionCard from "../components/booking/TransactionCard.js";
 import axios from "axios";
+import { useFocusEffect } from "@react-navigation/native";
+import * as SecureStore from 'expo-secure-store';
 
 const { width } = Dimensions.get("window");
 
 export default function Booking({ route }) {
+    // console.log('masuk screen =======================')
     const [activeTab, setActiveTab] = useState("bookings");
     const scrollViewRef = useRef(null);
     const scrollX = useRef(new Animated.Value(0)).current;
 
     const [bookingsData, setBookingsData] = useState([]);
     const [transactionsData, setTransactionsData] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const [userToken, setUserToken] = useState("");
 
     useEffect(() => {
         if (route.params?.screen) {
@@ -24,26 +28,44 @@ export default function Booking({ route }) {
             scrollViewRef.current?.scrollTo({ x: index * width, animated: true });
         }
     }, [route.params]);
-
     useEffect(() => {
-        fetchData();
-    }, []);
+        async function getToken() {
+            const token = await SecureStore.getItemAsync('userToken');
+            setUserToken(token);
+        }
+        getToken();
+    },[])
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchData();
+        }, [userToken])
+
+    )
 
     const fetchData = async () => {
         try {
-            setLoading(true);
-            const response = await axios.get("http://your-server-url/bookings"); // Ganti `your-server-url` dengan URL server Anda
+            // setLoading(true);
+            console.log(`${process.env.EXPO_PUBLIC_BASE_URL}/booking/user`, "masuk sini<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+
+            const response = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/booking/user`,{
+                headers: {              
+                    Authorization: `Bearer ${userToken}` 
+                }
+            })
+            // console.log(response.data, '<<<<<<<<<<<<<<<<');
             const bookings = response.data;
+            
 
             const formattedBookings = bookings.map(booking => ({
                 id: booking._id,
-                venueName: booking.venueName || "Unknown Venue",
-                courtNumber: booking.courtNumber || "Unknown Court",
+                venueName: booking.building.name || "Unknown Venue",
+                courtNumber: booking.court.type || "Unknown Court",
                 date: booking.date,
                 time: booking.selectedTime.join(" - "),
                 status: booking.statusBooking || "Pending",
                 price: `Rp ${booking.totalPrice}`,
-                image: booking.image || "https://via.placeholder.com/150", // Placeholder image jika tidak ada gambar
+                image: booking.building.imgUrl || "https://via.placeholder.com/150", // Placeholder image jika tidak ada gambar
                 courtId: booking.courtId,
             }));
 

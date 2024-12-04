@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "node --experimental-vm-modules ./node_modules/.bin/jest --runInBand --coverage --detectOpenHandles"
+    "test": "node --experimental-vm-modules ./node_modules/.bin/jest --runInBand --coverage --detectOpenHandles",
+    "start": "node bin/www.js",
+    "dev": "node --watch bin/www.js"
   },
   "keywords": [],
   "type": "module",
@@ -19,6 +21,7 @@
     "jsonwebtoken": "^9.0.2",
     "midtrans-client": "^1.4.2",
     "mongodb": "^6.11.0",
+    "node-cron": "^3.0.3",
     "socket.io": "^4.8.1",
     "supertest": "^7.0.0",
     "zod": "^3.23.8"

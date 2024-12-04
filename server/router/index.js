@@ -10,7 +10,7 @@ import courtRouter from './courts.js'
 import bookingRouter from './booking.js'
 import notificationRouter from './notification.js'
 import { BookingController } from '../controllers/BookingController.js';
-
+import geminiRouter from './gemini.js'
 export const router = express.Router()
 
 router.post("/register", UserController.register)
@@ -28,5 +28,6 @@ router.use("/room", roomRouter())
 router.use("/message", messageRouter())
 router.use("/booking", bookingRouter())
 router.use('/notifications', notificationRouter())
+router.use('/gemini', geminiRouter())
 
 router.use(errorHandler)

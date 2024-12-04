@@ -30,7 +30,7 @@ export default class MessageModel {
             .find({ roomId: new ObjectId(roomId) })
             .sort({ createdAt: -1 }) // Pesan terbaru lebih dahulu
             .skip(skip)
-            .limit(limit)
+            .limit(+limit)
             .toArray();
 
         return messages;

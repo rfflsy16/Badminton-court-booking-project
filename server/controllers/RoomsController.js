@@ -8,6 +8,8 @@ export class RoomController {
             const { courtId } = req.body;
             const { userId } = req.loginInfo;
 
+            if (courtId.length < 24) throw { name: 'InvalidInputID' }
+
             const building = await CourtModel.findBuildingWithCourt(courtId);
             const id = building.BuildingId
             const adminId = await BuildingModel.readByIdBuilding(id)
@@ -33,8 +35,8 @@ export class RoomController {
     static async getRoomById(req, res, next) {
         try {
             const { roomId } = req.params;
-            console.log(roomId, "ini room id nya")
-        
+            if (roomId.length < 24) throw { name: 'InvalidInputID' }
+
             const room = await RoomModel.getRoomById(roomId);
             res.status(200).json(room);
         } catch (err) {
@@ -46,17 +48,17 @@ export class RoomController {
         try {
             const { userId } = req.loginInfo;
             console.log('Current user ID:', userId);
-            
+
             const rooms = await RoomModel.getRoom();
             console.log('All rooms from DB:', JSON.stringify(rooms, null, 2));
-            
+
             // Get court details for each room
             const roomsWithDetails = await Promise.all(rooms.map(async (room) => {
                 try {
                     console.log(`Processing room ${room._id}:`);
                     console.log('- Room participants:', room.participants);
                     console.log('- Looking for user:', userId);
-                    
+
                     // Convert all participant IDs to strings for comparison
                     const participantIds = room.participants.map(id => id.toString());
                     const isUserParticipant = participantIds.includes(userId.toString());
@@ -64,7 +66,7 @@ export class RoomController {
 
                     const court = await CourtModel.readCourtById(room.courtId);
                     console.log('- Court details:', court);
-                    
+
                     return {
                         ...room,
                         name: court?.name || `Court ${room.courtId}`,
@@ -84,7 +86,7 @@ export class RoomController {
 
             // Filter rooms where the current user is a participant
             const userRooms = roomsWithDetails.filter(room => {
-                const isParticipant = room.participants.some(participantId => 
+                const isParticipant = room.participants.some(participantId =>
                     participantId.toString() === userId.toString()
                 );
                 console.log(`Room ${room._id} - User ${userId} is participant: ${isParticipant}`);
@@ -102,7 +104,8 @@ export class RoomController {
     static async deleteRoom(req, res, next) {
         try {
             const { roomId } = req.params;
-            console.log(`Deleting Room with ID: ${roomId}`);
+
+            if (roomId.length < 24) throw { name: 'InvalidInputID' }
 
             const room = await RoomModel.getRoomById(roomId);
 
@@ -125,7 +128,6 @@ export class RoomController {
     static async findRoom(req, res, next) {
         try {
             const { userId, adminId, courtId } = req.query;
-            // console.log(userId, adminId, courtId)
             const room = await RoomModel.findRoom(userId, adminId, courtId);
             res.status(200).json(room)
         } catch (err) {

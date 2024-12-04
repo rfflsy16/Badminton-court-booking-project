@@ -114,10 +114,10 @@ export class BookingController {
     }
 
 
-    // Delete a booking
     static async deleteBooking(req, res, next) {
         try {
             const { id } = req.params;
+
 
             const result = await BookingModel.deleteById(id);
             if (result.deletedCount === 0) {

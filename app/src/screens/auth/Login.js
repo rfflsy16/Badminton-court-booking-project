@@ -33,7 +33,7 @@ export default function Login() {
     }, [authContext.isLogin]);
 
     const handleLogin = async () => {
-
+        console.log("masuk login", process.env.EXPO_PUBLIC_BASE_URL)
         if (!isFormValid) return alert('Please fill in all fields');
 
         try {

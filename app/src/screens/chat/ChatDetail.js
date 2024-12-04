@@ -27,6 +27,7 @@ export default function ChatDetail({ route }) {
     const [userToken, setUserToken] = useState("");
     const [myProfile, setMyProfile] = useState({});
     const [roomId, setRoomId] = useState('');
+    const [page, setPage]= useState(1);
 
     useFocusEffect(
         useCallback(() => {
@@ -52,7 +53,7 @@ export default function ChatDetail({ route }) {
         });
 
         socket.on("SEND_MESSAGE", (data) => {
-            setMessages((prevMessages) => [...prevMessages, data]);
+            setMessages((prevMessages) => [data,...prevMessages]);
         });
 
         return () => {
@@ -77,7 +78,7 @@ export default function ChatDetail({ route }) {
         async function getMessage(){
             if(roomId && userToken){
                 try {
-                    const response = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/message/${roomId}`, {
+                    const response = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/message/${roomId}?page=${page}&limit=${10}`, {
                         headers: {
                             'Authorization': `Bearer ${userToken}`
                         }
@@ -90,6 +91,23 @@ export default function ChatDetail({ route }) {
         }
         getMessage();
     }, [roomId, userToken]);
+
+
+    async function refetchMessages() {
+        console.log("Refetching messages...");
+        try {
+        const response = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/message/${roomId}?page=${page+1}&limit=${10}`, {
+            headers: {
+                'Authorization': `Bearer ${userToken}`
+            }
+        });
+
+        setMessages(prevMessages => [...prevMessages, ...response.data.messages]);
+        setPage(prevPage => prevPage + 1);
+        } catch (error) {
+            console.log("Error fetching messages:", error);
+        }
+    }
 
     useEffect(() => {
         async function getRoomId(){
@@ -160,7 +178,8 @@ export default function ChatDetail({ route }) {
                     renderItem={({ item }) => <MessageBubble message={item} isUser={item.userId === myProfile.userId} />}
                     keyExtractor={item => item._id}
                     contentContainerStyle={styles.messageList}
-                    
+                    inverted={true}
+                    onEndReached={refetchMessages}
                 />
 
                 <View style={styles.inputContainer}>

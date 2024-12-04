@@ -11,7 +11,7 @@ export default function ChatList({ chats, onChatPress }) {
                     onPress={() => onChatPress(item._id, item.courtId, item.participants)}
                 />
             )}
-            keyExtractor={item => item._id}
+            keyExtractor={item => `chat-${item._id}-${item.courtId}`}
             contentContainerStyle={styles.listContainer}
             showsVerticalScrollIndicator={false}
         />

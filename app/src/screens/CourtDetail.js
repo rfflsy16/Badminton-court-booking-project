@@ -138,12 +138,29 @@ export default function CourtDetail() {
     };
 
     const handleNavigateToMaps = () => {
+        const coordinates = courtDetails?.buildingDetails?.location?.coordinates;
+        console.log('Raw coordinates:', coordinates);
+        
+        if (!coordinates || coordinates.length !== 2) {
+            console.log('Invalid coordinates format');
+            return;
+        }
+
+        const location = {
+            latitude: Number(coordinates[1]),
+            longitude: Number(coordinates[0])
+        };
+
+        console.log('Processed location:', location);
+
+        if (isNaN(location.latitude) || isNaN(location.longitude)) {
+            console.log('Invalid coordinate values');
+            return;
+        }
+
         navigation.navigate('Maps', {
-            location: {
-                latitude: courtDetails?.buildingDetails.location.coordinates.latitude,  // Sesuaikan dgn koordinat court
-                longitude: courtDetails?.buildingDetails.location.coordinates.longitude
-            },
-            courtName: court.name
+            location,
+            courtName: courtDetails?.buildingDetails?.name || 'Court'
         });
     };
 

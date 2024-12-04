@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
@@ -8,43 +9,67 @@ export default function ChatItem({ chat, onPress }) {
     const [userToken, setUserToken] = useState("");
 
     useEffect(() => {
-        async function getToken() {
-            const token = await SecureStore.getItemAsync('userToken');
-            setUserToken(token);
-        }
         getToken();
-    },[])
+    }, []);
 
-    useEffect(() => {
-        if(userToken !== ""){
-            fetchLastMessage();
+    useFocusEffect(
+        useCallback(() => {
+            const loadMessage = async () => {
+                if (userToken) {
+                    await fetchLastMessage();
+                }
+            };
+            loadMessage();
+        }, [userToken, chat._id])
+    );
+
+    async function getToken() {
+        try {
+            const token = await SecureStore.getItemAsync('userToken');
+            if (token) {
+                setUserToken(token);
+            } else {
+                console.log("No token found");
+            }
+        } catch (error) {
+            console.error("Error retrieving token:", error);
         }
-    }, [userToken]);
+    }
 
     const fetchLastMessage = async () => {
         try {
-            const response = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/message/${chat._id}`,{
-                headers: {              
-                    Authorization: `Bearer ${userToken}` 
+            if (!userToken) {
+                console.log("No token available for request");
+                return;
+            }
+
+            const response = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/message/${chat._id}`, {
+                headers: {
+                    'Authorization': `Bearer ${userToken}`,
+                    'Content-Type': 'application/json'
                 }
             });
-            // const messages = response.data.messages;
-            // const lastMessage = messages[messages.length - 1];
-            setLastMessage(response.data.messages[0]?.text);
-            // console.log(response.data.messages[0]?.text, "<<<<< response last message")
+
+            if (response.data && response.data.messages && response.data.messages.length > 0) {
+                setLastMessage(response.data.messages[0]?.text);
+            }
         } catch (error) {
-            console.error("Error fetching last message:", error);
+            if (error.response?.status === 401) {
+                console.log("Token expired or invalid, attempting to refresh...");
+                await getToken();
+            } else {
+                console.error("Error fetching last message:", error);
+            }
         }
     };
 
-    // console.log(JSON.stringify(chat, null, 2), "<<<<< chat dari chat item")
     return (
         <TouchableOpacity style={styles.chatItem} onPress={onPress}>
             <Image source={{ uri: "https://lh4.googleusercontent.com/proxy/ElNJBofC5Bx_BPHcyLtNKL6tb90TKY0O1RzSW4i8UB7ZzuVGqitPVR43wJbwCxCPwaNPCTmNhsp3PTEXaza1NivZS2LdfGHBqqDfmInrTtO_K1g8" }} style={styles.avatar} />
             <View style={styles.chatContent}>
                 <View style={styles.chatHeader}>
-                    <Text style={styles.chatName}>{chat.courtDetails.buildingDetails.name}</Text>
-                    <Text style={styles.chatTime}>{new Date(chat.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit' })} {new Date(chat.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</Text>
+                    <Text style={styles.chatName}>{chat.courtDetails.buildingDetails.name} - {chat.name.split(' ')[1]}</Text>
+                    <Text style={styles.chatTime}>{new Date(chat.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit' })} </Text>
                 </View>
                 <View style={styles.chatFooter}>
                     <Text style={styles.lastMessage} numberOfLines={1}>

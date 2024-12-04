@@ -7,7 +7,6 @@ import SearchBar from "../components/chat/SearchBar";
 import ChatList from "../components/chat/ChatList";
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 
 export default function Chat() {
@@ -58,39 +57,17 @@ export default function Chat() {
 
    
     const handleChatPress = (roomId, courtId, participants) => {
-        console.log(roomId, "<<<<< room id");
-        console.log(myProfile, "<<<< my profile")
-        console.log(courtId, "<<<< courtId")
-        console.log(participants, "<<<< participants")
         const adminId = participants.find(participant => participant !== myProfile.userId);
-        console.log(adminId, "<<<< admin id")  
         navigation.navigate('ChatDetail', {
             roomId,
             courtId,
             name: "Chatroom",
             adminId
-        });      
+        });     
+    };    
 
-        console.log("aku disini mas")
-        // console.log("Current roomChatList:", roomChatList);
-        // const selectedChat = roomChatList.find(chat => {
-            // console.log("Comparing:", chat._id, roomId);
-            // return chat._id === roomId;
-        // });
-        // console.log("Selected Chat:", selectedChat);
-        // console.log(selectedChat, "<<<<< selected chat")
-        // navigation.navigate('ChatDetail', {
-        //     courtId: selectedChat.courtId,
-        //     name: selectedChat.courtDetails.buildingDetails.name,
-        //     adminId: selectedChat.courtDetails.buildingDetails.userId 
-        // });
-    };
-
-    // console.log(roomChatList, "<<<<< room chat list")
-    
-
-    const filteredChats = chats.filter(chat =>
-        chat.name.toLowerCase().includes(searchQuery.toLowerCase())
+    const filteredChats = roomChatList.filter(chat =>
+        chat.courtDetails.buildingDetails.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     return (
@@ -101,8 +78,7 @@ export default function Chat() {
                 setSearchQuery={setSearchQuery}
             />
             <ChatList 
-                chats={roomChatList}
-                key={roomChatList._id}
+                chats={filteredChats}
                 onChatPress={handleChatPress}
             />
         </View>

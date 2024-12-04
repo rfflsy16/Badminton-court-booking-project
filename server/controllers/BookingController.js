@@ -15,6 +15,17 @@ export class BookingController {
         }
     }
 
+    static async getBookingByUserID(req, res, next) {
+        try {
+            const {userId} = req.loginInfo;
+            const bookings = await BookingModel.readByUserId(userId)
+           
+            res.status(200).json(bookings);
+        } catch (error) {
+            next(error);
+        }
+    }
+
     // Add a new booking
     static async addBooking(req, res, next) {
 
@@ -51,7 +62,7 @@ export class BookingController {
 
             const bookingData = {
                 userId,
-                courtId,
+                courtId: new ObjectId(courtId),
                 date,
                 selectedTime,
                 paymentType,

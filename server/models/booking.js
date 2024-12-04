@@ -11,10 +11,48 @@ export default class BookingModel {
         return await collection.find().toArray();
     }
 
-    static async readById(id) {
-        const _id = new ObjectId(id);
+    static async readByUserId(userId) {
+        const id = new ObjectId(userId);
         const collection = this.getCollection();
-        return await collection.findOne({ _id });
+
+        return await collection.aggregate([
+            {
+                $match: { userId: id }
+            },
+
+            {   
+                $lookup: {
+                    from: "Courts",
+                    localField: "courtId",
+                    foreignField: "_id",
+                    as: "court"
+                }
+              },
+
+              {
+                $unwind: {
+                    path: "$court",
+                    preserveNullAndEmptyArrays: false
+                }
+              },
+
+              {
+                $lookup: {
+                from: "Buildings",
+                localField: "court.BuildingId",
+                foreignField: "_id",
+                as: "building"
+                }
+              },
+
+              {
+                $unwind: {
+                path: "$building",
+                preserveNullAndEmptyArrays: false
+                }
+              }
+        ]).toArray();
+
     }
 
     static async create(data) {

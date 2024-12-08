@@ -12,7 +12,6 @@ export default function FeaturedCourts() {
     const [nearestCourts, setNearestCourts] = useState([]);
     const [latitude, setLatitude] = useState("");
     const [longitude, setLongitude] = useState("");
-    const base_url = process.env.EXPO_PUBLIC_BASE_URL;
     const [userToken, setUserToken] = useState("");
 
 
@@ -22,8 +21,8 @@ export default function FeaturedCourts() {
             setUserToken(token);
         }
         getToken();
-    },[])
-    
+    }, [])
+
     useEffect(() => {
         async function getCurrentLocation() {
             try {
@@ -43,31 +42,25 @@ export default function FeaturedCourts() {
         getCurrentLocation();
     }, []);
 
-      useEffect(() => {
+    useEffect(() => {
         getNearestCourts();
-      }, [userToken, latitude, longitude]);
+    }, [userToken, latitude, longitude]);
 
-      const getNearestCourts = async () => {
-          if (!latitude || !longitude || !userToken) return;
-          
-          try {
-            console.log('Fetching courts with:', {
-                longitude,
-                latitude,
-                userToken: userToken ? 'Present' : 'Missing'
-            });
-            // console.log(process.env.EXPO_PUBLIC_BASE_URL, "<<<<ENV")
+    const getNearestCourts = async () => {
+        if (!latitude || !longitude || !userToken) return;
+
+        try {
             const response = await axios.post(`${process.env.EXPO_PUBLIC_BASE_URL}/buildings/coordinates`,
                 {
                     longitude,
-                    latitude              
+                    latitude
                 },
-                {  
-                headers: {              
-                    Authorization: `Bearer ${userToken}` 
-                }
-            });
-        
+                {
+                    headers: {
+                        Authorization: `Bearer ${userToken}`
+                    }
+                });
+
             const courtsData = Array.isArray(response.data) ? response.data : [response.data];
             setNearestCourts(courtsData);
 
@@ -86,15 +79,15 @@ export default function FeaturedCourts() {
                     <Text style={styles.seeAll}>See All</Text>
                 </TouchableOpacity>
             </View>
-            <ScrollView 
-                horizontal 
+            <ScrollView
+                horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.featuredContainer}
             >
                 {nearestCourts && nearestCourts.length > 0 ? (
                     nearestCourts.map((court) => (
-                        <TouchableOpacity 
-                            key={court._id || court.id} 
+                        <TouchableOpacity
+                            key={court._id || court.id}
                             style={styles.featuredCard}
                             onPress={() => navigation.navigate('BuildingCourts', { venue: court })}
                         >
@@ -111,10 +104,10 @@ export default function FeaturedCourts() {
                                 <Text style={styles.courtName}>{court.name}</Text>
                                 <View style={styles.infoRow}>
                                     <View style={styles.courtTypeContainer}>
-                                        <MaterialCommunityIcons 
-                                            name={court.courtType === 'Indoor' ? 'home-variant' : 'tree'} 
-                                            size={14} 
-                                            color="#64748B" 
+                                        <MaterialCommunityIcons
+                                            name={court.courtType === 'Indoor' ? 'home-variant' : 'tree'}
+                                            size={14}
+                                            color="#64748B"
                                         />
                                         <Text style={styles.courtTypeText}>{court.courtType || 'Indoor'}</Text>
                                     </View>
@@ -144,18 +137,18 @@ export default function FeaturedCourts() {
                                 <View style={styles.facilitiesRow}>
                                     {(court.facilities || []).slice(0, 3).map((facility, index) => (
                                         <View key={index} style={styles.facilityTag}>
-                                            <MaterialCommunityIcons 
+                                            <MaterialCommunityIcons
                                                 name={
                                                     facility === 'AC' ? 'air-conditioner' :
-                                                    facility === 'Shower' ? 'shower' :
-                                                    facility === 'WiFi' ? 'wifi' :
-                                                    facility === 'Parking' ? 'parking' :
-                                                    facility === 'Toilet' ? 'toilet' :
-                                                    facility === 'Locker' ? 'locker' : 
-                                                    'food'
-                                                } 
-                                                size={12} 
-                                                color="#64748B" 
+                                                        facility === 'Shower' ? 'shower' :
+                                                            facility === 'WiFi' ? 'wifi' :
+                                                                facility === 'Parking' ? 'parking' :
+                                                                    facility === 'Toilet' ? 'toilet' :
+                                                                        facility === 'Locker' ? 'locker' :
+                                                                            'food'
+                                                }
+                                                size={12}
+                                                color="#64748B"
                                             />
                                             <Text style={styles.facilityText}>{facility}</Text>
                                         </View>

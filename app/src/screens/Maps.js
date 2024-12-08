@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Dimensions, TouchableOpacity, Platform, StatusBar } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+import * as Location from 'expo-location';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { Ionicons } from "@expo/vector-icons";
 
@@ -9,9 +10,28 @@ const Maps = () => {
     const navigation = useNavigation();
     const { location, courtName } = route.params || {};
     const [region, setRegion] = useState(null);
+    const [errorMsg, setErrorMsg] = useState(null);
 
     useEffect(() => {
-        console.log('Received location:', location);
+        (async () => {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                setErrorMsg('Permission to access location was denied');
+                return;
+            }
+
+            let location = await Location.getCurrentPositionAsync({});
+            const newRegion = {
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+                latitudeDelta: 0.005,
+                longitudeDelta: 0.005
+            };
+            setRegion(newRegion);
+        })();
+    }, []);
+
+    useEffect(() => {
         if (location?.latitude && location?.longitude) {
             const newRegion = {
                 latitude: location.latitude,
@@ -19,10 +39,7 @@ const Maps = () => {
                 latitudeDelta: 0.005,
                 longitudeDelta: 0.005
             };
-            console.log('Setting region:', newRegion);
             setRegion(newRegion);
-        } else {
-            console.log('Invalid location data received');
         }
     }, [location]);
 

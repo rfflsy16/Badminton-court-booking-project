@@ -28,16 +28,16 @@ export class BookingController {
         }
     }
 
-    static async getBookingById(req, res, next) { 
+    static async getBookingById(req, res, next) {
         try {
             const { id } = req.params;
             console.log(id, "ini id booking")
             const booking = await BookingModel.bookingById(id);
-            
+
             // console.log(booking, "<<<<<<<<<<<<<<<<<<<<<< ini booking");
-            
+
             res.status(200).json(booking);
-       
+
         } catch (error) {
             next(error);
         }
@@ -70,13 +70,18 @@ export class BookingController {
 
             // Validasi apakah waktu sudah di-booking
             const existingBookings = await BookingModel.findByCourtAndDate(courtId, date);
-            const conflictingTimes = existingBookings.flatMap(booking => booking.selectedTime)
-                .filter(time => selectedTime.includes(time));
 
-            if (conflictingTimes.length > 0) {
-                return res.status(400).json({
-                    message: `Lapangan penuh pada pukul ${conflictingTimes.join(', ')}:00`
-                });
+            if (existingBookings && existingBookings.length > 0) {
+                const conflictingTimes = existingBookings
+                    .filter(booking => booking.statusBooking !== 'cancelled') // Only check non-cancelled bookings
+                    .flatMap(booking => booking.selectedTime)
+                    .filter(time => selectedTime.includes(time));
+
+                if (conflictingTimes.length > 0) {
+                    return res.status(400).json({
+                        message: `Lapangan sudah di-booking pada jam ${conflictingTimes.join(', ')}:00`
+                    });
+                }
             }
 
             const totalPrice = selectedTime.length * price;
@@ -255,7 +260,7 @@ export class BookingController {
             // Cari booking berdasarkan ID
             if (bookingId.length < 24) throw { name: 'InvalidInputID' }
             const booking = await BookingModel.readById(bookingId);
-            
+
             if (!booking) {
                 return res.status(404).json({ message: "Booking not found" });
             }

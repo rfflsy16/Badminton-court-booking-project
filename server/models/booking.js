@@ -8,6 +8,7 @@ export default class BookingModel {
 
     static async read() {
         const collection = this.getCollection();
+        // console.log(collection, "collection================")
         return await collection.find().toArray();
     }
 
@@ -16,7 +17,7 @@ export default class BookingModel {
         const collection = this.getCollection();
         return await collection.findOne({ _id });
     }
-    
+
     static async readByUserId(userId) {
 
         const id = new ObjectId(userId);
@@ -28,37 +29,37 @@ export default class BookingModel {
                 $match: { userId: id }
             },
 
-            {   
+            {
                 $lookup: {
                     from: "Courts",
                     localField: "courtId",
                     foreignField: "_id",
                     as: "court"
                 }
-              },
+            },
 
-              {
+            {
                 $unwind: {
                     path: "$court",
                     preserveNullAndEmptyArrays: false
                 }
-              },
+            },
 
-              {
+            {
                 $lookup: {
-                from: "Buildings",
-                localField: "court.BuildingId",
-                foreignField: "_id",
-                as: "building"
+                    from: "Buildings",
+                    localField: "court.BuildingId",
+                    foreignField: "_id",
+                    as: "building"
                 }
-              },
+            },
 
-              {
+            {
                 $unwind: {
-                path: "$building",
-                preserveNullAndEmptyArrays: false
+                    path: "$building",
+                    preserveNullAndEmptyArrays: false
                 }
-              }
+            }
         ]).toArray();
 
     }
@@ -71,26 +72,26 @@ export default class BookingModel {
             {
                 $match: { _id }
             },
-            {   
+            {
                 $lookup: {
                     from: "Payments",
                     localField: "_id",
                     foreignField: "BookingId",
                     as: "payment"
-                  }
-              },
-              {
+                }
+            },
+            {
                 $lookup: {
                     from: "Courts",
                     localField: "courtId",
                     foreignField: "_id",
                     as: "court"
-                  }
-              },
-              {
+                }
+            },
+            {
                 $unwind: {
-                path: "$court",
-                preserveNullAndEmptyArrays: true
+                    path: "$court",
+                    preserveNullAndEmptyArrays: true
                 },
             },
             {
@@ -99,23 +100,23 @@ export default class BookingModel {
                     localField: "court.BuildingId",
                     foreignField: "_id",
                     as: "building"
-                  }
-              },
+                }
+            },
 
-              {
+            {
                 $unwind: {
                     path: "$building",
                     preserveNullAndEmptyArrays: true
-                  }
+                }
             }
         ]).toArray();
-        if (booking.length>0){
+        if (booking.length > 0) {
 
             return booking[0]
-        }else{
+        } else {
             return null
         }
-        
+
     }
 
     static async create(data) {
@@ -144,16 +145,16 @@ export default class BookingModel {
 
     static async findByCourtAndDate(courtId, date) {
         const collection = this.getCollection();
-        
+
         // Convert courtId to ObjectId if it's a string
         const courtObjectId = typeof courtId === 'string' ? new ObjectId(courtId) : courtId;
-        
+
         // Create start and end of the day for the given date
         const searchDate = new Date(date);
         const startOfDay = new Date(searchDate.getFullYear(), searchDate.getMonth(), searchDate.getDate());
         const endOfDay = new Date(searchDate.getFullYear(), searchDate.getMonth(), searchDate.getDate() + 1);
 
-        return await collection.find({ 
+        return await collection.find({
             courtId: courtObjectId,
             date: {
                 $gte: startOfDay.toISOString(),

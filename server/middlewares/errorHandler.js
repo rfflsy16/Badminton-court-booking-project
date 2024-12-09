@@ -93,11 +93,6 @@ export const errorHandler = (err, req, res, next) => {
         message = 'Database error';
     }
 
-    if (err.name === 'MongoServerError') {
-        status = 400;
-        message = 'Database error';
-    }
-
     res.status(status).json({
         message
     })

@@ -41,11 +41,6 @@ export default function Booking({ route }) {
 
     useFocusEffect(
         useCallback(() => {
-<<<<<<< HEAD
-            if (userToken !== "") {
-                fetchData();
-                fetchDataTransaction(); 
-=======
             if (userToken) {
                 const fetchAllData = async () => {
                     try {
@@ -64,7 +59,6 @@ export default function Booking({ route }) {
                 };
                 
                 fetchAllData();
->>>>>>> della-wiring
             }
         }, [userToken])
     );
@@ -77,13 +71,7 @@ export default function Booking({ route }) {
                 headers: {              
                     Authorization: `Bearer ${userToken}` 
                 }
-<<<<<<< HEAD
-            })
-            console.log(response.data, '<<<<<<<<<<<<<<<<');
-            const bookings = response.data;
-=======
             });
->>>>>>> della-wiring
             
             const bookings = response.data;
             const formatTimeRange = (timeArray) => {

@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function BookingCard({ item }) {
+    
     const getStatusStyle = (status) => {
         switch (status) {
             case 'Today':

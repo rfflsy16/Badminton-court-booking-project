@@ -96,50 +96,6 @@ export default class CourtModel {
         return court[0];
     }
 
-    static async updateCourt(id, data) {
-        const {
-            category,
-            type,
-            description,
-            startTime,
-            endTime,
-            excludedTime,
-            excludedDate,
-            price,
-            dp,
-            location,
-        } = data;
-
-        const updateData = {
-            ...(category && { category }),
-            ...(type && { type }),
-            ...(description && { description }),
-            ...(startTime && { startTime }),
-            ...(endTime && { endTime }),
-            ...(excludedTime && { excludedTime }),
-            ...(excludedDate && { excludedDate }),
-            ...(price && { price }),
-            ...(dp && { dp }),
-            ...(location && { location }),
-            updatedAt: new Date(),
-        };
-
-        const result = await this.getCollection().findOneAndUpdate(
-            { _id: new ObjectId(id) },
-            { $set: updateData },
-            { returnDocument: "after" }
-        );
-
-        if (!result.value) throw { name: "CourtNotFound" };
-        return result.value;
-    }
-
-    static async deleteCourt(id) {
-        const result = await this.getCollection().deleteOne({ _id: new ObjectId(id) });
-        if (result.deletedCount === 0) throw { name: "CourtNotFound" };
-        return { message: "Court deleted successfully" };
-    }
-
     static async findBuildingWithCourt(courtId) {
         const collection = this.getCollection();
 

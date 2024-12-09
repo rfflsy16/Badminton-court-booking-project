@@ -1,9 +1,12 @@
-import { View, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet, ScrollView, ActivityIndicator, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import InvoiceHeader from "../components/invoice/InvoiceHeader";
 import InvoiceDetails from "../components/invoice/InvoiceDetails";
 import InvoiceSection, { InfoItem, Divider } from "../components/invoice/InvoiceSection";
 import PaymentStatus from "../components/invoice/PaymentStatus";
+import { useEffect, useState } from "react";
+import * as SecureStore from "expo-secure-store";
+import axios from "axios";
 
 export default function Invoice({ route }) {
     const navigation = useNavigation();
@@ -32,10 +35,10 @@ export default function Invoice({ route }) {
                     <InfoItem label="Court Price" value={item.price} />
                     <InfoItem label="Service Fee" value="Rp 0" />
                     <Divider />
-                    <InfoItem label="Total" value={item.price} isTotal />
+                    <InfoItem label="Total" value={`Rp ${totalPrice || 0}`} isTotal />
                 </InvoiceSection>
 
-                <PaymentStatus status={item.status} />
+                <PaymentStatus status={statusBooking} />
             </ScrollView>
         </View>
     );
@@ -44,10 +47,15 @@ export default function Invoice({ route }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
     },
     content: {
         flex: 1,
         padding: 20,
+    },
+    loaderContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
     },
 });

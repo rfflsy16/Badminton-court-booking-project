@@ -1,12 +1,47 @@
-// const request = require('supertest')
-// const app = require('../app')
-// const { User } = require('../models/user')
+
 import request from 'supertest'
 import { app } from '../app'
 import { User } from '../models/user'
+import { beforeAll } from '@jest/globals'
+import { hashPassword } from '../helpers/bcrypt'
+import { signToken } from '../helpers/jwt'
 
-// beforeAll(async () => {
-// })
+
+let access_token_admin, access_token_user
+beforeAll(async () => {
+    const userCollection = User.getCollection()
+    await userCollection.insertMany([
+        {
+            fullName: 'anjay',
+            email: 'admin-tangerang@mail.com',
+            password: hashPassword('123456'),
+            role: 'user',
+            deviceId: 'abcd'
+        },
+        {
+            fullName: 'udinaja1',
+            email: 'admin@mail.com',
+            password: hashPassword('123456'),
+            role: 'admin',
+            deviceId: 'abcd'
+        }
+    ])
+
+    const users = await userCollection.find().toArray()
+    const admin = {
+        id: users[0]._id,
+        email: 'admin-tangerang@mail.com',
+    }
+
+    const user = {
+        id: users[1]._id,
+        email: 'anjay@mail.com',
+        role: 'user'
+    }
+
+    access_token_admin = signToken(admin)
+    access_token_user = signToken(user)
+})
 
 afterAll(async () => {
     const collection = User.getCollection()
@@ -36,9 +71,10 @@ describe('POST /register', () => {
                 .post('/register')
                 .send({
                     fullName: 'udinaja',
-                    email: 'admin@mail.com',
+                    email: 'adminanjay@mail.com',
                     password: '123456',
-                    role: 'admin'
+                    role: 'admin',
+                    deviceId: 'abcds'
                 })
 
             expect(response.status).toBe(201)
@@ -51,7 +87,7 @@ describe('POST /register', () => {
                 .post('/register')
                 .send({
                     fullName: 'udinaja',
-                    email: 'udin@mail.com',
+                    email: 'adminanjay@mail.com',
                     password: '123456'
                 })
 
@@ -80,6 +116,20 @@ describe('POST /register', () => {
                 .send({
                     fullName: 'udinaja',
                     email: '',
+                    password: '123456'
+                })
+
+            expect(response.status).toBe(400)
+            expect(response.body.message).toBe('Please input all of the field')
+        })
+    })
+    describe('POST /register -failed', () => {
+        it('should be return an error message because fullName is empty', async () => {
+            const response = await request(app)
+                .post('/register')
+                .send({
+                    fullName: '',
+                    email: 'mamang@mail.com',
                     password: '123456'
                 })
 
@@ -157,3 +207,23 @@ describe('POST /login', () => {
         })
     })
 })
+
+describe('GET /profile', () => {
+    it('should return user profile when authenticated', async () => {
+        const response = await request(app)
+            .get('/profile')
+            .set('Authorization', `Bearer ${access_token_admin}`);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty('fullName');
+        expect(response.body).toHaveProperty('email');
+        expect(response.body).toHaveProperty('role');
+    });
+
+    it('should return Unauthorized error when token is missing', async () => {
+        const response = await request(app).get('/profile');
+
+        expect(response.status).toBe(401);
+        expect(response.body.message).toBe('Please login first');
+    });
+});

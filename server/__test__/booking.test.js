@@ -365,3 +365,37 @@ describe('DELETE /booking/:id', () => {
         })
     })
 })
+
+
+describe('PUT /booking/:id', () => {
+    describe('PUT /booking/:id - failed', () => {
+        it('should be return an error message because is booking is not found', async () => {
+            const response = await request(app)
+                .put(`/booking/${dataOfBooking._id}`)
+                .set('Authorization', `Bearer ${access_token_user}`)
+                .send({
+                    "selectedTime": [9],
+                    "paymentType": "fullpayment",
+                    "price": 200000
+                });
+
+            expect(response.status).toBe(404);
+            expect(response.body.message).toBe(undefined)
+        });
+    });
+
+    describe('PUT /booking/:id - failed (unauthorized)', () => {
+        it('should return an error message if user is not authorized', async () => {
+            const response = await request(app)
+                .put(`/booking/${dataOfBooking._id}`)
+                .send({
+                    "selectedTime": [9],
+                    "paymentType": "fullpayment",
+                    "price": 200000
+                });
+
+            expect(response.status).toBe(401);
+            expect(response.body.message).toBe('Please login first');
+        });
+    });
+});

@@ -63,8 +63,6 @@ export default function TransactionCard({ item }) {
                 }
             );
 
-            console.log('Server response:', response.data);
-
             if (response.data.paymentUrl) {
                 navigation.navigate('Midtrans', {
                     paymentUrl: response.data.paymentUrl
@@ -130,7 +128,7 @@ export default function TransactionCard({ item }) {
                 </View>
                 <View style={styles.priceContainer}>
                     <Text style={[styles.price, { color: '#E11D48' }]}>{item.price}</Text>
-                    {item.status.toLowerCase() === 'ongoing' && item.paymentType === 'dp' && (
+                    {/* {item.status.toLowerCase() === 'ongoing' && item.paymentType === 'dp' && (
                         <TouchableOpacity 
                             style={[
                                 styles.completePaymentButton,
@@ -143,7 +141,7 @@ export default function TransactionCard({ item }) {
                                 {isLoading ? 'Processing...' : 'Complete Payment'}
                             </Text>
                         </TouchableOpacity>
-                    )}
+                    )} */}
                 </View>
             </View>
         </TouchableOpacity>

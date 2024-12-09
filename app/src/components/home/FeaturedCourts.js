@@ -131,7 +131,7 @@ export default function FeaturedCourts() {
                                     )}
                                 </View>
                                 <View style={styles.priceRow}>
-                                    <Text style={styles.price}>{court.price || 'Contact for price'}</Text>
+                                    <Text style={styles.price}>{court.price || 'Click for details'}</Text>
                                     <Text style={styles.priceUnit}>/hour</Text>
                                 </View>
                                 <View style={styles.facilitiesRow}>

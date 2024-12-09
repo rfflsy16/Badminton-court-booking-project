@@ -11,25 +11,24 @@ import axios from "axios";
 export default function Invoice({ route }) {
     const navigation = useNavigation();
     const { item } = route.params;
-    console.log(item, "<<<< INVOICE");
 
     return (
         <View style={styles.container}>
             <InvoiceHeader onBack={() => navigation.goBack()} />
 
             <ScrollView style={styles.content}>
-                <InvoiceDetails invoiceId={_id} date={date} />
+                <InvoiceDetails invoiceId={item._id} date={item.date} />
 
                 <InvoiceSection title="Venue Info">
                     <InfoItem label="Venue Name" value={item.venueName} />
-                    <InfoItem label="Court Number" value={item.courtNumber} />
+                    <InfoItem label="Court Type" value={item.courtNumber} />
                     <InfoItem label="Location" value={item.city} />
                 </InvoiceSection>
 
                 <InvoiceSection title="Booking Details">
-                    <InfoItem label="Date" value={date || "-"} />
-                    <InfoItem label="Time" value={selectedTime?.join(", ") || "-"} />
-                    <InfoItem label="Category" value={court?.category || "-"} />
+                    <InfoItem label="Date" value={item.date} />
+                    <InfoItem label="Time" value={item.time} />
+                    <InfoItem label="Duration" value={item.selectedTime.length + " Hours"} />
                 </InvoiceSection>
 
                 <InvoiceSection title="Payment Details">
